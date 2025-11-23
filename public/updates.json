@@ -21,5 +21,17 @@
     "Lessons Added": [
       "No new lessons - this update focused on production stability"
     ]
+    },
+    "Known Glitches": [
+      "The Shop page contains intentional 'glitch' effects and fun warnings when unlocking the legendary item. These are not real bugs and are part of the game experience!",
+      "No actual glitches or crashes were found in the latest scan."
+    ]
+    ,
+    "New Visuals": [
+      "Ocean wallpaper background with animated water ripples on every page."
+    ],
+    "Sound Effects": [
+      "Relaxing ocean wave sounds play in the background (toggle coming soon)."
+    ]
   }
 }

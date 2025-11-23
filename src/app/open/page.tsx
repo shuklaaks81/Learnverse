@@ -50,7 +50,10 @@ export default function OpenPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 via-pink-400 to-orange-400 p-6">
       <div className="max-w-xl w-full bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 border-4 border-white/50 text-center">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-4">Open Learnverse</h1>
+        <div className="flex items-center justify-center mb-4">
+          <img src="/icon-192.png.svg" alt="Learnverse logo" className="w-16 h-16 mr-3" />
+          <h1 className="text-2xl sm:text-3xl font-bold">Open Learnverse</h1>
+        </div>
 
         <p className="text-sm text-gray-700 mb-6">Open the app on another device quickly:</p>
 
