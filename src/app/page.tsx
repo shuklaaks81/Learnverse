@@ -24,7 +24,19 @@ export default function Home() {
           Monitor your child&apos;s progress and build amazing learning adventures! ✨
         </p>
         
-        <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-12">
+        <div className="grid sm:grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-6 sm:mt-12">
+                    {/* About the App Option */}
+                    <div className="border-4 border-gradient-to-r from-blue-400 to-cyan-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-2xl transition-all hover:scale-105 bg-gradient-to-br from-blue-50 to-cyan-50 flex flex-col justify-between">
+                      <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-2 sm:mb-3 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">ℹ️ About the App</h2>
+                      <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4 font-medium">
+                        Learn what makes Learnverse special, how to use it, and discover secret pages! 📖
+                      </p>
+                      <Link href="/info">
+                        <button className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3 px-4 rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105">
+                          About & Secrets →
+                        </button>
+                      </Link>
+                    </div>
           <div className="border-4 border-gradient-to-r from-indigo-400 to-purple-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-2xl transition-all hover:scale-105 bg-gradient-to-br from-indigo-50 to-purple-50">
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-2 sm:mb-3 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">👨‍👩‍👧‍👦 Parent Account</h2>
             <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4 font-medium">

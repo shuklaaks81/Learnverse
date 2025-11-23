@@ -1,3 +1,5 @@
+"use client";
+// Client component for ocean/water sound effect player
 // Simple ocean/water sound effect player
 import { useEffect } from "react";
 

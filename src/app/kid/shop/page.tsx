@@ -251,13 +251,13 @@ export default function ShopPage() {
   // Add special items based on coin thresholds
   let allItems = [...shopItems];
   
-  // Add legendary item if player has 100k+ coins
-  if (coins >= 100000) {
+  // Add legendary item if player has 100k+ coins and it hasn't been purchased yet
+  if (coins >= 100000 && !purchasedItems.includes(999)) {
     allItems = [...allItems, legendaryItem];
   }
   
-  // Add GOD TIER item if player has 950k+ coins (close to 1M!)
-  if (coins >= 950000) { // 950k - close enough to see it! 😈
+  // Add GOD TIER item if player has 950k+ coins and it hasn't been purchased yet
+  if (coins >= 950000 && !purchasedItems.includes(9999)) { // 950k - close enough to see it! 😈
     allItems = [...allItems, godTierItem];
   }
   
@@ -282,6 +282,22 @@ export default function ShopPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-400 via-orange-300 to-pink-300 p-6 relative">
+      {/* DEV: Give 1 million coins button */}
+      <button
+        onClick={() => {
+          const currentKid = JSON.parse(localStorage.getItem('currentKid') || '{}');
+          currentKid.coins = 1000000;
+          localStorage.setItem('currentKid', JSON.stringify(currentKid));
+          // Update in kidAccounts too
+          const kidAccounts = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
+          const updatedAccounts = kidAccounts.map((kid) => kid.id === currentKid.id ? { ...kid, coins: 1000000 } : kid);
+          localStorage.setItem('kidAccounts', JSON.stringify(updatedAccounts));
+          setCoins(1000000);
+        }}
+        style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, background: '#01579b', color: 'white', borderRadius: 8, padding: '8px 16px', fontWeight: 'bold', boxShadow: '0 2px 8px #0003' }}
+      >
+        💰 Get 1,000,000 Coins
+      </button>
       {/* Glitching overlay when purchasing legendary item */}
       {isGlitching && (
         <div className="fixed inset-0 z-50 pointer-events-none">

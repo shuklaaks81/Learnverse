@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./ocean.css";
-import OceanSounds from "../components/OceanSounds";
+import ClientOceanSoundsWrapper from "./ClientOceanSoundsWrapper";
 
 export const metadata: Metadata = {
   title: "Learning App",
@@ -37,7 +37,8 @@ export default function RootLayout({
           <div className="ripple" style={{top: '40%', left: '70%', width: 90, height: 90, animationDelay: '2.5s'}}></div>
           <div className="ripple" style={{top: '75%', left: '20%', width: 150, height: 150, animationDelay: '3s'}}></div>
         </div>
-        <OceanSounds />
+        {/* OceanSounds must be rendered in a client component */}
+        <ClientOceanSoundsWrapper />
         {children}
       </body>
     </html>
