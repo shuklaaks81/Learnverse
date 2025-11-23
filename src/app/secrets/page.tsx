@@ -29,7 +29,7 @@ export default function SecretsPage() {
             {corruptedText.map((line, i) => (
               <div key={i} className="text-2xl font-mono mb-2 animate-pulse" style={{letterSpacing: 2}}>{line}</div>
             ))}
-            <img src="/icon-192.png.svg" alt="Secret Icon" className="w-24 h-24 my-6" />
+            <Image src="/icon-192.png.svg" alt="Secret Icon" className="w-24 h-24 my-6" width={96} height={96} />
           </div>
         )}
         <Link href="/" className="mt-6 px-6 py-2 bg-gray-700 text-white rounded-lg font-bold shadow hover:bg-gray-900">Back to Home</Link>

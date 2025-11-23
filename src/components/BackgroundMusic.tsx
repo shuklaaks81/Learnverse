@@ -28,7 +28,7 @@ export default function BackgroundMusic() {
     }
 
     return () => stopMusic();
-  }, [isPlaying]);
+  }, [isPlaying, startMusic]);
 
   useEffect(() => {
     if (gainNodeRef.current) {

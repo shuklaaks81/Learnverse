@@ -57,7 +57,7 @@ export default function KidLogin() {
       window.addEventListener('keypress', handleKeyPress);
       return () => window.removeEventListener('keypress', handleKeyPress);
     }
-  }, [kidId, deviceInfo.hasKeyboard]);
+  }, [kidId, deviceInfo.hasKeyboard, handleSubmit]);
 
   const containerMaxWidth = deviceInfo.screenSize === 'large' ? 'max-w-2xl' : 'max-w-md';
 

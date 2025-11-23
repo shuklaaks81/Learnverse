@@ -36,7 +36,7 @@ export default function FunnyAnimations({ isCorrect, onComplete }: FunnyAnimatio
         onComplete?.();
       }, 2000);
     }
-  }, [isCorrect]);
+  }, [isCorrect, onComplete]);
 
   if (!showAnimation) return null;
 

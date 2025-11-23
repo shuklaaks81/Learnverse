@@ -298,10 +298,12 @@ export default function TopicPage() {
                 {/* Buddy Circle - Custom Drawing */}
                 <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-pink-400 via-purple-500 to-blue-500 rounded-full shadow-2xl border-4 border-yellow-300 flex items-center justify-center overflow-hidden animate-pulse">
                   {currentKid?.buddyDrawing ? (
-                    <img 
+                    <Image 
                       src={currentKid.buddyDrawing} 
                       alt="Your Buddy" 
                       className="w-full h-full object-cover"
+                      width={128}
+                      height={128}
                     />
                   ) : (
                   <svg width="80" height="80" viewBox="0 0 80 80">

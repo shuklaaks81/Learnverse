@@ -51,22 +51,22 @@ export default function OpenPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 via-pink-400 to-orange-400 p-6">
       <div className="max-w-xl w-full bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 border-4 border-white/50 text-center">
         <div className="flex items-center justify-center mb-4">
-          <img src="/icon-192.png.svg" alt="Learnverse logo" className="w-16 h-16 mr-3" />
+          <Image src="/icon-192.png.svg" alt="Learnverse logo" className="w-16 h-16 mr-3" width={64} height={64} />
           <h1 className="text-2xl sm:text-3xl font-bold">Open Learnverse</h1>
         </div>
 
         <p className="text-sm text-gray-700 mb-6">Open the app on another device quickly:</p>
 
-        <a
+        <Link
           href="/"
           className="inline-block w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-4 rounded-xl font-bold text-lg shadow-lg mb-6 hover:scale-105 transition-all"
         >
           Open Learnverse →
-        </a>
+        </Link>
 
         {qrSrc && (
           <div className="mb-6">
-            <img src={qrSrc} alt="QR to open site" className="mx-auto rounded-lg border" />
+            <Image src={qrSrc} alt="QR to open site" className="mx-auto rounded-lg border" width={300} height={300} />
             <p className="text-xs text-gray-500 mt-2">Scan this QR with your phone camera</p>
           </div>
         )}
