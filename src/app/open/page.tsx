@@ -97,14 +97,23 @@ export default function OpenPage() {
             >
               {loadingTiny ? "Generating..." : "Create TinyURL"}
             </button>
-            <a
-              href={tinyUrl || origin}
-              target="_blank"
-              rel="noreferrer"
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium"
-            >
-              Open Link
-            </a>
+            {tinyUrl && tinyUrl.startsWith('/') ? (
+              <Link
+                href={tinyUrl}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium"
+              >
+                Open Link
+              </Link>
+            ) : (
+              <a
+                href={tinyUrl || origin}
+                target="_blank"
+                rel="noreferrer"
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium"
+              >
+                Open Link
+              </a>
+            )}
           </div>
         </div>
       </div>
