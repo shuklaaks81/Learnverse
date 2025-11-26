@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -8,38 +8,54 @@ export default function KidWelcome() {
   const router = useRouter();
   const [hasAccount, setHasAccount] = useState<boolean | null>(null);
   const [kidId, setKidId] = useState("");
+  const [startCreateNew, setStartCreateNew] = useState(false);
 
+  // Handlers
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!kidId.trim()) {
       alert("Please enter your Kid ID!");
       return;
     }
-
-    // Check if kid exists
-    const savedKids = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
-    const foundKid = savedKids.find((k: any) => k.kidId === kidId);
-    
-    if (foundKid) {
-      localStorage.setItem('currentKid', JSON.stringify(foundKid));
-      alert(`Welcome back, ${foundKid.name}! 🎉`);
-      router.push('/kid/lessons');
-    } else {
-      alert("Kid ID not found! Please check and try again.");
+    if (typeof window !== "undefined") {
+      const savedKids = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
+      const foundKid = savedKids.find((k: any) => k.kidId === kidId);
+      if (foundKid) {
+        localStorage.setItem('currentKid', JSON.stringify(foundKid));
+        alert(`Welcome back, ${foundKid.name}! 🎉`);
+        router.push('/kid/lessons');
+      } else {
+        alert("Kid ID not found! Please check and try again.");
+      }
     }
   };
 
   const handleCreateNew = () => {
-    // Clear any previous setup data before starting new account creation
-    localStorage.removeItem('selectedDesign');
-    localStorage.removeItem('buddyDrawing');
-    localStorage.removeItem('buddyVoice');
-    router.push('/kid/choose-design');
+    if (typeof window !== "undefined") {
+      localStorage.removeItem('selectedDesign');
+      localStorage.removeItem('buddyDrawing');
+      localStorage.removeItem('buddyVoice');
+    }
+    setStartCreateNew(true);
   };
 
+  // Effects
+  useEffect(() => {
+    if (startCreateNew) {
+      router.push('/kid/choose-design');
+    }
+  }, [startCreateNew, router]);
+
+  useEffect(() => {
+    if (hasAccount === false) {
+      handleCreateNew();
+    }
+  }, [hasAccount]);
+
+  // Render logic
+  let content = null;
   if (hasAccount === null) {
-    return (
+    content = (
       <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 sm:p-8 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 animate-gradient">
         <style jsx>{`
           @keyframes gradient {
@@ -51,7 +67,6 @@ export default function KidWelcome() {
             animation: gradient 10s ease infinite;
           }
         `}</style>
-
         <div className="w-full max-w-4xl bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 sm:p-16 border-4 border-white/60">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-center mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent animate-pulse">
             🎓 Welcome! ✨
@@ -59,7 +74,6 @@ export default function KidWelcome() {
           <p className="text-center text-gray-700 mb-12 font-bold text-2xl sm:text-3xl">
             Do you already have a Kid Account? 🤔
           </p>
-
           <div className="grid sm:grid-cols-2 gap-6">
             <button
               onClick={() => setHasAccount(true)}
@@ -67,7 +81,6 @@ export default function KidWelcome() {
             >
               ✅ Yes, I Have an Account!
             </button>
-            
             <button
               onClick={() => setHasAccount(false)}
               className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white py-8 px-8 rounded-3xl hover:shadow-2xl transition-all font-bold text-2xl sm:text-3xl hover:scale-105 shadow-lg animate-pulse"
@@ -75,7 +88,6 @@ export default function KidWelcome() {
               ✨ No, Create New Account!
             </button>
           </div>
-
           <div className="mt-8 text-center">
             <Link href="/" className="text-gray-600 hover:text-gray-800 font-semibold text-lg">
               ← Back to Home
@@ -84,10 +96,8 @@ export default function KidWelcome() {
         </div>
       </div>
     );
-  }
-
-  if (hasAccount) {
-    return (
+  } else if (hasAccount) {
+    content = (
       <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 sm:p-8 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 animate-gradient">
         <style jsx>{`
           @keyframes gradient {
@@ -99,7 +109,6 @@ export default function KidWelcome() {
             animation: gradient 10s ease infinite;
           }
         `}</style>
-
         <div className="w-full max-w-4xl bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 sm:p-16 border-4 border-white/60">
           <h1 className="text-5xl sm:text-6xl font-bold text-center mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
             🔑 Login with Kid ID
@@ -107,7 +116,6 @@ export default function KidWelcome() {
           <p className="text-center text-gray-700 mb-8 font-semibold text-xl">
             Enter your Kid ID to continue! 🚀
           </p>
-
           <form onSubmit={handleLogin} className="max-w-2xl mx-auto">
             <input
               type="text"
@@ -117,7 +125,6 @@ export default function KidWelcome() {
               className="w-full px-8 py-6 text-2xl text-center border-4 border-purple-300 rounded-2xl focus:ring-4 focus:ring-purple-500 focus:border-transparent mb-6 font-bold"
               placeholder="Enter your Kid ID"
             />
-            
             <button
               type="submit"
               className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white py-6 px-8 rounded-2xl hover:shadow-2xl transition-all font-bold text-2xl hover:scale-105 shadow-lg"
@@ -125,7 +132,6 @@ export default function KidWelcome() {
               🚀 Login!
             </button>
           </form>
-
           <div className="mt-8 text-center">
             <button
               onClick={() => setHasAccount(null)}
@@ -137,13 +143,13 @@ export default function KidWelcome() {
         </div>
       </div>
     );
+  } else if (hasAccount === false) {
+    content = (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400">
+        <p className="text-white text-3xl font-bold">Loading... ✨</p>
+      </div>
+    );
   }
 
-  // Create new account - redirect to design chooser
-  handleCreateNew();
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400">
-      <p className="text-white text-3xl font-bold">Loading... ✨</p>
-    </div>
-  );
+  return content;
 }

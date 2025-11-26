@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import BackgroundMusic from "@/components/BackgroundMusic";
 import { useSoundEffects } from "@/utils/soundEffects";
@@ -19,7 +19,11 @@ interface Lesson {
 export default function LessonsPage() {
   const sounds = useSoundEffects();
   const isLegendary = useLegendaryMode();
-  const styles = getLegendaryStyles();
+  const [styles, setStyles] = useState(getLegendaryStyles());
+  // Ensure styles are updated on client after mount (SSR-safe)
+  useEffect(() => {
+    setStyles(getLegendaryStyles());
+  }, []);
   const [lessons] = useState<Lesson[]>([
     { id: 1, title: "Addition Basics", subject: "Math", icon: "➕", difficulty: "Easy", duration: "10 min", completed: true },
     { id: 2, title: "Subtraction Fun", subject: "Math", icon: "➖", difficulty: "Easy", duration: "10 min", completed: true },

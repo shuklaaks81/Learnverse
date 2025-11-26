@@ -31,8 +31,8 @@ export default function NameSetup() {
     // Keep generating until we get a unique ID
     while (!isUnique) {
       const uniqueNumber = Math.floor(100000 + Math.random() * 900000);
-      generatedId = kidName.trim() + uniqueNumber;
-      
+      // Add timestamp for extra uniqueness
+      generatedId = kidName.trim() + uniqueNumber + Date.now();
       // Check if this ID already exists
       isUnique = !existingKids.some((kid: any) => kid.kidId === generatedId);
     }

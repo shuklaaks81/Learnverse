@@ -14,8 +14,15 @@ export function useLegendaryMode() {
 }
 
 export function getLegendaryStyles() {
-  const isLegendary = typeof window !== 'undefined' && localStorage.getItem('legendaryMode') === 'true';
-  
+  // SSR-safe: default to non-legendary if window/localStorage not available
+  let isLegendary = false;
+  if (typeof window !== 'undefined') {
+    try {
+      isLegendary = localStorage.getItem('legendaryMode') === 'true';
+    } catch (e) {
+      isLegendary = false;
+    }
+  }
   if (!isLegendary) {
     return {
       background: 'bg-gradient-to-br from-amber-400 via-orange-300 to-pink-300',
@@ -25,7 +32,6 @@ export function getLegendaryStyles() {
       button: 'bg-gradient-to-r from-orange-400 to-pink-400'
     };
   }
-
   // 🔮 LEGENDARY CYBERPUNK THEME
   return {
     background: 'bg-gradient-to-br from-purple-900 via-black to-cyan-900',

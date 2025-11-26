@@ -31,7 +31,7 @@ export default function KidLogin() {
       localStorage.setItem('currentKid', JSON.stringify(kid));
       soundEffects?.playCorrect();
       setTimeout(() => {
-        router.push('/kid/lessons');
+        router.push('/kid'); // Redirect to dashboard/home
       }, 500);
     } else {
       // Kid ID not found

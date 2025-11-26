@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import dynamic from "next/dynamic";
 
 const base = "https://learnverse-delta.vercel.app";
 const features = [
@@ -44,7 +45,8 @@ const features = [
     title: "Easy Sharing",
     desc: "Open the app with a QR code, TinyURL, or Add to Home.",
     img: "/icon-192.png.svg",
-    link: base + "/open"
+    link: base + "/open",
+    qr: true
   },
   {
     title: "Secret Pages",
@@ -54,8 +56,11 @@ const features = [
   }
 ];
 
+const QRCode = dynamic(() => import("@/components/QRCode"), { ssr: false });
+
 export default function InfoPage() {
   const [search, setSearch] = useState("");
+  const [showQR, setShowQR] = useState(false);
   const filtered = features.filter(f =>
     f.title.toLowerCase().includes(search.toLowerCase()) ||
     f.desc.toLowerCase().includes(search.toLowerCase())
@@ -77,19 +82,39 @@ export default function InfoPage() {
         {/* Info Cards */}
         <div className="flex flex-col gap-6">
           {filtered.map((f, i) => (
-            <a
-              key={i}
-              href={f.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col md:flex-row items-center bg-white/90 rounded-2xl shadow-lg p-6 border-2 border-blue-200 hover:bg-blue-50 hover:shadow-2xl transition-all cursor-pointer"
-            >
-              <img src={f.img} alt={f.title} className="w-24 h-24 mb-4 md:mb-0 md:mr-8 rounded-xl border-2 border-blue-300 bg-blue-100" />
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold mb-2">{f.title}</h2>
-                <p className="text-lg text-blue-800 mb-1">{f.desc}</p>
-              </div>
-            </a>
+            f.qr ? (
+              <button
+                key={i}
+                onClick={() => setShowQR(v => !v)}
+                className="flex flex-col md:flex-row items-center bg-white/90 rounded-2xl shadow-lg p-6 border-2 border-blue-200 hover:bg-blue-50 hover:shadow-2xl transition-all cursor-pointer w-full text-left"
+              >
+                <img src={f.img} alt={f.title} className="w-24 h-24 mb-4 md:mb-0 md:mr-8 rounded-xl border-2 border-blue-300 bg-blue-100" />
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold mb-2">{f.title}</h2>
+                  <p className="text-lg text-blue-800 mb-1">{f.desc}</p>
+                  {showQR && (
+                    <div className="mt-4 flex flex-col items-center">
+                      <QRCode value={f.link} size={200} />
+                      <div className="mt-2 text-blue-700 text-sm">Scan to open: <span className="underline break-all">{f.link}</span></div>
+                    </div>
+                  )}
+                </div>
+              </button>
+            ) : (
+              <a
+                key={i}
+                href={f.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col md:flex-row items-center bg-white/90 rounded-2xl shadow-lg p-6 border-2 border-blue-200 hover:bg-blue-50 hover:shadow-2xl transition-all cursor-pointer"
+              >
+                <img src={f.img} alt={f.title} className="w-24 h-24 mb-4 md:mb-0 md:mr-8 rounded-xl border-2 border-blue-300 bg-blue-100" />
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold mb-2">{f.title}</h2>
+                  <p className="text-lg text-blue-800 mb-1">{f.desc}</p>
+                </div>
+              </a>
+            )
           ))}
         </div>
         <div className="flex justify-center mt-8">

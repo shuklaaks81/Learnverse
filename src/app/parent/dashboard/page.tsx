@@ -22,6 +22,7 @@ export default function ParentDashboard() {
   const [latestVersion, setLatestVersion] = useState('1.0.0');
   const [updateInfo, setUpdateInfo] = useState<any>(null);
   const [showChangelog, setShowChangelog] = useState(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
   
   // Check for updates
   useEffect(() => {
@@ -29,27 +30,31 @@ export default function ParentDashboard() {
       // Current app version
       const appVersion = '1.0.0';
       setCurrentVersion(appVersion);
-      
+
       // Check if user has dismissed this update
       const installedVersion = localStorage.getItem('installedAppVersion') || '1.0.0';
-      
+
       try {
         // Fetch update info from updates.json
         const response = await fetch('/updates.json');
+        if (!response.ok) throw new Error('Failed to fetch updates.json');
         const updateData = await response.json();
-        
+
         setLatestVersion(updateData.latestVersion);
         setUpdateInfo(updateData);
-        
+        setUpdateError(null);
+
         // Check if there's a new version available that hasn't been installed
         if (updateData.latestVersion !== installedVersion) {
           setUpdateAvailable(true);
         }
-      } catch (error) {
-        console.log('Could not check for updates');
+      } catch (error: any) {
+        setUpdateError('Could not load updates. Please check updates.json or your connection.');
+        setUpdateInfo(null);
+        setUpdateAvailable(false);
       }
     };
-    
+
     checkForUpdates();
   }, []);
   
@@ -60,54 +65,58 @@ export default function ParentDashboard() {
       if (savedKids) {
         try {
           const kidAccounts = JSON.parse(savedKids);
-          
+          // Defensive: filter out duplicate kidIds
+          const seenIds = new Set();
+          let duplicateFound = false;
           const kidsWithProgress = kidAccounts.map((kid: any) => {
             // CRITICAL VALIDATION: Check if kid name exceeds limits
             if (kid.name && kid.name.length > 1000) {
               console.error('🚨 CRITICAL: Kid name exceeds 1000 characters - CRASHING APP');
               const shortName = kid.name.substring(0, 30);
-              
               // Remove this kid from localStorage permanently
               const filteredKids = kidAccounts.filter((k: any) => k.kidId !== kid.kidId);
               localStorage.setItem('kidAccounts', JSON.stringify(filteredKids));
-              
               // CRASH THE APP
               setCrashed(true);
               setCrashReason(`Name was removed because it was too long: "${shortName}..." (${kid.name.length} characters)`);
-              
               throw new Error('APP CRASHED: Name exceeds 1000 characters');
             }
-            
+            // Defensive: skip duplicate kidIds
+            if (seenIds.has(kid.kidId)) {
+              duplicateFound = true;
+              return null;
+            }
+            seenIds.add(kid.kidId);
             // Get individual kid's progress data
-          const progressKey = `progress_${kid.kidId}`;
-          const streakKey = `streak_${kid.kidId}`;
-          const progressData = JSON.parse(localStorage.getItem(progressKey) || '{}');
-          const streakData = JSON.parse(localStorage.getItem(streakKey) || '{"currentStreak":0,"longestStreak":0,"totalDaysActive":0}');
-          
-          return {
-            id: kid.kidId,
-            name: kid.name,
-            progress: progressData.overallProgress || 0,
-            lessonsCompleted: progressData.lessonsCompleted || 0,
-            achievements: progressData.achievements || 0,
-            streakDays: streakData.currentStreak || 0,
-            lastActive: progressData.lastActive || kid.createdAt
-          };
-        }).filter((kid: any) => kid !== null);
-        
-        setKids(kidsWithProgress);
-        
+            const progressKey = `progress_${kid.kidId}`;
+            const streakKey = `streak_${kid.kidId}`;
+            const progressData = JSON.parse(localStorage.getItem(progressKey) || '{}');
+            const streakData = JSON.parse(localStorage.getItem(streakKey) || '{"currentStreak":0,"longestStreak":0,"totalDaysActive":0}');
+            return {
+              id: kid.kidId,
+              name: kid.name,
+              progress: progressData.overallProgress || 0,
+              lessonsCompleted: progressData.lessonsCompleted || 0,
+              achievements: progressData.achievements || 0,
+              streakDays: streakData.currentStreak || 0,
+              lastActive: progressData.lastActive || kid.createdAt
+            };
+          }).filter((kid: any) => kid !== null);
+          setKids(kidsWithProgress);
+          setDuplicateWarning(duplicateFound);
         } catch (error) {
           console.error('App crashed:', error);
         }
       }
     };
-    
     loadKids();
     // Refresh every 5 seconds to catch updates
     const interval = setInterval(loadKids, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  // State for duplicate warning
+  const [duplicateWarning, setDuplicateWarning] = useState(false);
   const [showAddKid, setShowAddKid] = useState(false);
   const [newKidId, setNewKidId] = useState("");
 
@@ -194,61 +203,61 @@ export default function ParentDashboard() {
       `}</style>
       
       <div className="max-w-7xl mx-auto">
-        {/* Update Notification Banner */}
-        {updateAvailable && (
-          <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-3xl shadow-2xl p-6 mb-6 border-4 border-white/50">
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="text-center sm:text-left">
-                  <h2 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 justify-center sm:justify-start">
-                    🎉 New Update Available!
-                  </h2>
-                  <p className="text-white/90 mt-2 font-semibold">
-                    Version {latestVersion} • Released {updateInfo?.releaseDate}
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowChangelog(!showChangelog)}
-                    className="bg-white/20 text-white px-6 py-3 rounded-xl hover:bg-white/30 transition-all font-bold hover:scale-105 border-2 border-white/40"
-                  >
-                    📋 {showChangelog ? 'Hide' : 'View'} Changes
-                  </button>
-                  <button
-                    onClick={() => {
-                      // Mark this version as installed
-                      localStorage.setItem('installedAppVersion', latestVersion);
-                      alert('🎉 Update installed successfully!\n\nThe app is now up to date!');
-                      setUpdateAvailable(false);
-                    }}
-                    className="bg-white text-green-600 px-8 py-4 rounded-xl hover:shadow-2xl transition-all font-bold text-lg hover:scale-105"
-                  >
-                    ⬇️ Install Now
-                  </button>
+        {/* Update Notification Banner (always show download button) */}
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-3xl shadow-2xl p-6 mb-6 border-4 border-white/50">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="text-center sm:text-left">
+                <h2 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 justify-center sm:justify-start">
+                  🎉 New Update Available!
+                </h2>
+                <p className="text-white/90 mt-2 font-semibold">
+                  Version {latestVersion} • Released {updateInfo?.releaseDate}
+                </p>
+                <p className="text-white/80 mt-1 text-sm italic">
+                  Some updates may have been downloaded automatically if the app was stopped or restarted.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowChangelog(!showChangelog)}
+                  className="bg-white/20 text-white px-6 py-3 rounded-xl hover:bg-white/30 transition-all font-bold hover:scale-105 border-2 border-white/40"
+                >
+                  📋 {showChangelog ? 'Hide' : 'View'} Changes
+                </button>
+                <button
+                  onClick={() => {
+                    // Mark this version as installed
+                    localStorage.setItem('installedAppVersion', latestVersion);
+                    alert('🎉 Update installed successfully!\n\nThe app is now up to date!');
+                    setUpdateAvailable(false);
+                  }}
+                  className="bg-white text-green-600 px-8 py-4 rounded-xl hover:shadow-2xl transition-all font-bold text-lg hover:scale-105"
+                >
+                  ⬇️ Install Now
+                </button>
+              </div>
+            </div>
+            {/* Changelog inside banner */}
+            {showChangelog && updateInfo?.changelog && (
+              <div className="mt-4 bg-white/10 backdrop-blur rounded-2xl p-6 border-2 border-white/20">
+                <h3 className="text-xl font-bold mb-4">📝 What&apos;s New in {latestVersion}</h3>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {Object.entries(updateInfo.changelog).map(([category, items]: [string, any]) => (
+                    <div key={category} className="bg-white/10 rounded-xl p-4">
+                      <h4 className="font-bold text-lg mb-2">{category}</h4>
+                      <ul className="space-y-1">
+                        {items.map((item: string, index: number) => (
+                          <li key={index} className="text-sm text-white/90">• {item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
                 </div>
               </div>
-              
-              {/* Changelog */}
-              {showChangelog && updateInfo?.changelog && (
-                <div className="mt-4 bg-white/10 backdrop-blur rounded-2xl p-6 border-2 border-white/20">
-                  <h3 className="text-xl font-bold mb-4">📝 What&apos;s New in {latestVersion}</h3>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {Object.entries(updateInfo.changelog).map(([category, items]: [string, any]) => (
-                      <div key={category} className="bg-white/10 rounded-xl p-4">
-                        <h4 className="font-bold text-lg mb-2">{category}</h4>
-                        <ul className="space-y-1">
-                          {items.map((item: string, index: number) => (
-                            <li key={index} className="text-sm text-white/90">• {item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
           </div>
-        )}
+        </div>
         
         {/* Header */}
         <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-6 sm:p-8 mb-6 border-4 border-white/50">
@@ -266,6 +275,30 @@ export default function ParentDashboard() {
               ← Home
             </Link>
           </div>
+        </div>
+
+        {/* Permanent What's New / Changelog Section */}
+        <div className="bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50 rounded-3xl shadow-xl p-6 mb-8 border-4 border-blue-100">
+          <h2 className="text-2xl font-bold text-blue-700 mb-4 flex items-center gap-2">📝 What&apos;s New in {latestVersion}</h2>
+          {updateError && (
+            <div className="text-red-600 font-bold mb-4">{updateError}</div>
+          )}
+          {updateInfo?.changelog ? (
+            <div className="grid sm:grid-cols-2 gap-4">
+              {Object.entries(updateInfo.changelog).map(([category, items]: [string, any]) => (
+                <div key={category} className="bg-white/60 rounded-xl p-4">
+                  <h4 className="font-bold text-lg mb-2 text-blue-800">{category}</h4>
+                  <ul className="space-y-1">
+                    {items.map((item: string, index: number) => (
+                      <li key={index} className="text-sm text-gray-800">• {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ) : !updateError ? (
+            <div className="text-gray-600">No updates found.</div>
+          ) : null}
         </div>
 
         {/* Add New Kid Button */}
@@ -312,6 +345,13 @@ export default function ParentDashboard() {
                 Cancel
               </button>
             </form>
+          </div>
+        )}
+
+        {/* Duplicate Key Warning */}
+        {duplicateWarning && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+            <strong>Warning:</strong> Duplicate Kid IDs detected. Some kids may not display correctly. Please ensure each Kid ID is unique.
           </div>
         )}
 

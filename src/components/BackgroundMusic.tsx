@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export default function BackgroundMusic() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -20,23 +20,8 @@ export default function BackgroundMusic() {
     }
   }, []);
 
-  useEffect(() => {
-    if (isPlaying) {
-      startMusic();
-    } else {
-      stopMusic();
-    }
 
-    return () => stopMusic();
-  }, [isPlaying, startMusic]);
-
-  useEffect(() => {
-    if (gainNodeRef.current) {
-      gainNodeRef.current.gain.value = volume;
-    }
-  }, [volume]);
-
-  const startMusic = () => {
+  const startMusic = useCallback(() => {
     if (audioContextRef.current) return;
 
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -67,22 +52,17 @@ export default function BackgroundMusic() {
         const oscillator = audioContext.createOscillator();
         oscillator.type = 'sine';
         oscillator.frequency.value = note.freq;
-        
         const noteGain = audioContext.createGain();
         noteGain.gain.setValueAtTime(0, currentTime);
         noteGain.gain.linearRampToValueAtTime(0.1, currentTime + 0.05);
         noteGain.gain.linearRampToValueAtTime(0, currentTime + note.duration);
-        
         oscillator.connect(noteGain);
         noteGain.connect(gainNode);
-        
         oscillator.start(currentTime);
         oscillator.stop(currentTime + note.duration);
-        
         oscillators.push(oscillator);
         currentTime += note.duration;
       });
-
       // Loop the melody
       setTimeout(() => {
         if (audioContextRef.current && isPlaying) {
@@ -90,12 +70,11 @@ export default function BackgroundMusic() {
         }
       }, currentTime * 1000 - audioContext.currentTime * 1000);
     };
-
     playMelody();
     oscillatorsRef.current = oscillators;
-  };
+  }, [isPlaying, volume]);
 
-  const stopMusic = () => {
+  const stopMusic = useCallback(() => {
     oscillatorsRef.current.forEach(osc => {
       try {
         osc.stop();
@@ -104,13 +83,28 @@ export default function BackgroundMusic() {
       }
     });
     oscillatorsRef.current = [];
-
     if (audioContextRef.current) {
       audioContextRef.current.close();
       audioContextRef.current = null;
     }
     gainNodeRef.current = null;
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isPlaying) {
+      startMusic();
+    } else {
+      stopMusic();
+    }
+    return () => stopMusic();
+  }, [isPlaying, startMusic, stopMusic]);
+
+  useEffect(() => {
+    if (gainNodeRef.current) {
+      gainNodeRef.current.gain.value = volume;
+    }
+  }, [volume]);
+
 
   const toggleMusic = () => {
     setIsPlaying(!isPlaying);

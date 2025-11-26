@@ -4,12 +4,19 @@
   "changelog": {
     "New Features": [
       "Comprehensive pre-deployment testing completed",
-      "Production build fully optimized and ready for Vercel"
+      "Production build fully optimized and ready for Vercel",
+      "Brand new interactive Lab: Place items like explosives, buildings, and trees, see what happens, and learn why! Kids can experiment and get instant feedback.",
+      "New home/dashboard: After entering your Kid ID, you land on a fun dashboard with Games, All You Can Learn, and Lessons all in one place!",
+      "Upcoming: Daily Educational Video! Each day, kids get a new, funny, and age-appropriate educational video, curated for safety and fun. Parents can trust all content is filtered for kids."
+    ],
+    "Update Lab": [
+      "The Lab now lets you drag items from the bottom bar into the scene. Each item triggers a fun effect and an explanation, making science and logic interactive! Try combining items for special results."
     ],
     "Improvements": [
       "Fixed all React component hydration issues",
       "Wrapped useSearchParams in Suspense boundaries for better performance",
-      "Production build optimized - all code compiled successfully"
+      "Production build optimized - all code compiled successfully",
+      "Kid login now takes you to a unified dashboard with Games, All You Can Learn, and Lessons for a smoother experience."
     ],
     "Bug Fixes": [
       "Fixed 23 apostrophe/quote escaping errors preventing production build",
@@ -20,19 +27,20 @@
     ],
     "Lessons Added": [
       "No new lessons - this update focused on production stability"
-    ]
-    },
+    ],
     "Known Glitches": [
       "The Shop page contains intentional 'glitch' effects and fun warnings when unlocking the legendary item. These are not real bugs and are part of the game experience!",
       "Legendary Mode is still present in the Shop. If you thought it was removed, it is still there as a hidden/secret feature!",
       "No actual glitches or crashes were found in the latest scan."
-    ]
-    ,
+    ],
     "New Visuals": [
       "Ocean wallpaper background with animated water ripples on every page."
     ],
     "Sound Effects": [
       "Relaxing ocean wave sounds play in the background (toggle coming soon)."
+    ],
+    "Meta": [
+      "[FIXED] Updates were not showing due to a malformed updates.json file. If you see this, the update system is working!"
     ]
   }
 }

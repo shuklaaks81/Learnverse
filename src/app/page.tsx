@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 
 export default function Home() {
@@ -60,7 +61,7 @@ export default function Home() {
                   Login with Kid ID 🔑
                 </button>
               </Link>
-              <Link href="/kid">
+              <Link href="/kid/welcome">
                 <button className="w-full bg-gradient-to-r from-pink-500 to-orange-500 text-white py-3 px-4 rounded-xl hover:from-pink-600 hover:to-orange-600 transition-all font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 animate-pulse">
                   Create New Account ✨
                 </button>
