@@ -1,0 +1,94 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- High-res version for larger displays -->
+  <defs>
+    <radialGradient id="galaxy512" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#6B46C1;stop-opacity:1" />
+      <stop offset="40%" style="stop-color:#4C1D95;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#1E1B4B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0C0A27;stop-opacity:1" />
+    </radialGradient>
+    
+    <radialGradient id="glow512" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#EC4899;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:0" />
+    </radialGradient>
+    
+    <linearGradient id="bookGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FCD34D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F59E0B;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Galaxy Background -->
+  <circle cx="256" cy="256" r="256" fill="url(#galaxy512)"/>
+  
+  <!-- Milky Way Swirls -->
+  <ellipse cx="256" cy="256" rx="190" ry="70" fill="url(#glow512)" opacity="0.4" transform="rotate(-30 256 256)"/>
+  <ellipse cx="256" cy="256" rx="160" ry="55" fill="url(#glow512)" opacity="0.3" transform="rotate(20 256 256)"/>
+  <ellipse cx="256" cy="256" rx="140" ry="45" fill="url(#glow512)" opacity="0.2" transform="rotate(-45 256 256)"/>
+  
+  <!-- More stars for high-res -->
+  <circle cx="80" cy="100" r="5" fill="#FFF" opacity="0.9"/>
+  <circle cx="130" cy="65" r="4" fill="#FFF" opacity="0.8"/>
+  <circle cx="380" cy="90" r="5" fill="#FFF" opacity="0.9"/>
+  <circle cx="430" cy="160" r="4" fill="#FFF" opacity="0.7"/>
+  <circle cx="450" cy="320" r="5" fill="#FFF" opacity="0.9"/>
+  <circle cx="410" cy="390" r="4" fill="#FFF" opacity="0.8"/>
+  <circle cx="100" cy="400" r="5" fill="#FFF" opacity="0.9"/>
+  <circle cx="65" cy="320" r="4" fill="#FFF" opacity="0.7"/>
+  <circle cx="200" cy="80" r="3" fill="#FFF" opacity="0.6"/>
+  <circle cx="320" cy="65" r="3" fill="#FFF" opacity="0.6"/>
+  <circle cx="480" cy="240" r="3" fill="#FFF" opacity="0.6"/>
+  <circle cx="40" cy="240" r="3" fill="#FFF" opacity="0.6"/>
+  <circle cx="150" cy="450" r="3" fill="#FFF" opacity="0.6"/>
+  <circle cx="350" cy="460" r="3" fill="#FFF" opacity="0.6"/>
+  
+  <!-- Book Stack Central (larger) -->
+  <g transform="rotate(-15 256 256)">
+    <rect x="190" y="270" width="95" height="120" fill="url(#bookGrad512)" rx="5"/>
+    <rect x="190" y="270" width="15" height="120" fill="#DC7410" opacity="0.7"/>
+    <line x1="205" y1="270" x2="205" y2="390" stroke="#FFF" stroke-width="1.5" opacity="0.5"/>
+    <line x1="190" y1="310" x2="285" y2="310" stroke="#FFF" stroke-width="1" opacity="0.3"/>
+  </g>
+  
+  <g transform="rotate(10 256 256)">
+    <rect x="225" y="230" width="100" height="130" fill="#EC4899" rx="5"/>
+    <rect x="225" y="230" width="15" height="130" fill="#BE185D" opacity="0.7"/>
+    <line x1="240" y1="230" x2="240" y2="360" stroke="#FFF" stroke-width="1.5" opacity="0.5"/>
+    <line x1="225" y1="270" x2="325" y2="270" stroke="#FFF" stroke-width="1" opacity="0.3"/>
+  </g>
+  
+  <g transform="rotate(-8 256 256)">
+    <rect x="210" y="190" width="95" height="115" fill="#8B5CF6" rx="5"/>
+    <rect x="210" y="190" width="15" height="115" fill="#6B21A8" opacity="0.7"/>
+    <line x1="225" y1="190" x2="225" y2="305" stroke="#FFF" stroke-width="1.5" opacity="0.5"/>
+    <line x1="210" y1="230" x2="305" y2="230" stroke="#FFF" stroke-width="1" opacity="0.3"/>
+  </g>
+  
+  <!-- Floating sparkles -->
+  <circle cx="310" cy="200" r="8" fill="#FCD34D" opacity="0.7">
+    <animate attributeName="opacity" values="0.4;0.9;0.4" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="185" cy="240" r="6" fill="#EC4899" opacity="0.7">
+    <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="320" cy="300" r="7" fill="#8B5CF6" opacity="0.7">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="180" cy="320" r="5" fill="#FCD34D" opacity="0.6">
+    <animate attributeName="opacity" values="0.4;0.9;0.4" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Rocket -->
+  <g transform="translate(390, 390)">
+    <polygon points="0,-25 -12,12 0,8 12,12" fill="#F59E0B"/>
+    <circle cx="0" cy="-20" r="8" fill="#FFF"/>
+    <circle cx="0" cy="-20" r="4" fill="#8B5CF6"/>
+    <path d="M -8,8 Q 0,20 8,8" fill="#EC4899" opacity="0.6">
+      <animateTransform attributeName="transform" type="scale" values="1;1.3;1" dur="0.8s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <!-- Letter L -->
+  <text x="256" y="445" font-family="Arial, sans-serif" font-size="65" font-weight="bold" fill="#FFF" text-anchor="middle" opacity="0.9">L</text>
+</svg>
