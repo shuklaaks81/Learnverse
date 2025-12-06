@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { speak, stopSpeaking, voices } from '@/utils/movieVoice';
 
 export default function TheaterPage() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function TheaterPage() {
   const [isGodMode, setIsGodMode] = useState(false);
   const [showBuddyIntro, setShowBuddyIntro] = useState(false);
   const [buddyScene, setBuddyScene] = useState(0);
+  const [actionScene, setActionScene] = useState(0);
 
   useEffect(() => {
     const legendary = localStorage.getItem('legendaryMode') === 'true';
@@ -29,6 +31,87 @@ export default function TheaterPage() {
     }
   }, [playing]);
 
+  // ACTION SCENES with voice!
+  useEffect(() => {
+    if (!playing) return;
+    
+    // Narrate key moments
+    if (elapsedTime === 10) {
+      speak("In the beginning, there was nothing... then everything exploded!", voices.narrator.rate, voices.narrator.pitch);
+    }
+    if (elapsedTime === 120) {
+      speak("A mysterious book survived the chaos, holding all knowledge of the universe!", voices.dramatic.rate, voices.dramatic.pitch);
+      setActionScene(1); // Book chase scene
+    }
+    if (elapsedTime === 180) {
+      setActionScene(0);
+    }
+    if (elapsedTime === 500) {
+      speak("The universe rapidly expanded, creating infinite possibilities!", voices.excited.rate, voices.excited.pitch);
+      setActionScene(2); // Space race
+    }
+    if (elapsedTime === 560) {
+      setActionScene(0);
+    }
+    if (elapsedTime === 1000) {
+      speak("From darkness, the first stars ignited with tremendous power!", voices.dramatic.rate, voices.dramatic.pitch);
+      setActionScene(3); // Star explosion
+    }
+    if (elapsedTime === 1100) {
+      setActionScene(0);
+    }
+    if (elapsedTime === 2200) {
+      speak("The imagination planet Cartoonnia collided with reality in an epic explosion!", voices.excited.rate, voices.excited.pitch);
+      setActionScene(4); // Planet collision
+    }
+    if (elapsedTime === 2350) {
+      setActionScene(0);
+    }
+    if (elapsedTime === 3500) {
+      speak("The first stick figure emerged from pure imagination!", voices.buddy.rate, voices.buddy.pitch);
+      setActionScene(5); // Stick figure birth
+    }
+    if (elapsedTime === 3550) {
+      setActionScene(0);
+    }
+    if (elapsedTime === 5000) {
+      speak("Civilizations rose and fell on the cartoony Snack World!", voices.narrator.rate, voices.narrator.pitch);
+      setActionScene(6); // Civilization montage
+    }
+    if (elapsedTime === 5300) {
+      setActionScene(0);
+    }
+    if (elapsedTime === 10750) {
+      speak("And finally... the ultimate learning experience was created!", voices.excited.rate, voices.excited.pitch);
+      speak("Welcome to LEARNVERSE!", voices.excited.rate, voices.excited.pitch);
+    }
+  }, [playing, elapsedTime]);
+
+  // End credits voice
+  useEffect(() => {
+    if (elapsedTime === 10800) {
+      speak("Unfortunately, some people are sooo dramatic!", voices.dramatic.rate, voices.dramatic.pitch);
+    }
+    if (elapsedTime === 10805) {
+      speak("If you don't stop crying, you're fired!", voices.boss.rate, voices.boss.pitch);
+    }
+    if (elapsedTime === 10808) {
+      speak("I WANT TO BE FIRED!", voices.scared.rate, voices.scared.pitch);
+    }
+    if (elapsedTime === 10810) {
+      speak("Ok.", voices.boss.rate, voices.boss.pitch);
+    }
+    if (elapsedTime === 10813) {
+      speak("AHHHHH I DIDN'T WANT THAT FIRE!", voices.scared.rate, voices.scared.pitch);
+    }
+    if (elapsedTime === 10816) {
+      speak("Well I'm sorry you wanted to be on fire!", voices.boss.rate, voices.boss.pitch);
+    }
+    if (elapsedTime === 10819) {
+      speak("CALL MY LAWYER! CALL MY LAWYER!", voices.scared.rate, voices.scared.pitch);
+    }
+  }, [elapsedTime]);
+
   const formatTime = (seconds: number) => {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
@@ -40,15 +123,30 @@ export default function TheaterPage() {
     setShowBuddyIntro(true);
     setBuddyScene(1);
     // Buddy walks in
-    setTimeout(() => setBuddyScene(2), 3000); // Buddy talks
-    setTimeout(() => setBuddyScene(3), 8000); // Popcorn dump!
-    setTimeout(() => setBuddyScene(4), 10000); // Allergic reaction
-    setTimeout(() => setBuddyScene(5), 13000); // "You're hired!"
+    setTimeout(() => {
+      setBuddyScene(2);
+      speak("This is the movie of the Learnverse! I hope you enjoy it!", voices.buddy.rate, voices.buddy.pitch);
+    }, 3000);
+    setTimeout(() => {
+      speak("It's THREE HOURS LONG so sit back, grab some popcorn", voices.buddy.rate, voices.buddy.pitch);
+    }, 6000);
+    setTimeout(() => {
+      speak("even though I'm allergic to popcorn... and enjoy!", voices.buddy.rate, voices.buddy.pitch);
+    }, 9000);
+    setTimeout(() => setBuddyScene(3), 12000); // Popcorn dump!
+    setTimeout(() => {
+      setBuddyScene(4);
+      speak("DUDE I QUI I A CHOOO I Q Q", voices.scared.rate, voices.scared.pitch);
+    }, 14000); // Allergic reaction
+    setTimeout(() => {
+      setBuddyScene(5);
+      speak("Qualify? Ok, you're hired!", voices.boss.rate, voices.boss.pitch);
+    }, 17000); // "You're hired!"
     setTimeout(() => {
       setShowBuddyIntro(false);
       setPlaying(true);
       setStage(1);
-    }, 16000); // Start movie
+    }, 20000); // Start movie
   };
 
   const getColors = () => {
@@ -156,17 +254,6 @@ export default function TheaterPage() {
             </p>
           </div>
         )}
-
-        <style jsx>{`
-          @keyframes fall {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(600px) rotate(360deg); opacity: 0; }
-          }
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translate(-50%, -20px); }
-            to { opacity: 1; transform: translate(-50%, 0); }
-          }
-        `}</style>
       </div>
     );
   }
@@ -285,7 +372,8 @@ export default function TheaterPage() {
       </div>
 
       {/* Movie content - The EPIC 3-hour saga! */}
-      <div className="h-screen flex items-center justify-center">
+      <div className="h-screen flex items-center justify-center relative">
+        {/* MAIN MOVIE CONTENT */}
         <div className="text-center space-y-6 animate-pulse">
           <div className="text-9xl">
             {elapsedTime < 60 ? '💥' : 
@@ -330,6 +418,84 @@ export default function TheaterPage() {
              'And finally, the ultimate learning experience was created... Welcome to Learnverse! 🎉'}
           </p>
         </div>
+
+        {/* ACTION SCENE 1: Book Chase! */}
+        {actionScene === 1 && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center overflow-hidden">
+            <div className="text-8xl absolute animate-[chase_3s_linear_infinite]" style={{ left: '10%' }}>📚</div>
+            <div className="text-7xl absolute animate-[chase_3s_linear_infinite]" style={{ left: '0%', animationDelay: '0.5s' }}>👹</div>
+            <div className="text-7xl absolute animate-[chase_3s_linear_infinite]" style={{ left: '5%', animationDelay: '1s' }}>😈</div>
+            <p className="text-4xl text-yellow-400 font-bold animate-bounce">BOOK CHASE SCENE!</p>
+          </div>
+        )}
+
+        {/* ACTION SCENE 2: Space Race! */}
+        {actionScene === 2 && (
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-900 to-blue-900 flex items-center justify-center overflow-hidden">
+            {[...Array(20)].map((_, i) => (
+              <div key={i} className="text-6xl absolute animate-[flyBy_2s_linear_infinite]" style={{ top: `${i * 5}%`, animationDelay: `${i * 0.1}s` }}>
+                {i % 3 === 0 ? '🚀' : i % 3 === 1 ? '🛸' : '🌟'}
+              </div>
+            ))}
+            <p className="text-5xl text-white font-bold animate-pulse">SPACE RACE!</p>
+          </div>
+        )}
+
+        {/* ACTION SCENE 3: Star Explosion! */}
+        {actionScene === 3 && (
+          <div className="absolute inset-0 bg-black flex items-center justify-center overflow-hidden">
+            {[...Array(50)].map((_, i) => (
+              <div key={i} className="text-5xl absolute" style={{ 
+                left: '50%', 
+                top: '50%',
+                animation: `explode 2s ease-out infinite`,
+                transform: `rotate(${i * 7.2}deg) translateX(0)`
+              }}>
+                {i % 2 === 0 ? '⭐' : '💫'}
+              </div>
+            ))}
+            <p className="text-6xl text-yellow-300 font-black animate-ping">SUPERNOVA!</p>
+          </div>
+        )}
+
+        {/* ACTION SCENE 4: Planet Collision! */}
+        {actionScene === 4 && (
+          <div className="absolute inset-0 bg-gradient-to-br from-red-900 via-purple-900 to-pink-900 flex items-center justify-center overflow-hidden">
+            <div className="text-9xl absolute left-1/4 animate-[slideRight_2s_ease-in]">🪐</div>
+            <div className="text-9xl absolute right-1/4 animate-[slideLeft_2s_ease-in]">🌍</div>
+            <p className="text-7xl text-white font-black animate-bounce">CRASH!</p>
+          </div>
+        )}
+
+        {/* ACTION SCENE 5: Stick Figure Birth! */}
+        {actionScene === 5 && (
+          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-pink-400 to-purple-400 flex items-center justify-center">
+            <div className="text-9xl animate-[scaleUp_2s_ease-out]">🧍</div>
+            {[...Array(30)].map((_, i) => (
+              <div key={i} className="text-4xl absolute animate-pulse" style={{
+                left: `${20 + Math.random() * 60}%`,
+                top: `${20 + Math.random() * 60}%`,
+                animationDelay: `${Math.random() * 2}s`
+              }}>✨</div>
+            ))}
+            <p className="absolute bottom-20 text-5xl text-white font-bold animate-bounce">LIFE BEGINS!</p>
+          </div>
+        )}
+
+        {/* ACTION SCENE 6: Civilization Montage! */}
+        {actionScene === 6 && (
+          <div className="absolute inset-0 bg-gradient-to-br from-green-700 via-blue-700 to-purple-700 flex items-center justify-center overflow-hidden">
+            <div className="grid grid-cols-3 gap-8 text-7xl animate-pulse">
+              <div className="animate-bounce">🏛️</div>
+              <div className="animate-bounce animation-delay-200">🏰</div>
+              <div className="animate-bounce animation-delay-300">🏙️</div>
+              <div className="animate-bounce animation-delay-400">🚂</div>
+              <div className="animate-bounce animation-delay-500">✈️</div>
+              <div className="animate-bounce animation-delay-700">🚀</div>
+            </div>
+            <p className="absolute bottom-20 text-5xl text-white font-bold animate-pulse">CIVILIZATION RISES!</p>
+          </div>
+        )}
       </div>
 
       {/* End credits at 3 hours */}
@@ -449,45 +615,6 @@ export default function TheaterPage() {
           >
             🚪 Return to Learnverse
           </button>
-
-          <style jsx>{`
-            @keyframes drip {
-              0%, 100% { transform: translateY(0); }
-              50% { transform: translateY(20px); }
-            }
-            @keyframes slideInRight {
-              from { transform: translateX(100px); opacity: 0; }
-              to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideInLeft {
-              from { transform: translateX(-100px); opacity: 0; }
-              to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes scaleUp {
-              from { transform: scale(0); opacity: 0; }
-              to { transform: scale(1); opacity: 1; }
-            }
-            @keyframes shake {
-              0%, 100% { transform: translateX(-50%) rotate(0deg); }
-              25% { transform: translateX(-50%) rotate(-5deg); }
-              75% { transform: translateX(-50%) rotate(5deg); }
-            }
-            @keyframes scrollUp {
-              from { transform: translate(-50%, 0); }
-              to { transform: translate(-50%, -100%); }
-            }
-            @keyframes fadeIn {
-              from { opacity: 0; transform: translate(-50%, 20px); }
-              to { opacity: 1; transform: translate(-50%, 0); }
-            }
-            @keyframes runInCircles {
-              0% { transform: translate(0, 0) rotate(0deg); }
-              25% { transform: translate(100px, -50px) rotate(90deg); }
-              50% { transform: translate(200px, 0) rotate(180deg); }
-              75% { transform: translate(100px, 50px) rotate(270deg); }
-              100% { transform: translate(0, 0) rotate(360deg); }
-            }
-          `}</style>
         </div>
       )}
     </div>
