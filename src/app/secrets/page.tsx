@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const corruptedText = [
   "█▓░ S̴̢͝E̵̛͢C̴҉R̴͟E̷̢T̵̨Ş̴͝ ░▓█",

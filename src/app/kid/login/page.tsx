@@ -61,7 +61,7 @@ export default function KidLogin() {
   // Handle Enter key
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && kidId.trim() !== '') {
+      if (e.key === 'Enter' && familyName.trim() !== '' && kidName.trim() !== '') {
         handleSubmit(e as any);
       }
     };
@@ -70,7 +70,7 @@ export default function KidLogin() {
       window.addEventListener('keypress', handleKeyPress);
       return () => window.removeEventListener('keypress', handleKeyPress);
     }
-  }, [kidId, deviceInfo.hasKeyboard, handleSubmit]);
+  }, [familyName, kidName, deviceInfo.hasKeyboard, handleSubmit]);
 
   const containerMaxWidth = deviceInfo.screenSize === 'large' ? 'max-w-2xl' : 'max-w-md';
 

@@ -290,7 +290,7 @@ export default function ShopPage() {
           localStorage.setItem('currentKid', JSON.stringify(currentKid));
           // Update in kidAccounts too
           const kidAccounts = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
-          const updatedAccounts = kidAccounts.map((kid) => kid.id === currentKid.id ? { ...kid, coins: 1000000 } : kid);
+          const updatedAccounts = kidAccounts.map((kid: any) => kid.id === currentKid.id ? { ...kid, coins: 1000000 } : kid);
           localStorage.setItem('kidAccounts', JSON.stringify(updatedAccounts));
           setCoins(1000000);
         }}

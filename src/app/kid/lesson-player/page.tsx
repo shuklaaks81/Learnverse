@@ -349,6 +349,8 @@ function LessonContent() {
       return () => clearTimeout(timer);
     }, [currentStep]);
 
+  const progressPercent = ((currentStep + 1) * 100) / lessonSteps.length;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-400 via-orange-300 to-pink-300 p-8 relative overflow-hidden">
       {/* Confetti Effect */}
@@ -367,18 +369,6 @@ function LessonContent() {
               }}
             />
           ))}
-          <style>{`
-            @keyframes confetti {
-              0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-              }
-              100% {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-              }
-            }
-          `}</style>
         </div>
       )}
 
@@ -436,12 +426,6 @@ function LessonContent() {
                     animation: isSpeaking ? 'bounce 0.5s ease-in-out infinite' : 'float 3s ease-in-out infinite'
                   }}
                 >
-                  <style>{`
-                    @keyframes float {
-                      0%, 100% { transform: translateY(0px); }
-                      50% { transform: translateY(-10px); }
-                    }
-                  `}</style>
                   <defs>
                     <filter id="roughen">
                       <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" result="noise" seed="2"/>
@@ -484,22 +468,6 @@ function LessonContent() {
                   </g>
                 </svg>
               </div>
-                            {/* Buddy walk-in/out animation styles */}
-                            <style jsx global>{`
-                              .-translate-x-\[180px\] {
-                                transform: translateX(-180px);
-                              }
-                              .translate-x-0 {
-                                transform: translateX(0);
-                              }
-                              .opacity-0 {
-                                opacity: 0;
-                              }
-                              .opacity-100 {
-                                opacity: 1;
-                              }
-                            `}</style>
-              </div>
               
               {/* Buddy Speech */}
               <div className="bg-yellow-100 rounded-xl p-4 border-2 border-yellow-300 relative">
@@ -522,31 +490,6 @@ function LessonContent() {
                 key={currentStep}
                 className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 mb-6 relative"
               >
-                <style>{`
-                  @keyframes letterFall {
-                    0% { 
-                      opacity: 0; 
-                      transform: translateY(-50px) rotate(-10deg); 
-                    }
-                    50% {
-                      opacity: 1;
-                    }
-                    100% { 
-                      opacity: 1; 
-                      transform: translateY(0) rotate(0deg); 
-                    }
-                  }
-                  @keyframes slideIn {
-                    from { opacity: 0; transform: translateX(-20px); }
-                    to { opacity: 1; transform: translateX(0); }
-                  }
-                  @keyframes emojiSpin {
-                    0%, 100% { transform: scale(1) rotate(0deg); }
-                    25% { transform: scale(1.3) rotate(-15deg); }
-                    75% { transform: scale(1.3) rotate(15deg); }
-                  }
-                `}</style>
-                
                 {!practiceMode ? (
                   <>
                     <div className="flex items-center gap-4 mb-4">
@@ -757,16 +700,10 @@ function LessonContent() {
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner relative overflow-hidden">
-                  <style jsx>{`
-                    @keyframes shimmer {
-                      0% { background-position: -200% 0; }
-                      100% { background-position: 200% 0; }
-                    }
-                  `}</style>
                   <div
                     className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 h-3 rounded-full transition-all duration-500 ease-out relative"
                     style={{ 
-                      width: `${(currentStep + 1) / lessonSteps.length * 100}%`,
+                      width: `${progressPercent}%`,
                       backgroundSize: '200% 100%',
                       animation: 'shimmer 2s infinite'
                     }}
