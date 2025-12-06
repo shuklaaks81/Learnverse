@@ -10,6 +10,8 @@ export default function TheaterPage() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isLegendary, setIsLegendary] = useState(false);
   const [isGodMode, setIsGodMode] = useState(false);
+  const [showBuddyIntro, setShowBuddyIntro] = useState(false);
+  const [buddyScene, setBuddyScene] = useState(0);
 
   useEffect(() => {
     const legendary = localStorage.getItem('legendaryMode') === 'true';
@@ -35,9 +37,18 @@ export default function TheaterPage() {
   };
 
   const startMovie = () => {
-    setPlaying(true);
-    setStage(1);
-    // Start the epic journey!
+    setShowBuddyIntro(true);
+    setBuddyScene(1);
+    // Buddy walks in
+    setTimeout(() => setBuddyScene(2), 3000); // Buddy talks
+    setTimeout(() => setBuddyScene(3), 8000); // Popcorn dump!
+    setTimeout(() => setBuddyScene(4), 10000); // Allergic reaction
+    setTimeout(() => setBuddyScene(5), 13000); // "You're hired!"
+    setTimeout(() => {
+      setShowBuddyIntro(false);
+      setPlaying(true);
+      setStage(1);
+    }, 16000); // Start movie
   };
 
   const getColors = () => {
@@ -62,6 +73,103 @@ export default function TheaterPage() {
   };
 
   const colors = getColors();
+
+  // BUDDY INTRO SCENE!
+  if (showBuddyIntro) {
+    return (
+      <div className="fixed inset-0 bg-black z-[9999] flex items-center justify-center overflow-hidden">
+        {/* Stage curtains */}
+        <div className="absolute top-0 left-0 w-1/4 h-full bg-gradient-to-r from-red-800 to-red-700 z-10" />
+        <div className="absolute top-0 right-0 w-1/4 h-full bg-gradient-to-l from-red-800 to-red-700 z-10" />
+
+        {/* Buddy walking in */}
+        {buddyScene >= 1 && (
+          <div 
+            className="absolute bottom-20 text-9xl transition-all duration-3000"
+            style={{
+              left: buddyScene === 1 ? '-200px' : '50%',
+              transform: buddyScene === 1 ? 'translateX(0)' : 'translateX(-50%)',
+              transition: 'all 3s ease-out'
+            }}
+          >
+            🧍‍♂️
+          </div>
+        )}
+
+        {/* Speech bubble */}
+        {buddyScene >= 2 && buddyScene < 4 && (
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 bg-white rounded-3xl p-8 shadow-2xl max-w-2xl animate-[fadeIn_0.5s_ease-in]">
+            <p className="text-2xl text-gray-800 leading-relaxed">
+              "This is the movie of the <span className="font-bold text-purple-600">Learnverse</span>! 
+              I hope you enjoy it! It's <span className="font-bold text-red-600">3 HOURS LONG</span> so sit back, 
+              grab some popcorn... even though I'm <span className="italic">allergic to popcorn</span>... and enjoy!" 🎬
+            </p>
+          </div>
+        )}
+
+        {/* POPCORN TRUCK DUMP! */}
+        {buddyScene >= 3 && buddyScene < 5 && (
+          <>
+            {/* Truck */}
+            <div 
+              className="absolute top-10 text-9xl"
+              style={{
+                right: buddyScene === 3 ? '-200px' : '20%',
+                transition: 'all 1s ease-in'
+              }}
+            >
+              🚚
+            </div>
+            
+            {/* POPCORN AVALANCHE! */}
+            {[...Array(50)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute text-5xl animate-[fall_2s_ease-in_forwards]"
+                style={{
+                  left: `${40 + Math.random() * 20}%`,
+                  top: '10%',
+                  animationDelay: `${Math.random() * 0.5}s`,
+                  animation: `fall 2s ease-in ${Math.random() * 0.5}s forwards`
+                }}
+              >
+                🍿
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* ALLERGIC REACTION! */}
+        {buddyScene >= 4 && buddyScene < 5 && (
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 bg-red-100 border-4 border-red-500 rounded-3xl p-8 shadow-2xl animate-bounce">
+            <p className="text-4xl font-bold text-red-600">
+              "DUDE I QUI I A CHOOO I Q Q" 🤧💥
+            </p>
+          </div>
+        )}
+
+        {/* YOU'RE HIRED! */}
+        {buddyScene >= 5 && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-100 border-4 border-green-500 rounded-3xl p-10 shadow-2xl animate-pulse">
+            <p className="text-5xl font-bold text-green-600 text-center">
+              "Qualify? Ok, YOU'RE HIRED!" ✅🎉
+            </p>
+          </div>
+        )}
+
+        <style jsx>{`
+          @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(600px) rotate(360deg); opacity: 0; }
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   if (!playing) {
     return (
