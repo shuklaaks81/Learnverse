@@ -334,15 +334,125 @@ export default function TheaterPage() {
 
       {/* End credits at 3 hours */}
       {elapsedTime >= 10800 && (
-        <div className="absolute inset-0 bg-black flex flex-col items-center justify-center z-40">
-          <h1 className="text-7xl font-bold text-white mb-8 animate-pulse">THE END</h1>
-          <p className="text-3xl text-white/80 mb-12">Thank you for watching! 🎬✨</p>
+        <div className="absolute inset-0 bg-black flex flex-col items-center justify-center z-40 overflow-hidden">
+          {/* CRYING BUDDY WITH RED DOTS */}
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 text-center animate-bounce">
+            <div className="relative inline-block">
+              {/* Puffy red dots around buddy */}
+              <div className="absolute w-8 h-8 bg-red-500 rounded-full top-0 left-0 animate-pulse" />
+              <div className="absolute w-6 h-6 bg-red-400 rounded-full top-10 right-0 animate-pulse animation-delay-200" />
+              <div className="absolute w-10 h-10 bg-red-500 rounded-full bottom-0 left-2 animate-pulse animation-delay-300" />
+              <div className="absolute w-7 h-7 bg-red-400 rounded-full bottom-5 right-2 animate-pulse animation-delay-500" />
+              
+              {/* Crying buddy */}
+              <div className="text-9xl relative">😭</div>
+              
+              {/* Snot dripping */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-6xl animate-[drip_2s_ease-in-out_infinite]">
+                💧
+              </div>
+            </div>
+          </div>
+
+          {/* Dramatic text */}
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border-2 border-white/30 rounded-3xl p-8 max-w-3xl text-center animate-[fadeIn_1s_ease-in]">
+            <p className="text-4xl font-bold text-white mb-4">
+              Unfortunately, SOME PEOPLE ARE <span className="text-red-400 italic">SOOO DRAMATIC</span>... 🎭
+            </p>
+            <p className="text-2xl text-white/80">
+              So here's the credits... 📜
+            </p>
+          </div>
+
+          {/* Voice from background */}
+          <div className="absolute top-1/2 right-10 bg-gray-900/90 border-2 border-yellow-400 rounded-2xl p-6 animate-[slideInRight_2s_ease-out]">
+            <p className="text-2xl font-bold text-yellow-400">
+              "If you don't stop crying, YOU'RE FIRED!" 😤
+            </p>
+          </div>
+
+          {/* Buddy's response */}
+          <div className="absolute top-1/2 left-10 bg-blue-900/90 border-2 border-blue-400 rounded-2xl p-6 mt-20 animate-[slideInLeft_2.5s_ease-out]">
+            <p className="text-3xl font-bold text-white">
+              "I WANT TO BE FIRED!!!" 😭💥
+            </p>
+          </div>
+
+          {/* OK response */}
+          <div className="absolute top-1/2 right-10 bg-green-900/90 border-2 border-green-400 rounded-2xl p-6 mt-40 animate-[slideInRight_3s_ease-out]">
+            <p className="text-2xl font-bold text-green-400">
+              "Ok." 😐
+            </p>
+          </div>
+
+          {/* LITERAL FIRE!!! */}
+          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 animate-[scaleUp_3.5s_ease-out]">
+            <div className="relative">
+              <div className="text-9xl animate-pulse">🔥</div>
+              <div className="absolute -top-10 -left-10 text-7xl animate-ping">🔥</div>
+              <div className="absolute -top-10 -right-10 text-7xl animate-ping animation-delay-200">🔥</div>
+              <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-7xl animate-ping animation-delay-300">🔥</div>
+            </div>
+          </div>
+
+          {/* Final scream */}
+          <div className="absolute bottom-40 left-1/2 -translate-x-1/2 bg-red-600/90 border-4 border-orange-500 rounded-2xl p-8 animate-[shake_4s_ease-out] shadow-2xl">
+            <p className="text-5xl font-black text-white">
+              "AHHHHH I DIDN'T WANT <span className="text-orange-300">THAT</span> FIRE!!!" 🔥😱
+            </p>
+          </div>
+
+          {/* Actual credits scrolling */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-white text-center opacity-50 animate-[scrollUp_10s_linear_infinite]">
+            <h2 className="text-3xl font-bold mb-4">CREDITS</h2>
+            <p className="text-xl mb-2">Created by: You! 🎬</p>
+            <p className="text-xl mb-2">Stick Buddy: Allergic Actor 🧍‍♂️</p>
+            <p className="text-xl mb-2">Popcorn Supplier: Big Truck Inc. 🚚</p>
+            <p className="text-xl mb-2">Fire Effects: Too Literal Studios 🔥</p>
+            <p className="text-xl mb-2">Drama Level: MAXIMUM 🎭</p>
+            <p className="text-xl mb-8">Runtime: 3 EPIC HOURS ⏰</p>
+            <p className="text-2xl font-bold">THE END</p>
+          </div>
+
+          {/* Return button */}
           <button
             onClick={() => router.back()}
-            className={`${colors.button} text-white px-12 py-6 rounded-xl text-2xl font-bold shadow-2xl`}
+            className={`absolute top-4 left-1/2 -translate-x-1/2 ${colors.button} text-white px-12 py-6 rounded-xl text-2xl font-bold shadow-2xl z-50 animate-pulse`}
           >
-            Return to Learnverse
+            🚪 Return to Learnverse
           </button>
+
+          <style jsx>{`
+            @keyframes drip {
+              0%, 100% { transform: translateY(0); }
+              50% { transform: translateY(20px); }
+            }
+            @keyframes slideInRight {
+              from { transform: translateX(100px); opacity: 0; }
+              to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideInLeft {
+              from { transform: translateX(-100px); opacity: 0; }
+              to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes scaleUp {
+              from { transform: scale(0); opacity: 0; }
+              to { transform: scale(1); opacity: 1; }
+            }
+            @keyframes shake {
+              0%, 100% { transform: translateX(-50%) rotate(0deg); }
+              25% { transform: translateX(-50%) rotate(-5deg); }
+              75% { transform: translateX(-50%) rotate(5deg); }
+            }
+            @keyframes scrollUp {
+              from { transform: translate(-50%, 0); }
+              to { transform: translate(-50%, -100%); }
+            }
+            @keyframes fadeIn {
+              from { opacity: 0; transform: translate(-50%, 20px); }
+              to { opacity: 1; transform: translate(-50%, 0); }
+            }
+          `}</style>
         </div>
       )}
     </div>
