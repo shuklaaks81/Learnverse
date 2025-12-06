@@ -1,12 +1,14 @@
 {
-  "name": "Learning App - All You Can Learn",
-  "short_name": "Learning App",
-  "description": "Interactive learning app for kids with parent dashboard",
+  "name": "Learnverse - Fun Learning App for Kids",
+  "short_name": "Learnverse",
+  "description": "Interactive learning app with games, lessons, and fun activities for kids. Works offline!",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#8B5CF6",
-  "orientation": "portrait",
+  "orientation": "any",
+  "scope": "/",
+  "categories": ["education", "kids", "learning"],
   "icons": [
     {
       "src": "/icon-192.png.svg",
@@ -19,6 +21,23 @@
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Kid Login",
+      "short_name": "Kid",
+      "description": "Login as a kid",
+      "url": "/kid/login",
+      "icons": [{ "src": "/icon-192.png.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Parent Login",
+      "short_name": "Parent",
+      "description": "Login as a parent",
+      "url": "/parent/login",
+      "icons": [{ "src": "/icon-192.png.svg", "sizes": "192x192" }]
     }
   ]
 }

@@ -4,6 +4,7 @@ import "./ocean.css";
 import ClientOceanSoundsWrapper from "./ClientOceanSoundsWrapper";
 import { SecretEventProvider } from "./SecretEventProvider";
 import LoadingWrapper from "./LoadingWrapper";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 import VersionLayoutClient from "./VersionLayoutClient";
 
@@ -51,6 +52,7 @@ export default function RootLayout({
             </div>
             {/* OceanSounds must be rendered in a client component */}
             <ClientOceanSoundsWrapper />
+            <PWAInstallPrompt />
             <VersionLayoutClient>{children}</VersionLayoutClient>
           </SecretEventProvider>
         </LoadingWrapper>
