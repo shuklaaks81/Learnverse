@@ -229,8 +229,9 @@ export default function ParentDashboard() {
                   onClick={() => {
                     // Mark this version as installed
                     localStorage.setItem('installedAppVersion', latestVersion);
-                    alert('🎉 Update installed successfully!\n\nThe app is now up to date!');
+                    setCurrentVersion(latestVersion); // Update state so effect logic matches
                     setUpdateAvailable(false);
+                    alert('🎉 Update installed successfully!\n\nThe app is now up to date!');
                   }}
                   className="bg-white text-green-600 px-8 py-4 rounded-xl hover:shadow-2xl transition-all font-bold text-lg hover:scale-105"
                 >

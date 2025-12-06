@@ -1,46 +1,54 @@
 {
-  "latestVersion": "1.0.2",
-  "releaseDate": "2025-01-20",
+  "latestVersion": "1.1.0",
+  "releaseDate": "2025-12-06",
   "changelog": {
     "New Features": [
-      "Comprehensive pre-deployment testing completed",
-      "Production build fully optimized and ready for Vercel",
-      "Brand new interactive Lab: Place items like explosives, buildings, and trees, see what happens, and learn why! Kids can experiment and get instant feedback.",
-      "New home/dashboard: After entering your Kid ID, you land on a fun dashboard with Games, All You Can Learn, and Lessons all in one place!",
-      "Upcoming: Daily Educational Video! Each day, kids get a new, funny, and age-appropriate educational video, curated for safety and fun. Parents can trust all content is filtered for kids."
+      "🎨 New Versions Coming Soon! We're working on Original, Middle Age, and Premium themes with unique visuals!",
+      "👨‍👩‍👧‍👦 Family Name System: Parents create a Family Name, kids can join using it - no more complicated Kid IDs!",
+      "🎮 Enhanced Home Cards: Games, All You Can Learn, and Lessons now have beautiful animated cards with hover effects!",
+      "🔐 Streamlined Login: Simple, clean login experience for both kids and parents!",
+      "✨ Improved Account Creation: Family Name asked first, making it easy to group family accounts!"
     ],
-    "Update Lab": [
-      "The Lab now lets you drag items from the bottom bar into the scene. Each item triggers a fun effect and an explanation, making science and logic interactive! Try combining items for special results."
+    "Account System Updates": [
+      "Family Name asked FIRST when creating a new account - it's the very first step!",
+      "Login with Family Name + Your Name instead of random Kid IDs",
+      "Parent accounts now require Family Name during signup",
+      "Kids can optionally skip Family Name if they don't have one",
+      "Family Name shows as read-only during final name setup if already entered"
     ],
-    "Improvements": [
-      "Fixed all React component hydration issues",
-      "Wrapped useSearchParams in Suspense boundaries for better performance",
-      "Production build optimized - all code compiled successfully",
-      "Kid login now takes you to a unified dashboard with Games, All You Can Learn, and Lessons for a smoother experience."
+    "Premium Visual Effects": [
+      "Galaxy backgrounds with 100 twinkling stars on Premium kid login",
+      "Cyber grid with 50 neon particles on Premium parent login",
+      "Holographic shimmer overlays on Premium login cards",
+      "Electric animated borders that pulse cyan/magenta",
+      "Glassmorphism cards with backdrop blur and neon shadows",
+      "Animated bouncing emojis with staggered delays on home cards",
+      "Floating particles with ping effects in card corners"
     ],
     "Bug Fixes": [
-      "Fixed 23 apostrophe/quote escaping errors preventing production build",
-      "Fixed module variable naming conflict in topic lesson loader",
-      "Fixed TypeScript type error in topic progress tracking",
-      "Fixed useSearchParams CSR bailout errors in map and setup pages",
-      "All build-blocking errors resolved - app ready for deployment"
+      "Fixed hydration error caused by Math.random() stars in LoadingScreen - now generates on client only",
+      "Fixed 'Unterminated regexp literal' build error in lesson-player (invalid Tailwind classes)",
+      "Fixed border syntax from border-l-6 to border-l-[6px] for proper Tailwind parsing",
+      "Fixed shimmer keyframe placement causing parser confusion",
+      "Fixed missing mouthShapes array definition in lesson-player",
+      "Removed ancient 'Family Name' bug by making it a real, fully integrated feature!"
     ],
-    "Lessons Added": [
-      "No new lessons - this update focused on production stability"
+    "Improvements": [
+      "Updated Next.js to latest version for newest features and bug fixes",
+      "Added animation delay utility classes (.animation-delay-200 through .animation-delay-700)",
+      "Version selection persists across all pages via localStorage",
+      "Premium theme applies consistent styling across kid/parent login flows",
+      "Improved account creation flow - Family Name → Design → Buddy → Voice → Name"
     ],
-    "Known Glitches": [
-      "The Shop page contains intentional 'glitch' effects and fun warnings when unlocking the legendary item. These are not real bugs and are part of the game experience!",
-      "Legendary Mode is still present in the Shop. If you thought it was removed, it is still there as a hidden/secret feature!",
-      "No actual glitches or crashes were found in the latest scan."
+    "Design System": [
+      "8 new CSS animation keyframes: float-particle, pulse-slow, card-appear, hologram, glow-text, button-glow, electric-border",
+      "Premium color palette: Cyan (#0ff), Purple (#f0f), Pink (#ff00ff) neon colors",
+      "Glassmorphism styling with backdrop-blur and semi-transparent backgrounds",
+      "Drop shadow glow utility for text effects",
+      "Staggered animation delays for sequential entrance effects"
     ],
-    "New Visuals": [
-      "Ocean wallpaper background with animated water ripples on every page."
-    ],
-    "Sound Effects": [
-      "Relaxing ocean wave sounds play in the background (toggle coming soon)."
-    ],
-    "Meta": [
-      "[FIXED] Updates were not showing due to a malformed updates.json file. If you see this, the update system is working!"
+    "Known Issues": [
+      "None! Everything is working smoothly 🎉"
     ]
   }
 }

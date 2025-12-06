@@ -16,6 +16,7 @@ interface LessonStep {
 }
 
 function LessonContent() {
+    const [buddyVisible, setBuddyVisible] = useState(true);
   const searchParams = useSearchParams();
   const lessonTitle = searchParams.get("title") || "Lesson";
   const sounds = useSoundEffects();
@@ -186,11 +187,13 @@ function LessonContent() {
   
   const lessonSteps: LessonStep[] = getLessonContent(lessonTitle);
 
+  // Mouth shapes for animation
+  const mouthShapes: ('closed' | 'small' | 'medium' | 'wide')[] = ['closed', 'small', 'medium', 'wide', 'medium', 'small'];
+
   // Animate character when speaking - varied mouth shapes for realistic talking
   useEffect(() => {
     if (isSpeaking) {
       // Random mouth shapes to simulate natural speech
-      const mouthShapes: Array<'closed' | 'small' | 'medium' | 'wide'> = ['small', 'medium', 'wide', 'medium', 'small', 'closed'];
       let shapeIndex = 0;
       
       const interval = setInterval(() => {
@@ -336,7 +339,15 @@ function LessonContent() {
   // Auto-speak first message
   useEffect(() => {
     speakText(lessonSteps[0].text);
+      setBuddyVisible(true);
   }, []);
+
+    // Animate buddy in/out on step change
+    useEffect(() => {
+      setBuddyVisible(false);
+      const timer = setTimeout(() => setBuddyVisible(true), 200);
+      return () => clearTimeout(timer);
+    }, [currentStep]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-400 via-orange-300 to-pink-300 p-8 relative overflow-hidden">
@@ -415,7 +426,7 @@ function LessonContent() {
               <h3 className="text-center text-purple-700 font-bold mb-4 text-xl">👋 Your Learning Buddy!</h3>
               
               {/* Animated Character in Window */}
-              <div className="flex justify-center mb-4 bg-white rounded-xl p-4 shadow-inner">
+              <div className={`flex justify-center mb-4 bg-white rounded-xl p-4 shadow-inner overflow-visible transition-transform transition-opacity duration-700 ${buddyVisible ? 'translate-x-0 opacity-100' : '-translate-x-[180px] opacity-0'}`} style={{ willChange: 'transform, opacity' }}>
                 <svg 
                   width="150" 
                   height="210" 
@@ -473,10 +484,26 @@ function LessonContent() {
                   </g>
                 </svg>
               </div>
+                            {/* Buddy walk-in/out animation styles */}
+                            <style jsx global>{`
+                              .-translate-x-\[180px\] {
+                                transform: translateX(-180px);
+                              }
+                              .translate-x-0 {
+                                transform: translateX(0);
+                              }
+                              .opacity-0 {
+                                opacity: 0;
+                              }
+                              .opacity-100 {
+                                opacity: 1;
+                              }
+                            `}</style>
+              </div>
               
               {/* Buddy Speech */}
               <div className="bg-yellow-100 rounded-xl p-4 border-2 border-yellow-300 relative">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-6 border-r-6 border-b-6 border-transparent border-b-yellow-100"></div>
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent border-b-yellow-100"></div>
                 <p className="text-sm text-gray-700 text-center font-medium">
                   {lessonSteps[currentStep].isQuestion 
                     ? "🤔 Think carefully and type your answer!"
@@ -730,22 +757,22 @@ function LessonContent() {
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner relative overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 h-3 rounded-full transition-all duration-500 ease-out relative"
-                    style={{ 
-                      width: `${((currentStep + 1) / lessonSteps.length) * 100}%`,
-                      animation: 'shimmer 2s infinite',
-                      backgroundSize: '200% 100%'
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-white opacity-30 animate-pulse"></div>
-                  </div>
-                  <style>{`
+                  <style jsx>{`
                     @keyframes shimmer {
                       0% { background-position: -200% 0; }
                       100% { background-position: 200% 0; }
                     }
                   `}</style>
+                  <div
+                    className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 h-3 rounded-full transition-all duration-500 ease-out relative"
+                    style={{ 
+                      width: `${(currentStep + 1) / lessonSteps.length * 100}%`,
+                      backgroundSize: '200% 100%',
+                      animation: 'shimmer 2s infinite'
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-white opacity-30 animate-pulse"></div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -17,7 +17,7 @@ interface TopicLesson {
 export const lessons: { [key: number]: TopicLesson } = {
   502: {
     id: 502,
-    title: 'Making Inferences',
+      title: 'Unit 5: Making Inferences',
     icon: '🔍',
     description: 'Reading between the lines',
     content: [

@@ -45,7 +45,7 @@ const features = [
     title: "Easy Sharing",
     desc: "Open the app with a QR code, TinyURL, or Add to Home.",
     img: "/icon-192.png.svg",
-    link: base + "/open",
+    link: base + "/", // Home/login page
     qr: true
   },
   {

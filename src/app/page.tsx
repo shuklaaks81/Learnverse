@@ -69,6 +69,9 @@ export default function Home() {
             </div>
           </div>
         </div>
+      <Link href="/lab" className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-4 px-8 rounded-2xl shadow-lg text-2xl text-center transition-all">
+        🧪 Try the Lab
+      </Link>
       </main>
     </div>
   );

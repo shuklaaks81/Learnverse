@@ -419,50 +419,62 @@ export default function ShopPage() {
             const isPurchased = purchasedItems.includes(item.id);
             const canAfford = coins >= item.price;
             const isLegendary = item.id === 999;
+            const isGodMode = item.id === 9999;
 
+            // Special glitchy rendering for God Mode and Legendary items
+            const glitchy = (isLegendary || isGodMode) && !isPurchased;
             return (
               <div
                 key={item.id}
                 className={`rounded-2xl shadow-lg p-6 transition-all hover:shadow-xl relative overflow-hidden ${
                   isPurchased ? 'border-4 border-green-400 bg-white' : ''
-                } ${isLegendary ? 'border-4 border-red-600 bg-black col-span-full' : 'bg-white'}`}
-                style={isLegendary && !isPurchased ? {
+                } ${isLegendary && !isPurchased ? 'border-4 border-red-600 bg-black col-span-full' : ''} ${isGodMode && !isPurchased ? 'border-4 border-purple-700 bg-black col-span-full' : 'bg-white'}`}
+                style={glitchy ? {
                   animation: 'glitchCard 0.1s infinite',
-                  boxShadow: '0 0 50px rgba(255, 0, 0, 0.5), inset 0 0 50px rgba(0, 255, 255, 0.2)'
+                  boxShadow: isLegendary ? '0 0 50px rgba(255, 0, 0, 0.5), inset 0 0 50px rgba(0, 255, 255, 0.2)' : '0 0 50px rgba(128,0,255,0.5), inset 0 0 50px rgba(0,255,255,0.2)'
                 } : {}}
               >
-                {/* Glitch effect overlays for legendary item */}
-                {isLegendary && !isPurchased && (
+                {/* Glitch effect overlays for legendary/god mode item */}
+                {glitchy && (
                   <>
                     <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
-                      background: 'repeating-linear-gradient(0deg, red 0px, cyan 2px, lime 4px, transparent 6px)',
+                      background: isLegendary
+                        ? 'repeating-linear-gradient(0deg, red 0px, cyan 2px, lime 4px, transparent 6px)'
+                        : 'repeating-linear-gradient(0deg, purple 0px, cyan 2px, magenta 4px, transparent 6px)',
                       animation: 'scanlines 0.5s infinite'
                     }}></div>
                     <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none" style={{
-                      background: 'linear-gradient(90deg, transparent 0%, red 50%, transparent 100%)',
+                      background: isLegendary
+                        ? 'linear-gradient(90deg, transparent 0%, red 50%, transparent 100%)'
+                        : 'linear-gradient(90deg, transparent 0%, purple 50%, transparent 100%)',
                       animation: 'glitchSweep 2s infinite'
                     }}></div>
                   </>
                 )}
-                
+
                 <div className="text-center mb-4 relative z-10">
-                  <div className={`mb-3 ${isLegendary ? 'text-9xl' : 'text-6xl'}`} style={isLegendary && !isPurchased ? {
+                  <div className={`mb-3 ${glitchy ? 'text-9xl' : 'text-6xl'}`} style={glitchy ? {
                     animation: 'glitchEmoji 0.2s infinite',
-                    textShadow: '3px 0 red, -3px 0 cyan, 0 3px lime'
+                    textShadow: isLegendary
+                      ? '3px 0 red, -3px 0 cyan, 0 3px lime'
+                      : '3px 0 purple, -3px 0 cyan, 0 3px magenta',
+                    filter: 'contrast(200%) brightness(150%)'
                   } : {}}>
-                    {isLegendary && !isPurchased ? (
-                      <span className="inline-block" style={{filter: 'contrast(200%) brightness(150%)'}}>
-                        ⚠️
+                    {glitchy ? (
+                      <span className="inline-block">
+                        {isLegendary ? '⚠️' : '✨'}
                       </span>
                     ) : item.emoji}
                   </div>
-                  <h3 className={`font-bold ${isLegendary ? 'text-4xl mb-4 text-red-500 font-mono' : 'text-xl text-gray-800'}`} style={isLegendary && !isPurchased ? {
+                  <h3 className={`font-bold ${glitchy ? 'text-4xl mb-4 font-mono' : 'text-xl text-gray-800'} ${isLegendary ? 'text-red-500' : ''} ${isGodMode ? 'text-purple-400' : ''}`} style={glitchy ? {
                     animation: 'glitchText 0.3s infinite',
-                    textShadow: '2px 0 red, -2px 0 cyan'
+                    textShadow: isLegendary
+                      ? '2px 0 red, -2px 0 cyan'
+                      : '2px 0 purple, -2px 0 cyan'
                   } : {}}>
                     {item.name}
                   </h3>
-                  <p className={`mt-2 ${isLegendary ? 'text-lg text-lime-400 font-mono' : 'text-sm text-gray-600'}`}>
+                  <p className={`mt-2 ${glitchy ? 'text-lg font-mono' : 'text-sm text-gray-600'} ${isLegendary ? 'text-lime-400' : ''} ${isGodMode ? 'text-fuchsia-300' : ''}`}>
                     {item.description}
                   </p>
                   {isLegendary && !isPurchased && (
@@ -470,35 +482,50 @@ export default function ShopPage() {
                       ⚠️ ERROR: UNKNOWN CONSEQUENCES // PROCEED AT OWN RISK ⚠️
                     </div>
                   )}
+                  {isGodMode && !isPurchased && (
+                    <div className="mt-4 bg-purple-900 text-fuchsia-300 px-4 py-2 rounded-lg font-bold text-sm border-2 border-fuchsia-400 animate-pulse">
+                      ✨ WARNING: REALITY BREAKER // TRANSCENDENCE IMMINENT ✨
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200 relative z-10">
-                  <div className={`font-bold ${isLegendary ? 'text-4xl text-red-500 font-mono' : 'text-2xl text-yellow-500'}`} style={isLegendary && !isPurchased ? {
-                    textShadow: '0 0 10px red, 0 0 20px red'
+                  <div className={`font-bold ${glitchy ? 'text-4xl font-mono' : 'text-2xl text-yellow-500'} ${isLegendary ? 'text-red-500' : ''} ${isGodMode ? 'text-purple-400' : ''}`} style={glitchy ? {
+                    textShadow: isLegendary
+                      ? '0 0 10px red, 0 0 20px red'
+                      : '0 0 10px purple, 0 0 20px magenta'
                   } : {}}>
-                    {isLegendary ? '⚠️' : '🪙'} {item.price.toLocaleString()}
+                    {isLegendary ? '⚠️' : isGodMode ? '✨' : '🪙'} {item.price.toLocaleString()}
                   </div>
                   {isPurchased ? (
-                    <div className={`bg-green-100 text-green-700 px-4 py-2 rounded-full font-semibold ${isLegendary ? 'text-xl' : ''}`}>
-                      ✓ {isLegendary ? 'REALITY ALTERED' : 'Owned'}
+                    <div className={`bg-green-100 text-green-700 px-4 py-2 rounded-full font-semibold ${glitchy ? 'text-xl' : ''}`}>
+                      ✓ {isLegendary ? 'REALITY ALTERED' : isGodMode ? 'TRANSCENDED' : 'Owned'}
                     </div>
                   ) : (
                     <button
                       onClick={() => handlePurchase(item)}
                       disabled={!canAfford}
                       className={`px-6 py-2 rounded-full font-semibold transition-all ${
-                        isLegendary && canAfford
-                          ? 'bg-red-600 text-yellow-300 hover:shadow-2xl hover:scale-110 text-xl border-4 border-yellow-500 font-mono'
+                        glitchy && canAfford
+                          ? (isLegendary
+                              ? 'bg-red-600 text-yellow-300 hover:shadow-2xl hover:scale-110 text-xl border-4 border-yellow-500 font-mono'
+                              : 'bg-purple-700 text-fuchsia-300 hover:shadow-2xl hover:scale-110 text-xl border-4 border-fuchsia-400 font-mono')
                           : canAfford
                           ? 'bg-gradient-to-r from-orange-400 to-pink-400 text-white hover:shadow-lg hover:scale-105'
                           : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                       }`}
-                      style={isLegendary && canAfford ? {
+                      style={glitchy && canAfford ? {
                         animation: 'glitchButton 0.5s infinite',
-                        boxShadow: '0 0 20px red'
+                        boxShadow: isLegendary ? '0 0 20px red' : '0 0 20px purple'
                       } : {}}
                     >
-                      {isLegendary && canAfford ? '⚠️ CORRUPT' : canAfford ? 'Buy' : 'Need more'}
+                      {isLegendary && canAfford
+                        ? '⚠️ CORRUPT'
+                        : isGodMode && canAfford
+                        ? '✨ TRANSCEND'
+                        : canAfford
+                        ? 'Buy'
+                        : 'Need more'}
                     </button>
                   )}
                 </div>

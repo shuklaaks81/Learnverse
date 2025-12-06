@@ -8,6 +8,7 @@ export default function DrawBuddy() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(false);
+  const [premium, setPremium] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -105,6 +106,14 @@ export default function DrawBuddy() {
       `}</style>
 
       <div className="w-full max-w-4xl bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 sm:p-12 border-4 border-white/60">
+        <div className="flex justify-end mb-2">
+          <button
+            onClick={() => setPremium((p) => !p)}
+            className={`px-4 py-2 rounded-xl font-bold shadow transition-all text-lg ${premium ? 'bg-gradient-to-r from-yellow-400 to-pink-400 text-black' : 'bg-gray-200 text-gray-700'}`}
+          >
+            {premium ? 'Switch to Original Buddy' : 'Switch to Premium Buddy'}
+          </button>
+        </div>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-center mb-4 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
           🎨 Draw Your Learning Buddy! ✨
         </h1>
@@ -112,7 +121,42 @@ export default function DrawBuddy() {
           Get creative! Draw your perfect learning buddy! 🖌️
         </p>
 
-        <div className="flex justify-center mb-6">
+        <div className="flex flex-col items-center mb-6">
+          {/* Drawing Guide SVG */}
+          {premium ? (
+            <svg width="220" height="220" viewBox="0 0 220 220" className="mb-2">
+              {/* Half-oval body */}
+              <ellipse cx="110" cy="120" rx="70" ry="90" fill="#fffbe9" stroke="#6d28d9" strokeWidth="8" />
+              {/* Thick top line */}
+              <path d="M40 120 Q110 30 180 120" stroke="#6d28d9" strokeWidth="12" fill="none" />
+              {/* Tentacles (curved, coming to points) */}
+              <path d="M60 200 Q70 180 80 200" stroke="#6d28d9" strokeWidth="8" fill="none" />
+              <path d="M90 200 Q100 180 110 200" stroke="#6d28d9" strokeWidth="8" fill="none" />
+              <path d="M120 200 Q130 180 140 200" stroke="#6d28d9" strokeWidth="8" fill="none" />
+              <path d="M150 200 Q160 180 170 200" stroke="#6d28d9" strokeWidth="8" fill="none" />
+              {/* Eyes and mouth like stick buddy */}
+              <circle cx="90" cy="120" r="10" fill="#222" />
+              <circle cx="130" cy="120" r="10" fill="#222" />
+              <ellipse cx="110" cy="145" rx="16" ry="8" fill="none" stroke="#222" strokeWidth="5" />
+            </svg>
+          ) : (
+            <svg width="220" height="220" viewBox="0 0 220 220" className="mb-2">
+              {/* Better stick buddy: oval head, thick lines, simple body */}
+              <ellipse cx="110" cy="80" rx="40" ry="50" fill="#fffbe9" stroke="#6d28d9" strokeWidth="8" />
+              {/* Body */}
+              <line x1="110" y1="130" x2="110" y2="180" stroke="#6d28d9" strokeWidth="10" />
+              {/* Arms */}
+              <line x1="110" y1="140" x2="70" y2="170" stroke="#6d28d9" strokeWidth="8" />
+              <line x1="110" y1="140" x2="150" y2="170" stroke="#6d28d9" strokeWidth="8" />
+              {/* Legs */}
+              <line x1="110" y1="180" x2="90" y2="210" stroke="#6d28d9" strokeWidth="8" />
+              <line x1="110" y1="180" x2="130" y2="210" stroke="#6d28d9" strokeWidth="8" />
+              {/* Eyes and mouth */}
+              <circle cx="95" cy="80" r="7" fill="#222" />
+              <circle cx="125" cy="80" r="7" fill="#222" />
+              <ellipse cx="110" cy="100" rx="12" ry="6" fill="none" stroke="#222" strokeWidth="4" />
+            </svg>
+          )}
           <canvas
             ref={canvasRef}
             onMouseDown={startDrawing}
