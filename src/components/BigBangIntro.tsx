@@ -22,18 +22,19 @@ export default function BigBangIntro() {
     if (stage === 1 && !clicked) {
       setClicked(true);
       setTimeout(() => setStage(2), 100); // Big Bang explosion
-      setTimeout(() => setStage(3), 2000); // Book appears
-      setTimeout(() => setStage(4), 4000); // Stick mixing
-      setTimeout(() => setStage(5), 6000); // Rapid expansion
-      setTimeout(() => setStage(6), 8000); // Star forms
-      setTimeout(() => setStage(7), 10000); // Rings appear
-      setTimeout(() => setStage(8), 12000); // Cartoonnia collides
-      setTimeout(() => setStage(9), 14000); // Imagination spreads
-      setTimeout(() => setStage(10), 16000); // Rings collide - cartoony
-      setTimeout(() => setStage(11), 18000); // Stick figure
-      setTimeout(() => setStage(12), 20000); // Snack World zoom
-      setTimeout(() => setStage(13), 22000); // Person at computer
-      setTimeout(() => setStage(14), 24000); // App loads!
+      setTimeout(() => setStage(3), 3000); // Book appears
+      setTimeout(() => setStage(4), 6000); // Stick mixing
+      setTimeout(() => setStage(5), 9000); // Rapid expansion
+      setTimeout(() => setStage(6), 12000); // Star forms
+      setTimeout(() => setStage(7), 15000); // Rings appear
+      setTimeout(() => setStage(8), 18000); // Cartoonnia collides
+      setTimeout(() => setStage(9), 21000); // Imagination spreads
+      setTimeout(() => setStage(10), 24000); // Rings collide - cartoony
+      setTimeout(() => setStage(11), 27000); // Stick figure
+      setTimeout(() => setStage(12), 30000); // Snack World zoom
+      setTimeout(() => setStage(13), 33000); // Person at computer
+      setTimeout(() => setStage(14), 36000); // Opening credits
+      setTimeout(() => setStage(15), 40000); // App loads!
     }
   };
 
@@ -45,11 +46,11 @@ export default function BigBangIntro() {
 
   // Skip intro after completion
   useEffect(() => {
-    if (stage === 14) {
+    if (stage === 15) {
       const completeTimer = setTimeout(() => {
         localStorage.setItem('introDone', 'true');
         // No redirect - let loading wrapper handle it
-      }, 2000);
+      }, 3000);
       return () => clearTimeout(completeTimer);
     }
   }, [stage]);
@@ -80,7 +81,9 @@ export default function BigBangIntro() {
   if (stage === 0) {
     return (
       <div className="fixed inset-0 bg-black z-[9999] flex items-center justify-center">
-        <div className="text-white text-2xl animate-pulse">Loading the universe...</div>
+        <div className="text-white text-2xl font-light tracking-[0.3em] uppercase animate-pulse">
+          Loading the universe...
+        </div>
       </div>
     );
   }
@@ -137,11 +140,11 @@ export default function BigBangIntro() {
     // BOOK APPEARS
     return (
       <div className={`fixed inset-0 bg-gradient-to-br ${colors.bg} z-[9999] flex items-center justify-center`}>
-        <div className="text-9xl animate-[spin_3s_ease-in-out] opacity-0 animate-[fadeIn_1s_ease-in_forwards]">
+        <div className="text-9xl animate-[spin_3s_ease-in-out] opacity-0 animate-[fadeIn_2s_ease-in_forwards]">
           📚
         </div>
-        <p className="absolute bottom-20 text-white text-2xl font-bold animate-pulse">
-          A book... in the void...
+        <p className="absolute bottom-20 text-white text-3xl font-light tracking-wider animate-[fadeIn_2s_ease-in_1s_forwards] opacity-0">
+          In the beginning... there was knowledge
         </p>
         <style jsx>{`
           @keyframes fadeIn {
@@ -174,13 +177,17 @@ export default function BigBangIntro() {
             />
           ))}
         </div>
-        <p className="absolute bottom-20 text-white text-2xl font-bold animate-pulse">
-          Mixing with every substance...
+        <p className="absolute bottom-20 text-white text-3xl font-light tracking-wide animate-[fadeIn_1.5s_ease-in] opacity-0" style={{ animation: 'fadeIn 1.5s ease-in forwards' }}>
+          Knowledge mixed with every element
         </p>
         <style jsx>{`
           @keyframes orbit {
             0% { transform: translate(-50%, -50%) rotate(0deg) translateX(100px) rotate(0deg); }
             100% { transform: translate(-50%, -50%) rotate(360deg) translateX(100px) rotate(-360deg); }
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
           }
         `}</style>
       </div>
@@ -204,8 +211,8 @@ export default function BigBangIntro() {
             }}
           />
         ))}
-        <p className="absolute bottom-20 text-white text-3xl font-bold animate-pulse z-10">
-          RAPID EXPANSION! 💫
+        <p className="absolute bottom-20 text-white text-4xl font-light tracking-widest animate-pulse z-10 uppercase">
+          The Universe Expands
         </p>
         <style jsx>{`
           @keyframes expand {
@@ -238,8 +245,8 @@ export default function BigBangIntro() {
             />
           ))}
         </div>
-        <p className="absolute bottom-20 text-white text-2xl font-bold animate-pulse">
-          A star is born! ⭐
+        <p className="absolute bottom-20 text-white text-3xl font-light tracking-wider animate-pulse italic">
+          From darkness... light
         </p>
       </div>
     );
@@ -320,8 +327,8 @@ export default function BigBangIntro() {
           />
         ))}
         <div className="absolute text-9xl animate-pulse">✨</div>
-        <p className="absolute bottom-20 text-white text-2xl font-bold animate-pulse z-10">
-          IMAGINATION spreads across reality! 🌈✨
+        <p className="absolute bottom-20 text-white text-4xl font-light tracking-wider animate-pulse z-10 italic">
+          And imagination... became reality
         </p>
         <style jsx>{`
           @keyframes spread {
@@ -352,8 +359,8 @@ export default function BigBangIntro() {
             {emoji}
           </div>
         ))}
-        <p className="absolute bottom-20 text-white text-3xl font-bold animate-pulse z-10">
-          Everything becomes CARTOONY! 🎨✨
+        <p className="absolute bottom-20 text-white text-4xl font-light tracking-widest animate-pulse z-10">
+          A New World Forms
         </p>
       </div>
     );
@@ -374,8 +381,8 @@ export default function BigBangIntro() {
             <line x1="100" y1="180" x2="130" y2="250" stroke="black" strokeWidth="6" />
           </svg>
         </div>
-        <p className="absolute bottom-20 text-gray-800 text-2xl font-bold animate-pulse">
-          A stick figure emerges! 🧍
+        <p className="absolute bottom-20 text-gray-800 text-3xl font-light tracking-wider animate-pulse">
+          Life begins...
         </p>
       </div>
     );
@@ -388,8 +395,8 @@ export default function BigBangIntro() {
         <div className="text-9xl animate-[zoomIn_2s_ease-out]">
           🌍
         </div>
-        <p className="absolute bottom-20 text-white text-3xl font-bold animate-pulse">
-          Welcome to SNACK WORLD! 🌍✨
+        <p className="absolute bottom-20 text-white text-4xl font-light tracking-[0.3em] animate-pulse uppercase">
+          Snack World
         </p>
         <style jsx>{`
           @keyframes zoomIn {
@@ -409,26 +416,78 @@ export default function BigBangIntro() {
           <div className="text-8xl">🧑‍💻</div>
           <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-6xl animate-pulse">💻</div>
         </div>
-        <p className="absolute bottom-20 text-white text-2xl font-bold animate-pulse">
-          Someone opens their computer...
+        <p className="absolute bottom-20 text-white text-3xl font-light tracking-wider animate-pulse italic">
+          And a seeker discovers...
         </p>
       </div>
     );
   }
 
   if (stage === 14) {
-    // APP LOADS - LEARNVERSE!
+    // OPENING CREDITS - MOVIE STYLE
     return (
-      <div className={`fixed inset-0 bg-gradient-to-br ${colors.bg} z-[9999] flex flex-col items-center justify-center`}>
-        <div className="text-9xl mb-8 animate-bounce">
-          {isGodMode ? '✨' : isLegendary ? '🔮' : '🌌'}
+      <div className="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center overflow-hidden">
+        {/* Cinematic bars */}
+        <div className="absolute top-0 left-0 right-0 h-20 bg-black z-10" />
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-black z-10" />
+        
+        {/* Stars background */}
+        {[...Array(100)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              opacity: Math.random() * 0.7 + 0.3
+            }}
+          />
+        ))}
+
+        {/* Production company style text */}
+        <div className="text-center space-y-8 animate-[fadeIn_2s_ease-in]">
+          <p className="text-white/60 text-xl font-light tracking-[0.5em] uppercase">
+            A Learning Experience
+          </p>
+          <h1 
+            className="text-8xl font-bold text-white tracking-wider"
+            style={{ 
+              textShadow: `0 0 40px ${colors.glow}, 0 0 80px ${colors.glow}`,
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              letterSpacing: '0.1em'
+            }}
+          >
+            LEARNVERSE
+          </h1>
+          <p className="text-white/80 text-2xl font-light tracking-widest">
+            {isGodMode ? '⚡ GOD MODE EDITION ⚡' : isLegendary ? '🔮 LEGENDARY EDITION 🔮' : '✨ WHERE IMAGINATION BECOMES REALITY ✨'}
+          </p>
         </div>
-        <h1 className="text-7xl font-bold text-white mb-4 animate-pulse" style={{ textShadow: `0 0 30px ${colors.glow}` }}>
-          LEARNVERSE
-        </h1>
-        <p className="text-3xl text-white/80 animate-pulse">
-          {isGodMode ? 'GOD MODE ACTIVATED ✨' : isLegendary ? 'Legendary Edition 🔮' : 'The Journey Begins... 🚀'}
-        </p>
+        
+        <style jsx>{`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  if (stage === 15) {
+    // FINAL FADE TO APP
+    return (
+      <div className={`fixed inset-0 bg-gradient-to-br ${colors.bg} z-[9999] flex items-center justify-center animate-[fadeOut_3s_ease-out_forwards]`}>
+        <div className="text-9xl animate-pulse">
+          {isGodMode ? '⚡' : isLegendary ? '🔮' : '🚀'}
+        </div>
+        <style jsx>{`
+          @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+          }
+        `}</style>
       </div>
     );
   }
