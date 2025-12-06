@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   title: "Learning App",
   description: "A learning app with parent-kid account system",
   manifest: "/manifest.json",
+  verification: {
+    google: "kkwMXkR9OHkcPq5sGveqsGx9YFngdxfgxum6XrNGlfE",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
