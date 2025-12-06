@@ -24,6 +24,17 @@ export function useSecretEvent() {
   return ctx;
 }
 
+// Secret key listener for replaying intro
+if (typeof window !== 'undefined') {
+  window.addEventListener('keydown', (e) => {
+    // Press 'I' for Intro replay
+    if (e.key === 'i' || e.key === 'I') {
+      localStorage.removeItem('introDone');
+      window.location.reload();
+    }
+  });
+}
+
 export const SecretEventProvider = ({ children }: { children: React.ReactNode }) => {
   const [showSecret, setShowSecret] = useState(false);
   const [secretStage, setSecretStage] = useState<SecretStage>(null);
