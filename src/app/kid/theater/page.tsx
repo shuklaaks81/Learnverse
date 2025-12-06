@@ -402,6 +402,32 @@ export default function TheaterPage() {
             </p>
           </div>
 
+          {/* Person running around ON FIRE! */}
+          <div className="absolute left-1/4 top-1/2 animate-[runInCircles_5s_linear_infinite]">
+            <div className="relative">
+              <div className="text-8xl">🏃</div>
+              {/* Fire everywhere! */}
+              <div className="absolute -top-5 left-0 text-5xl animate-pulse">🔥</div>
+              <div className="absolute -top-5 right-0 text-5xl animate-pulse animation-delay-200">🔥</div>
+              <div className="absolute top-5 -left-5 text-5xl animate-pulse animation-delay-300">🔥</div>
+              <div className="absolute top-5 -right-5 text-5xl animate-pulse animation-delay-400">🔥</div>
+            </div>
+          </div>
+
+          {/* Boss person saying sorry */}
+          <div className="absolute right-1/4 top-1/4 bg-purple-900/90 border-2 border-purple-400 rounded-2xl p-6 animate-[bounce_2s_ease-in-out_infinite]">
+            <p className="text-2xl font-bold text-white">
+              "Well I'M SORRY you wanted to be <span className="text-orange-400">ON FIRE</span>!" 😤🔥
+            </p>
+          </div>
+
+          {/* Person on fire screaming */}
+          <div className="absolute left-1/3 bottom-1/3 bg-red-600/90 border-4 border-orange-500 rounded-2xl p-6 animate-[shake_1s_ease-in-out_infinite]">
+            <p className="text-3xl font-black text-white">
+              "CALL MY LAWYER! <br/>CALL MY LAWYER!!!" 📞👨‍⚖️
+            </p>
+          </div>
+
           {/* Actual credits scrolling */}
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-white text-center opacity-50 animate-[scrollUp_10s_linear_infinite]">
             <h2 className="text-3xl font-bold mb-4">CREDITS</h2>
@@ -410,8 +436,10 @@ export default function TheaterPage() {
             <p className="text-xl mb-2">Popcorn Supplier: Big Truck Inc. 🚚</p>
             <p className="text-xl mb-2">Fire Effects: Too Literal Studios 🔥</p>
             <p className="text-xl mb-2">Drama Level: MAXIMUM 🎭</p>
+            <p className="text-xl mb-2">Legal Department: Currently On Fire 👨‍⚖️🔥</p>
             <p className="text-xl mb-8">Runtime: 3 EPIC HOURS ⏰</p>
             <p className="text-2xl font-bold">THE END</p>
+            <p className="text-sm mt-4 italic">No actors were actually harmed... probably.</p>
           </div>
 
           {/* Return button */}
@@ -451,6 +479,13 @@ export default function TheaterPage() {
             @keyframes fadeIn {
               from { opacity: 0; transform: translate(-50%, 20px); }
               to { opacity: 1; transform: translate(-50%, 0); }
+            }
+            @keyframes runInCircles {
+              0% { transform: translate(0, 0) rotate(0deg); }
+              25% { transform: translate(100px, -50px) rotate(90deg); }
+              50% { transform: translate(200px, 0) rotate(180deg); }
+              75% { transform: translate(100px, 50px) rotate(270deg); }
+              100% { transform: translate(0, 0) rotate(360deg); }
             }
           `}</style>
         </div>
