@@ -133,6 +133,24 @@ export default function KidPage() {
             <span className="font-bold text-lg">Kid News</span>
             <span className="text-xs text-gray-500 mt-1">Read the latest, print-friendly newspaper!</span>
           </Link>
+          
+          {/* MOVIE THEATER - NEW! */}
+          <Link href="/kid/theater" className="relative bg-gradient-to-br from-red-600/90 to-purple-700/90 hover:from-red-500/90 hover:to-purple-600/90 backdrop-blur-xl rounded-2xl p-8 flex flex-col items-center shadow-[0_0_40px_rgba(220,38,38,0.6)] border-2 border-red-400/30 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_60px_rgba(220,38,38,0.9)] group overflow-hidden col-span-1 sm:col-span-3">
+            {/* Cinema curtain effect */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute w-3 h-3 bg-yellow-400 rounded-full top-3 left-3 animate-pulse"></div>
+              <div className="absolute w-3 h-3 bg-yellow-400 rounded-full top-3 right-3 animate-pulse animation-delay-200"></div>
+              <div className="absolute w-3 h-3 bg-yellow-400 rounded-full bottom-3 left-3 animate-pulse animation-delay-300"></div>
+              <div className="absolute w-3 h-3 bg-yellow-400 rounded-full bottom-3 right-3 animate-pulse animation-delay-500"></div>
+            </div>
+            {/* Spotlight shimmer */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+            
+            <span className="text-7xl mb-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.9)] animate-pulse relative z-10">🎬</span>
+            <span className="font-black text-2xl text-white drop-shadow-glow relative z-10 tracking-wider">CINEMA</span>
+            <span className="text-sm text-yellow-300 mt-2 text-center relative z-10 font-bold">🍿 Watch the EPIC 3-Hour Learnverse Movie! 🎭</span>
+            <span className="text-xs text-red-200 mt-1 relative z-10 italic">Now Playing: The Complete Saga</span>
+          </Link>
         </div>
       </div>
     </div>
