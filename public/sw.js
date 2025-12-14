@@ -1,5 +1,5 @@
 // Service Worker for Learnverse PWA
-const CACHE_NAME = 'learnverse-v1';
+const CACHE_NAME = 'learnverse-v2'; // Updated version!
 const urlsToCache = [
   '/',
   '/kid',
@@ -39,6 +39,11 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
+  // Skip non-http requests
+  if (!event.request.url.startsWith('http')) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -65,6 +70,10 @@ self.addEventListener('fetch', (event) => {
             });
 
           return response;
+        }).catch((error) => {
+          // Network failed, return offline page or error
+          console.log('Fetch failed; returning offline page instead.', error);
+          return caches.match('/offline.html');
         });
       })
   );
