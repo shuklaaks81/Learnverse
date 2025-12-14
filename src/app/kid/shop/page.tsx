@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSoundEffects } from '@/utils/soundEffects';
 import BackgroundMusic from '@/components/BackgroundMusic';
+import WeeklyAnimation from '@/components/WeeklyAnimation';
 
 interface ShopItem {
   id: number;
@@ -21,6 +22,18 @@ export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [purchasedItems, setPurchasedItems] = useState<number[]>([]);
   const [isGlitching, setIsGlitching] = useState(false);
+  const [showWeeklyAnimation, setShowWeeklyAnimation] = useState(false);
+  const [weeklyAnimationUnlocked, setWeeklyAnimationUnlocked] = useState(false);
+
+  // Get current week number (changes every week!)
+  const getCurrentWeek = () => {
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const days = Math.floor((now.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
+    return Math.ceil((days + startOfYear.getDay() + 1) / 7);
+  };
+
+  const currentWeek = getCurrentWeek();
 
   const shopItems: ShopItem[] = [
     // Buddy Colors
@@ -79,6 +92,10 @@ export default function ShopPage() {
     // Load purchased items
     const purchased = JSON.parse(localStorage.getItem(`purchased_${currentKid.id}`) || '[]');
     setPurchasedItems(purchased);
+
+    // Check if weekly animation is unlocked
+    const weeklyUnlocked = localStorage.getItem(`weeklyAnimation_week${currentWeek}`) === 'true';
+    setWeeklyAnimationUnlocked(weeklyUnlocked);
 
     // Glitch sound effect for legendary item
     if (currentCoins >= 100000 && !purchased.includes(999)) {
@@ -345,6 +362,67 @@ export default function ShopPage() {
             <div className="text-right">
               <p className="text-sm text-gray-500">Your Balance</p>
               <p className="text-3xl font-bold text-yellow-500">🪙 {coins}</p>
+            </div>
+          </div>
+
+          {/* WEEKLY ANIMATION SECTION */}
+          <div className="mb-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-2xl p-6 text-white shadow-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-3xl animate-bounce">🎭</span>
+                  <h3 className="text-2xl font-bold">This Week's Animation!</h3>
+                  <span className="bg-yellow-400 text-black px-2 py-1 rounded-full text-sm font-bold">Week {currentWeek}</span>
+                </div>
+                <p className="text-sm opacity-90 mb-3">
+                  {weeklyAnimationUnlocked 
+                    ? "✅ Unlocked! Watch anytime!" 
+                    : "🎬 Unlock this week's hilarious animation!"}
+                </p>
+                <p className="text-xs opacity-75 italic">
+                  {currentWeek % 52 === 1 && "Alex's Video Game Logic Loop 🎮"}
+                  {currentWeek % 52 !== 1 && "New animation each week!"}
+                </p>
+              </div>
+              <div>
+                {weeklyAnimationUnlocked ? (
+                  <button
+                    onClick={() => {
+                      setShowWeeklyAnimation(true);
+                      soundEffects?.playClick();
+                    }}
+                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-lg transform hover:scale-105 transition"
+                  >
+                    ▶️ Watch Again
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      if (coins >= 10) {
+                        const newCoins = coins - 10;
+                        setCoins(newCoins);
+                        setWeeklyAnimationUnlocked(true);
+                        
+                        // Save to localStorage
+                        const currentKid = JSON.parse(localStorage.getItem('currentKid') || '{}');
+                        currentKid.coins = newCoins;
+                        localStorage.setItem('currentKid', JSON.stringify(currentKid));
+                        localStorage.setItem(`weeklyAnimation_week${currentWeek}`, 'true');
+                        
+                        // Play animation
+                        setShowWeeklyAnimation(true);
+                        soundEffects?.playCelebration();
+                      } else {
+                        alert('Not enough coins! You need 10 coins.');
+                        soundEffects?.playWrong();
+                      }
+                    }}
+                    className="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3 rounded-xl font-bold text-lg shadow-lg transform hover:scale-105 transition"
+                  >
+                    🪙 Unlock for 10 Coins
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -623,7 +701,28 @@ export default function ShopPage() {
           50% { transform: scale(0.95); filter: hue-rotate(180deg); }
           75% { transform: scale(1.02); filter: hue-rotate(270deg); }
         }
+        @keyframes slideInRight {
+          from { transform: translateX(100px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes walkRight {
+          from { transform: translateX(0); }
+          to { transform: translateX(200px); opacity: 0; }
+        }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-10px); }
+          75% { transform: translateX(10px); }
+        }
       `}</style>
+
+      {/* Weekly Animation Modal */}
+      {showWeeklyAnimation && (
+        <WeeklyAnimation
+          weekNumber={currentWeek % 52 || 1} // Cycle through 52 weeks
+          onClose={() => setShowWeeklyAnimation(false)}
+        />
+      )}
     </div>
   );
 }

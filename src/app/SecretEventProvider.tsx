@@ -27,6 +27,12 @@ export function useSecretEvent() {
 // Secret key listener for replaying intro
 if (typeof window !== 'undefined') {
   window.addEventListener('keydown', (e) => {
+    // Don't trigger if user is typing in an input/textarea
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+      return;
+    }
+    
     // Press 'I' for Intro replay
     if (e.key === 'i' || e.key === 'I') {
       localStorage.removeItem('introDone');
