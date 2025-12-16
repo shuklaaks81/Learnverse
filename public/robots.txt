@@ -1,0 +1,23 @@
+# robots.txt for Learnverse
+User-agent: *
+Allow: /
+
+# Main pages
+Allow: /kid
+Allow: /parent
+Allow: /info
+
+# Important kid pages
+Allow: /kid/lessons
+Allow: /kid/games
+Allow: /kid/theater
+Allow: /kid/shop
+Allow: /kid/achievements
+
+# Block login pages from indexing (privacy)
+Disallow: /kid/login
+Disallow: /parent/login
+Disallow: /owner
+
+# Sitemap
+Sitemap: https://learnverse-delta.vercel.app/sitemap.xml

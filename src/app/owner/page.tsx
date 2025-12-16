@@ -43,13 +43,13 @@ export default function OwnerDashboard() {
   ];
 
   useEffect(() => {
-    // Initialize total visitors (simulate growth)
+    // Initialize total visitors (simulate growth) - MORE REALISTIC numbers!
     const storedVisitors = localStorage.getItem('totalVisitors');
-    const baseVisitors = storedVisitors ? parseInt(storedVisitors) : Math.floor(Math.random() * 500) + 150;
+    const baseVisitors = storedVisitors ? parseInt(storedVisitors) : Math.floor(Math.random() * 50) + 10; // 10-60 visitors
     setTotalVisitors(baseVisitors);
 
     // Generate random users
-    const numUsers = Math.floor(Math.random() * 8) + 3; // 3-10 users
+    const numUsers = Math.floor(Math.random() * 5) + 2; // 2-6 users
     const generatedUsers: User[] = [];
     
     for (let i = 0; i < numUsers; i++) {
@@ -100,7 +100,7 @@ export default function OwnerDashboard() {
 
     // Update online count
     const onlineInterval = setInterval(() => {
-      const newOnline = Math.floor(Math.random() * 8) + 2; // 2-9 online
+      const newOnline = Math.floor(Math.random() * 5) + 1; // 1-5 online (more realistic!)
       setOnlineNow(newOnline);
     }, 15000);
 
