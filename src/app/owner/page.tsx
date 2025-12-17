@@ -14,10 +14,23 @@ interface User {
 }
 
 export default function OwnerDashboard() {
+  const [password, setPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [error, setError] = useState('');
   const [totalVisitors, setTotalVisitors] = useState(0);
   const [onlineNow, setOnlineNow] = useState(0);
   const [users, setUsers] = useState<User[]>([]);
   const [activityFeed, setActivityFeed] = useState<string[]>([]);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === 'Aksgkp1234!!!!!') {
+      setIsAuthenticated(true);
+      setError('');
+    } else {
+      setError('Wrong password!');
+    }
+  };
 
   // Simulated users with fun names and activities
   const possibleUsers = [
@@ -110,6 +123,46 @@ export default function OwnerDashboard() {
       clearInterval(onlineInterval);
     };
   }, []);
+
+  // Login form
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-8">
+        <div className="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-12 border border-white/20 max-w-md w-full">
+          <div className="text-center mb-8">
+            <div className="text-7xl mb-4">🔐</div>
+            <h1 className="text-4xl font-bold text-white mb-2">Owner Access</h1>
+            <p className="text-white/70">Enter password to view dashboard</p>
+          </div>
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password..."
+                className="w-full px-6 py-4 rounded-xl bg-white/20 text-white placeholder-white/50 border-2 border-white/30 focus:border-white/60 outline-none text-lg"
+              />
+            </div>
+            {error && (
+              <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 text-red-200 text-center">
+                {error}
+              </div>
+            )}
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold py-4 rounded-xl transition transform hover:scale-105"
+            >
+              🔓 Unlock Dashboard
+            </button>
+          </form>
+          <Link href="/" className="block text-center mt-6 text-white/60 hover:text-white/90 transition">
+            ← Back to Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 p-8">
