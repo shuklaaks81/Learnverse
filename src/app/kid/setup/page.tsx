@@ -17,6 +17,9 @@ function KidSetupContent() {
   const [expressionType, setExpressionType] = useState('happy');
   const [skinColor, setSkinColor] = useState('#FFE4B5');
   
+  // Version preference
+  const [preferredVersion, setPreferredVersion] = useState('stable');
+  
   // Voice settings
   const [voiceRate, setVoiceRate] = useState(0.88);
   const [voicePitch, setVoicePitch] = useState(1.2);
@@ -108,10 +111,12 @@ function KidSetupContent() {
       voicePitch,
       voiceVolume,
       musicEnabled,
-      customNamePronunciation: hasRecordedName
+      customNamePronunciation: hasRecordedName,
+      preferredVersion
     };
     
     localStorage.setItem('buddyPreferences', JSON.stringify(preferences));
+    localStorage.setItem('preferredVersion', preferredVersion);
     
     // Save audio blob separately if exists
     if (nameAudioBlob) {
@@ -131,22 +136,22 @@ function KidSetupContent() {
     excited: 'M 33 43 Q 40 52 47 43',
     friendly: 'M 35 46 Q 40 49 45 46',
     cheerful: 'M 34 44 Q 40 51 46 44'
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-400 via-orange-300 to-pink-300 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 p-8 animate-gradient-shift">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-5xl font-bold text-white mb-2 text-center drop-shadow-lg">
-          ✨ Let&apos;s Set Up Your Learning Buddy! ✨
+        <h1 className="text-6xl font-bold text-white mb-4 text-center drop-shadow-2xl animate-bounce-slow">
+          🎨 Let&apos;s Set Up Your Learning Buddy! ✨
         </h1>
-        <p className="text-xl text-white mb-8 text-center">
-          Customize your buddy and voice, {kidName}!
+        <p className="text-2xl text-white mb-8 text-center font-semibold drop-shadow-lg">
+          Customize everything, {kidName}!
         </p>
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Left side - Buddy Preview */}
-          <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl">
-            <h2 className="text-3xl font-bold text-purple-600 mb-6 text-center">
+          <div className="bg-gradient-to-br from-white to-purple-100 rounded-3xl p-8 shadow-2xl border-4 border-white transform hover:scale-105 transition-transform">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6 text-center">
+              Your Learning Buddy
+            </h2>lassName="text-3xl font-bold text-purple-600 mb-6 text-center">
               Your Learning Buddy
             </h2>
             
@@ -378,7 +383,7 @@ function KidSetupContent() {
               </div>
 
               {/* Background Music */}
-              <div className="border-t-2 border-gray-200 pt-6">
+              <div className="border-t-2 border-purple-200 pt-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-700">Background Music</h3>
@@ -399,15 +404,53 @@ function KidSetupContent() {
                 </div>
               </div>
 
+              {/* App Version Preference - NEW! */}
+              <div className="border-t-2 border-purple-200 pt-6 mt-6">
+                <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">🔄 App Version</h3>
+                <p className="text-sm text-gray-600 mb-4">Choose which version you want to use!</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    onClick={() => {
+                      setPreferredVersion('stable');
+                      sounds?.playClick();
+                    }}
+                    className={`p-5 rounded-2xl border-4 transition-all transform ${
+                      preferredVersion === 'stable'
+                        ? 'border-green-500 bg-gradient-to-br from-green-50 to-green-100 scale-105 shadow-xl'
+                        : 'border-gray-300 bg-white hover:border-green-300 hover:scale-105'
+                    }`}
+                  >
+                    <div className="text-5xl mb-2">✅</div>
+                    <div className="font-bold text-lg text-green-600">Stable</div>
+                    <div className="text-xs text-gray-600 mt-1">Tested & reliable</div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPreferredVersion('beta');
+                      sounds?.playClick();
+                    }}
+                    className={`p-5 rounded-2xl border-4 transition-all transform ${
+                      preferredVersion === 'beta'
+                        ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 scale-105 shadow-xl'
+                        : 'border-gray-300 bg-white hover:border-blue-300 hover:scale-105'
+                    }`}
+                  >
+                    <div className="text-5xl mb-2">🚀</div>
+                    <div className="font-bold text-lg text-blue-600">Beta</div>
+                    <div className="text-xs text-gray-600 mt-1">New features!</div>
+                  </button>
+                </div>
+              </div>
+
               {/* Continue Button */}
               <button
                 onClick={() => {
-                  sounds?.playClick();
+                  sounds?.playVictory();
                   saveAndContinue();
                 }}
-                className="w-full py-4 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white rounded-xl font-bold text-xl shadow-lg transition-all mt-8"
+                className="w-full py-6 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 hover:from-green-600 hover:via-emerald-600 hover:to-teal-600 text-white rounded-2xl font-bold text-2xl shadow-2xl transition-all mt-8 transform hover:scale-105 animate-pulse"
               >
-                ✨ Start Learning! ✨
+                🎉 All Done - Let&apos;s Learn! 🎉
               </button>
             </div>
           </div>
