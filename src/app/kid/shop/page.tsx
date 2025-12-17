@@ -61,28 +61,6 @@ export default function ShopPage() {
     { id: 16, name: 'XP Boost', description: '1.5x XP for 10 lessons', price: 100, category: 'powerups', emoji: '⚡', unlocked: false },
   ];
 
-  // 🔮 ULTRA SECRET LEGENDARY ITEM - Only visible with 100,000+ coins!
-  const legendaryItem: ShopItem = {
-    id: 999,
-    name: '█▓░ L̴̢͝E̵̛͢G̴҉E̴͟N̷̢D̵̨A̴̧͝R̸̢Y̶̡ ̷M̴̛O̶̢D̸̨Ȩ̵ ░▓█',
-    description: '⚠️ ER̷R̸O͝R̶ ⚠️ C̴̨O̴̡R̴͘R̶U̸P̴T̴E̵D̵ ̶D̴A̶T̴A̸ ̴D̸E̴T̴E̸C̴T̵E̷D̷ ⚠️ Transform reality itself... Unlock forbidden powers... Reality.exe has stopped working... ⚠️ UNKNOWN EFFECTS ⚠️',
-    price: 100000,
-    category: 'powerups',
-    emoji: '⚠️',
-    unlocked: false
-  };
-
-  // 🌟✨ ULTIMATE HIDDEN GOD TIER ITEM - Only visible at high coins!!!
-  const godTierItem: ShopItem = {
-    id: 9999,
-    name: '▂▃▄▅▆▇█ G̸̢̛͠O̴̧̨͠D̸̢̛͝ ̴̧̛͝M̸̢̛͠O̴̧̨͠D̸̢̛͝Ȩ̴̨͠ █▇▆▅▄▃▂',
-    description: '✨⚡💫 TRANSCEND REALITY ✨⚡💫 Become one with the universe... Control time and space... Infinite knowledge unlocked... You are no longer bound by the laws of physics... Reality is yours to command... ✨ ASCEND BEYOND EXISTENCE ✨',
-    price: 1000000, // 1 MILLION COINS! Still SUPER hard but possible! 🎯
-    category: 'powerups',
-    emoji: '✨',
-    unlocked: false
-  };
-
   useEffect(() => {
     // Load coins from currentKid (same as daily challenge)
     const currentKid = JSON.parse(localStorage.getItem('currentKid') || '{}');
@@ -96,50 +74,10 @@ export default function ShopPage() {
     // Check if weekly animation is unlocked
     const weeklyUnlocked = localStorage.getItem(`weeklyAnimation_week${currentWeek}`) === 'true';
     setWeeklyAnimationUnlocked(weeklyUnlocked);
-
-    // Glitch sound effect for legendary item
-    if (currentCoins >= 100000 && !purchased.includes(999)) {
-      const glitchInterval = setInterval(() => {
-        // Create glitch sound using Web Audio API
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        // Random glitchy frequency
-        oscillator.frequency.value = Math.random() * 500 + 100;
-        oscillator.type = 'sawtooth';
-        
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.1);
-      }, 3000); // Play glitch sound every 3 seconds
-
-      return () => clearInterval(glitchInterval);
-    }
   }, []);
 
   const handlePurchase = (item: ShopItem) => {
     if (coins >= item.price && !purchasedItems.includes(item.id)) {
-      // GOD TIER ITEM - THE ULTIMATE SECRET!!! 🌟
-      if (item.id === 9999) {
-        // EXTREME GLITCHING EFFECT - REALITY BREAKING!
-        setIsGlitching(true);
-        
-        // Super intense glitch sounds
-        const godGlitchSounds = setInterval(() => {
-          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-          const oscillator = audioContext.createOscillator();
-          const gainNode = audioContext.createGain();
-          
-          oscillator.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-          
-          oscillator.frequency.value = Math.random() * 2000 + 50;
           oscillator.type = 'square';
           
           gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
@@ -268,16 +206,6 @@ export default function ShopPage() {
   // Add special items based on coin thresholds
   let allItems = [...shopItems];
   
-  // Add legendary item if player has 100k+ coins and it hasn't been purchased yet
-  if (coins >= 100000 && !purchasedItems.includes(999)) {
-    allItems = [...allItems, legendaryItem];
-  }
-  
-  // Add GOD TIER item if player has 950k+ coins and it hasn't been purchased yet
-  if (coins >= 950000 && !purchasedItems.includes(9999)) { // 950k - close enough to see it! 😈
-    allItems = [...allItems, godTierItem];
-  }
-  
   // Filter items based on category AND affordability
   let filteredItems = selectedCategory === 'all' 
     ? allItems 
@@ -299,57 +227,6 @@ export default function ShopPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-400 via-orange-300 to-pink-300 p-6 relative">
-      {/* DEV: Give 1 million coins button */}
-      <button
-        onClick={() => {
-          const currentKid = JSON.parse(localStorage.getItem('currentKid') || '{}');
-          currentKid.coins = 1000000;
-          localStorage.setItem('currentKid', JSON.stringify(currentKid));
-          // Update in kidAccounts too
-          const kidAccounts = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
-          const updatedAccounts = kidAccounts.map((kid: any) => kid.id === currentKid.id ? { ...kid, coins: 1000000 } : kid);
-          localStorage.setItem('kidAccounts', JSON.stringify(updatedAccounts));
-          setCoins(1000000);
-        }}
-        style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, background: '#01579b', color: 'white', borderRadius: 8, padding: '8px 16px', fontWeight: 'bold', boxShadow: '0 2px 8px #0003' }}
-      >
-        💰 Get 1,000,000 Coins
-      </button>
-      {/* Glitching overlay when purchasing legendary item */}
-      {isGlitching && (
-        <div className="fixed inset-0 z-50 pointer-events-none">
-          <div className="absolute inset-0 bg-black animate-pulse" style={{
-            animation: 'glitchOverlay 0.1s infinite',
-            opacity: 0.5
-          }}></div>
-          <div className="absolute inset-0" style={{
-            background: 'repeating-linear-gradient(0deg, transparent 0px, red 2px, transparent 4px, cyan 6px, transparent 8px, lime 10px, transparent 12px)',
-            animation: 'scanlinesFast 0.3s infinite',
-            opacity: 0.3
-          }}></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-            <div className="text-9xl mb-4 animate-pulse" style={{
-              animation: 'glitchEmoji 0.1s infinite',
-              textShadow: '5px 0 red, -5px 0 cyan, 0 5px lime',
-              filter: 'contrast(200%) brightness(150%)'
-            }}>⚠️</div>
-            <div className="text-6xl font-mono font-bold text-red-500" style={{
-              animation: 'glitchText 0.2s infinite',
-              textShadow: '3px 0 red, -3px 0 cyan'
-            }}>
-              C̴O̸R̸R̵U̷P̶T̸I̴N̸G̴.̶.̸.̵
-            </div>
-            <div className="text-3xl font-mono text-lime-400 mt-4" style={{
-              animation: 'glitchText 0.15s infinite'
-            }}>
-              {`>> REALITY.EXE LOADING...`}
-            </div>
-            <div className="text-xl font-mono text-cyan-400 mt-2">
-              {`>> DO NOT CLOSE`}
-            </div>
-          </div>
-        </div>
-      )}
       
       <div className="max-w-6xl mx-auto">
         {/* Header */}
@@ -496,114 +373,45 @@ export default function ShopPage() {
           {filteredItems.map(item => {
             const isPurchased = purchasedItems.includes(item.id);
             const canAfford = coins >= item.price;
-            const isLegendary = item.id === 999;
-            const isGodMode = item.id === 9999;
 
-            // Special glitchy rendering for God Mode and Legendary items
-            const glitchy = (isLegendary || isGodMode) && !isPurchased;
             return (
               <div
                 key={item.id}
                 className={`rounded-2xl shadow-lg p-6 transition-all hover:shadow-xl relative overflow-hidden ${
-                  isPurchased ? 'border-4 border-green-400 bg-white' : ''
-                } ${isLegendary && !isPurchased ? 'border-4 border-red-600 bg-black col-span-full' : ''} ${isGodMode && !isPurchased ? 'border-4 border-purple-700 bg-black col-span-full' : 'bg-white'}`}
-                style={glitchy ? {
-                  animation: 'glitchCard 0.1s infinite',
-                  boxShadow: isLegendary ? '0 0 50px rgba(255, 0, 0, 0.5), inset 0 0 50px rgba(0, 255, 255, 0.2)' : '0 0 50px rgba(128,0,255,0.5), inset 0 0 50px rgba(0,255,255,0.2)'
-                } : {}}
+                  isPurchased ? 'border-4 border-green-400 bg-white' : 'bg-white'
+                }`}
               >
-                {/* Glitch effect overlays for legendary/god mode item */}
-                {glitchy && (
-                  <>
-                    <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
-                      background: isLegendary
-                        ? 'repeating-linear-gradient(0deg, red 0px, cyan 2px, lime 4px, transparent 6px)'
-                        : 'repeating-linear-gradient(0deg, purple 0px, cyan 2px, magenta 4px, transparent 6px)',
-                      animation: 'scanlines 0.5s infinite'
-                    }}></div>
-                    <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none" style={{
-                      background: isLegendary
-                        ? 'linear-gradient(90deg, transparent 0%, red 50%, transparent 100%)'
-                        : 'linear-gradient(90deg, transparent 0%, purple 50%, transparent 100%)',
-                      animation: 'glitchSweep 2s infinite'
-                    }}></div>
-                  </>
-                )}
-
                 <div className="text-center mb-4 relative z-10">
-                  <div className={`mb-3 ${glitchy ? 'text-9xl' : 'text-6xl'}`} style={glitchy ? {
-                    animation: 'glitchEmoji 0.2s infinite',
-                    textShadow: isLegendary
-                      ? '3px 0 red, -3px 0 cyan, 0 3px lime'
-                      : '3px 0 purple, -3px 0 cyan, 0 3px magenta',
-                    filter: 'contrast(200%) brightness(150%)'
-                  } : {}}>
-                    {glitchy ? (
-                      <span className="inline-block">
-                        {isLegendary ? '⚠️' : '✨'}
-                      </span>
-                    ) : item.emoji}
+                  <div className="mb-3 text-6xl">
+                    {item.emoji}
                   </div>
-                  <h3 className={`font-bold ${glitchy ? 'text-4xl mb-4 font-mono' : 'text-xl text-gray-800'} ${isLegendary ? 'text-red-500' : ''} ${isGodMode ? 'text-purple-400' : ''}`} style={glitchy ? {
-                    animation: 'glitchText 0.3s infinite',
-                    textShadow: isLegendary
-                      ? '2px 0 red, -2px 0 cyan'
-                      : '2px 0 purple, -2px 0 cyan'
-                  } : {}}>
+                  <h3 className="font-bold text-xl text-gray-800">
                     {item.name}
                   </h3>
-                  <p className={`mt-2 ${glitchy ? 'text-lg font-mono' : 'text-sm text-gray-600'} ${isLegendary ? 'text-lime-400' : ''} ${isGodMode ? 'text-fuchsia-300' : ''}`}>
+                  <p className="mt-2 text-sm text-gray-600">
                     {item.description}
                   </p>
-                  {isLegendary && !isPurchased && (
-                    <div className="mt-4 bg-red-900 text-yellow-300 px-4 py-2 rounded-lg font-bold text-sm border-2 border-yellow-500 animate-pulse">
-                      ⚠️ ERROR: UNKNOWN CONSEQUENCES // PROCEED AT OWN RISK ⚠️
-                    </div>
-                  )}
-                  {isGodMode && !isPurchased && (
-                    <div className="mt-4 bg-purple-900 text-fuchsia-300 px-4 py-2 rounded-lg font-bold text-sm border-2 border-fuchsia-400 animate-pulse">
-                      ✨ WARNING: REALITY BREAKER // TRANSCENDENCE IMMINENT ✨
-                    </div>
-                  )}
                 </div>
 
                 <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200 relative z-10">
-                  <div className={`font-bold ${glitchy ? 'text-4xl font-mono' : 'text-2xl text-yellow-500'} ${isLegendary ? 'text-red-500' : ''} ${isGodMode ? 'text-purple-400' : ''}`} style={glitchy ? {
-                    textShadow: isLegendary
-                      ? '0 0 10px red, 0 0 20px red'
-                      : '0 0 10px purple, 0 0 20px magenta'
-                  } : {}}>
-                    {isLegendary ? '⚠️' : isGodMode ? '✨' : '🪙'} {item.price.toLocaleString()}
+                  <div className="font-bold text-2xl text-yellow-500">
+                    🪙 {item.price.toLocaleString()}
                   </div>
                   {isPurchased ? (
-                    <div className={`bg-green-100 text-green-700 px-4 py-2 rounded-full font-semibold ${glitchy ? 'text-xl' : ''}`}>
-                      ✓ {isLegendary ? 'REALITY ALTERED' : isGodMode ? 'TRANSCENDED' : 'Owned'}
+                    <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full font-semibold">
+                      ✓ Owned
                     </div>
                   ) : (
                     <button
                       onClick={() => handlePurchase(item)}
                       disabled={!canAfford}
                       className={`px-6 py-2 rounded-full font-semibold transition-all ${
-                        glitchy && canAfford
-                          ? (isLegendary
-                              ? 'bg-red-600 text-yellow-300 hover:shadow-2xl hover:scale-110 text-xl border-4 border-yellow-500 font-mono'
-                              : 'bg-purple-700 text-fuchsia-300 hover:shadow-2xl hover:scale-110 text-xl border-4 border-fuchsia-400 font-mono')
-                          : canAfford
-                          ? 'bg-gradient-to-r from-orange-400 to-pink-400 text-white hover:shadow-lg hover:scale-105'
-                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        canAfford
+                        ? 'bg-gradient-to-r from-orange-400 to-pink-400 text-white hover:shadow-lg hover:scale-105'
+                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                       }`}
-                      style={glitchy && canAfford ? {
-                        animation: 'glitchButton 0.5s infinite',
-                        boxShadow: isLegendary ? '0 0 20px red' : '0 0 20px purple'
-                      } : {}}
                     >
-                      {isLegendary && canAfford
-                        ? '⚠️ CORRUPT'
-                        : isGodMode && canAfford
-                        ? '✨ TRANSCEND'
-                        : canAfford
-                        ? 'Buy'
-                        : 'Need more'}
+                      {canAfford ? 'Buy' : 'Need more'}
                     </button>
                   )}
                 </div>
