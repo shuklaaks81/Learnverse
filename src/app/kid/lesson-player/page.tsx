@@ -13,6 +13,7 @@ interface LessonStep {
   emoji?: string;
   isQuestion?: boolean;
   correctAnswer?: string;
+  phase?: 'intro' | 'how' | 'solve' | 'practice' | 'quiz';
 }
 
 function LessonContent() {
@@ -63,16 +64,16 @@ function LessonContent() {
     switch (title) {
       case "Addition Basics":
         return [
-          { text: "Hi there! Ready to become an addition superstar? Let's do this!", emoji: "⭐" },
-          { text: "Addition means putting numbers together. When we add, we combine things!", emoji: "➕" },
-          { text: "Imagine you have 2 toy cars. Your friend gives you 3 more cars. Now count them all!", emoji: "🚗" },
-          { text: "1, 2... then 3, 4, 5! You have 5 cars total. So 2 plus 3 equals 5!", emoji: "🎉" },
-          { text: "Let me ask you a question! What is 3 + 2? Think carefully!", emoji: "🤔", isQuestion: true, correctAnswer: "5" },
-          { text: "Awesome job! The answer is 5. You're getting this!", emoji: "✨" },
-          { text: "Here's a cool trick: You can switch the numbers! 3 + 2 and 2 + 3 both equal 5!", emoji: "🔄" },
-          { text: "Ready for another? What is 4 + 4? You've got this!", emoji: "💪", isQuestion: true, correctAnswer: "8" },
-          { text: "Fantastic! 4 + 4 = 8. You're doing amazing!", emoji: "🌟" },
-          { text: "You crushed it! You're an addition champion! Keep practicing!", emoji: "🏆" }
+          { text: "Hi there! Ready to become an addition superstar? Let's do this!", emoji: "⭐", phase: 'intro' },
+          { text: "Addition means putting numbers together. When we add, we combine things!", emoji: "➕", phase: 'intro' },
+          { text: "Imagine you have 2 toy cars. Your friend gives you 3 more cars. Now count them all!", emoji: "🚗", phase: 'how' },
+          { text: "1, 2... then 3, 4, 5! You have 5 cars total. So 2 plus 3 equals 5!", emoji: "🎉", phase: 'how' },
+          { text: "Let me ask you a question! What is 3 + 2? Think carefully!", emoji: "🤔", isQuestion: true, correctAnswer: "5", phase: 'solve' },
+          { text: "Awesome job! The answer is 5. You're getting this!", emoji: "✨", phase: 'solve' },
+          { text: "Here's a cool trick: You can switch the numbers! 3 + 2 and 2 + 3 both equal 5!", emoji: "🔄", phase: 'practice' },
+          { text: "Ready for another? What is 4 + 4? You've got this!", emoji: "💪", isQuestion: true, correctAnswer: "8", phase: 'practice' },
+          { text: "Fantastic! 4 + 4 = 8. You're doing amazing!", emoji: "🌟", phase: 'quiz' },
+          { text: "You crushed it! You're an addition champion! Keep practicing!", emoji: "🏆", phase: 'quiz' }
         ];
       
       case "Subtraction Fun":
@@ -691,21 +692,60 @@ function LessonContent() {
             )}
           </div>
 
-              {/* Progress */}
+              {/* Progress - Chunked by Phase */}
               <div className="mb-6">
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="font-bold text-purple-700 animate-pulse text-lg">✨ Progress ✨</span>
+                <div className="flex justify-between text-sm mb-3">
+                  <span className="font-bold text-purple-700 animate-pulse text-lg">✨ Your Learning Journey ✨</span>
                   <span className="font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent animate-[bounce_1s_ease-in-out_infinite] text-lg">
                     Step {currentStep + 1} of {lessonSteps.length}
                   </span>
                 </div>
-                <div className="w-full bg-gradient-to-r from-gray-300 via-purple-100 to-gray-300 rounded-full h-4 shadow-lg relative overflow-hidden border-2 border-purple-300">
+                
+                {/* Phase-based chunked progress */}
+                <div className="flex gap-2 mb-2">
+                  {['intro', 'how', 'solve', 'practice', 'quiz'].map((phase, idx) => {
+                    const phaseNames = ['📚 Intro', '🔍 How', '✏️ Solve', '💪 Practice', '🎯 Quiz'];
+                    const phaseColors = [
+                      'from-blue-400 to-blue-500',
+                      'from-green-400 to-green-500', 
+                      'from-yellow-400 to-yellow-500',
+                      'from-orange-400 to-orange-500',
+                      'from-purple-400 to-purple-500'
+                    ];
+                    const currentPhase = lessonSteps[currentStep]?.phase || 'intro';
+                    const phaseIndex = ['intro', 'how', 'solve', 'practice', 'quiz'].indexOf(currentPhase);
+                    const isActive = idx === phaseIndex;
+                    const isComplete = idx < phaseIndex;
+                    
+                    return (
+                      <div key={phase} className="flex-1">
+                        <div className={`text-xs text-center mb-1 font-bold transition-all ${
+                          isActive ? 'text-purple-700 scale-110' : isComplete ? 'text-green-600' : 'text-gray-400'
+                        }`}>
+                          {phaseNames[idx]}
+                        </div>
+                        <div className={`h-3 rounded-full border-2 transition-all duration-500 ${
+                          isActive ? `bg-gradient-to-r ${phaseColors[idx]} border-purple-400 animate-pulse shadow-lg scale-105` :
+                          isComplete ? 'bg-gradient-to-r from-green-400 to-green-500 border-green-400' :
+                          'bg-gray-200 border-gray-300'
+                        }`}>
+                          {isComplete && (
+                            <div className="flex items-center justify-center h-full text-white text-xs font-bold">✓</div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {/* Overall progress bar */}
+                <div className="w-full bg-gradient-to-r from-gray-300 via-purple-100 to-gray-300 rounded-full h-2 shadow-lg relative overflow-hidden border border-purple-200 mt-3">
                   <div
-                    className="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 h-4 rounded-full transition-all duration-700 ease-out relative"
+                    className="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 h-2 rounded-full transition-all duration-700 ease-out relative"
                     style={{ 
                       width: `${progressPercent}%`,
                       backgroundSize: '200% 100%',
-                      animation: 'shimmer 2s infinite, pulse 1.5s ease-in-out infinite'
+                      animation: 'shimmer 2s infinite'
                     }}
                   >
                     <div className="absolute inset-0 bg-white opacity-40 animate-pulse"></div>
