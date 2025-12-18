@@ -352,7 +352,7 @@ function LessonContent() {
   const progressPercent = ((currentStep + 1) * 100) / lessonSteps.length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-400 via-orange-300 to-pink-300 p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-400 to-orange-400 p-8 relative overflow-hidden animate-gradient-shift" style={{ backgroundSize: '200% 200%' }}>
       {/* Confetti Effect */}
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-50">
@@ -391,9 +391,9 @@ function LessonContent() {
 
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
+        <div className="bg-gradient-to-r from-white to-purple-50 rounded-2xl shadow-2xl p-6 mb-6 border-4 border-purple-300">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-purple-600">{lessonTitle}</h1>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent animate-pulse">{lessonTitle}</h1>
             <Link 
               href="/kid/lessons"
               className="text-purple-600 hover:text-purple-700 font-medium"
@@ -412,8 +412,8 @@ function LessonContent() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Side - Buddy in Window */}
           <div className="lg:col-span-1">
-            <div className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl shadow-xl p-6 border-4 border-purple-300 sticky top-6">
-              <h3 className="text-center text-purple-700 font-bold mb-4 text-xl">👋 Your Learning Buddy!</h3>
+            <div className="bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200 rounded-2xl shadow-2xl p-6 border-4 border-purple-400 sticky top-6 animate-pulse-slow">
+              <h3 className="text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-bold mb-4 text-2xl">👋 Your Learning Buddy!</h3>
               
               {/* Animated Character in Window */}
               <div className={`flex justify-center mb-4 bg-white rounded-xl p-4 shadow-inner overflow-visible transition-transform transition-opacity duration-700 ${buddyVisible ? 'translate-x-0 opacity-100' : '-translate-x-[180px] opacity-0'}`} style={{ willChange: 'transform, opacity' }}>
@@ -694,21 +694,21 @@ function LessonContent() {
               {/* Progress */}
               <div className="mb-6">
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-600 animate-pulse">Progress</span>
-                  <span className="font-semibold text-purple-600 animate-[bounce_1s_ease-in-out_infinite]">
+                  <span className="font-bold text-purple-700 animate-pulse text-lg">✨ Progress ✨</span>
+                  <span className="font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent animate-[bounce_1s_ease-in-out_infinite] text-lg">
                     Step {currentStep + 1} of {lessonSteps.length}
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner relative overflow-hidden">
+                <div className="w-full bg-gradient-to-r from-gray-300 via-purple-100 to-gray-300 rounded-full h-4 shadow-lg relative overflow-hidden border-2 border-purple-300">
                   <div
-                    className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 h-3 rounded-full transition-all duration-500 ease-out relative"
+                    className="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 h-4 rounded-full transition-all duration-700 ease-out relative"
                     style={{ 
                       width: `${progressPercent}%`,
                       backgroundSize: '200% 100%',
-                      animation: 'shimmer 2s infinite'
+                      animation: 'shimmer 2s infinite, pulse 1.5s ease-in-out infinite'
                     }}
                   >
-                    <div className="absolute inset-0 bg-white opacity-30 animate-pulse"></div>
+                    <div className="absolute inset-0 bg-white opacity-40 animate-pulse"></div>
                   </div>
                 </div>
               </div>
@@ -716,6 +716,23 @@ function LessonContent() {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes gradient-shift {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.8; }
+        }
+        .animate-gradient-shift {
+          animation: gradient-shift 8s ease infinite;
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 3s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 }
