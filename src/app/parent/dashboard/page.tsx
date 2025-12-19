@@ -23,6 +23,13 @@ export default function ParentDashboard() {
   const [updateInfo, setUpdateInfo] = useState<any>(null);
   const [showChangelog, setShowChangelog] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
+  const [showTerminal, setShowTerminal] = useState(false);
+  const [terminalInput, setTerminalInput] = useState('');
+  const [terminalHistory, setTerminalHistory] = useState<string[]>([
+    '🖥️ Parent Terminal v1.0',
+    'Type "help" for available commands',
+    ''
+  ]);
   
   // Check for updates
   useEffect(() => {
@@ -114,6 +121,72 @@ export default function ParentDashboard() {
     const interval = setInterval(loadKids, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  // Terminal command processor
+  const processCommand = (cmd: string) => {
+    const command = cmd.toLowerCase().trim();
+    const output: string[] = [...terminalHistory, `> ${cmd}`];
+
+    switch (command) {
+      case 'help':
+        output.push('📚 Available Commands:');
+        output.push('  stats    - Show app statistics');
+        output.push('  kids     - List all registered kids');
+        output.push('  logs     - View recent activity');
+        output.push('  clear    - Clear terminal');
+        output.push('  help     - Show this message');
+        break;
+      
+      case 'stats':
+        const totalKids = kids.length;
+        const totalLessons = kids.reduce((sum, kid) => sum + kid.lessonsCompleted, 0);
+        const totalAchievements = kids.reduce((sum, kid) => sum + kid.achievements, 0);
+        const avgProgress = totalKids > 0 ? Math.round(kids.reduce((sum, kid) => sum + kid.progress, 0) / totalKids) : 0;
+        output.push('📊 App Statistics:');
+        output.push(`  Total Kids: ${totalKids}`);
+        output.push(`  Total Lessons Completed: ${totalLessons}`);
+        output.push(`  Total Achievements: ${totalAchievements}`);
+        output.push(`  Average Progress: ${avgProgress}%`);
+        output.push(`  App Version: ${currentVersion}`);
+        break;
+      
+      case 'kids':
+        if (kids.length === 0) {
+          output.push('⚠️ No kids registered yet');
+        } else {
+          output.push(`👥 Registered Kids (${kids.length}):`);
+          kids.forEach((kid, index) => {
+            output.push(`  ${index + 1}. ${kid.name}`);
+            output.push(`     Progress: ${kid.progress}% | Lessons: ${kid.lessonsCompleted} | Streak: ${kid.streakDays} days`);
+          });
+        }
+        break;
+      
+      case 'logs':
+        output.push('📜 Recent Activity:');
+        output.push(`  Last update check: ${new Date().toLocaleTimeString()}`);
+        output.push(`  Current version: ${currentVersion}`);
+        output.push(`  Latest version: ${latestVersion}`);
+        output.push(`  Update available: ${updateAvailable ? 'Yes' : 'No'}`);
+        break;
+      
+      case 'clear':
+        setTerminalHistory(['🖥️ Parent Terminal v1.0', 'Type "help" for available commands', '']);
+        setTerminalInput('');
+        return;
+      
+      case '':
+        return;
+      
+      default:
+        output.push(`❌ Unknown command: "${cmd}"`);
+        output.push('Type "help" for available commands');
+    }
+
+    output.push('');
+    setTerminalHistory(output);
+    setTerminalInput('');
+  };
 
   // State for duplicate warning
   const [duplicateWarning, setDuplicateWarning] = useState(false);
@@ -478,6 +551,48 @@ export default function ParentDashboard() {
                   <p className="text-xs text-gray-400 mt-2 text-center">ID: {kid.id}</p>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+
+        {/* Terminal Section */}
+        <div className="mt-8">
+          <button
+            onClick={() => setShowTerminal(!showTerminal)}
+            className="w-full bg-gray-900 text-green-400 p-4 rounded-t-2xl font-mono font-bold text-xl hover:bg-gray-800 transition-all flex items-center justify-between border-4 border-gray-700"
+          >
+            <span>🖥️ Admin Terminal</span>
+            <span>{showTerminal ? '▼' : '▶'}</span>
+          </button>
+          
+          {showTerminal && (
+            <div className="bg-gray-900 border-4 border-t-0 border-gray-700 rounded-b-2xl p-6 font-mono">
+              {/* Terminal Output */}
+              <div className="bg-black rounded-xl p-4 mb-4 h-96 overflow-y-auto">
+                {terminalHistory.map((line, index) => (
+                  <div key={index} className="text-green-400 text-sm mb-1">
+                    {line}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Terminal Input */}
+              <div className="flex gap-2">
+                <span className="text-green-400">$</span>
+                <input
+                  type="text"
+                  value={terminalInput}
+                  onChange={(e) => setTerminalInput(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      processCommand(terminalInput);
+                    }
+                  }}
+                  className="flex-1 bg-transparent text-green-400 outline-none font-mono"
+                  placeholder="Type a command..."
+                  autoComplete="off"
+                />
+              </div>
             </div>
           )}
         </div>
