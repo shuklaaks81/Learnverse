@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function KidPage() {
@@ -8,8 +8,24 @@ export default function KidPage() {
   const [progress, setProgress] = useState(65); // percentage
   const [coins, setCoins] = useState(250);
   const [streak, setStreak] = useState(7);
+  const [showBuildButton, setShowBuildButton] = useState(false);
 
-  function handleSignOut() {
+  useEffect(() => {
+    // Check if Build Your App feature is enabled
+    const featureEnabled = localStorage.getItem('feature_buildApp');
+    setShowBuildButton(featureEnabled === 'true');
+  return (
+    <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100 p-8">
+      {/* Build Your App Button - Top Right Corner */}
+      {showBuildButton && (
+        <Link href="/kid/build" className="fixed top-4 right-4 z-50">
+          <button className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-6 py-3 rounded-2xl font-bold text-lg shadow-2xl hover:scale-110 transition-transform animate-pulse border-4 border-yellow-300">
+            🏗️ Build Your App!!!
+          </button>
+        </Link>
+      )}
+
+      {/* Profile Header Bar */}
     // Sign out logic
     alert("Signed out!");
   }

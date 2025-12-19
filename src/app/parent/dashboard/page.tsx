@@ -133,6 +133,7 @@ export default function ParentDashboard() {
         output.push('  stats    - Show app statistics');
         output.push('  kids     - List all registered kids');
         output.push('  logs     - View recent activity');
+        output.push('  build    - Add "Build Your App" feature');
         output.push('  clear    - Clear terminal');
         output.push('  help     - Show this message');
         break;
@@ -168,6 +169,22 @@ export default function ParentDashboard() {
         output.push(`  Current version: ${currentVersion}`);
         output.push(`  Latest version: ${latestVersion}`);
         output.push(`  Update available: ${updateAvailable ? 'Yes' : 'No'}`);
+        break;
+      
+      case 'build':
+        output.push('🏗️ Building "Build Your App" feature...');
+        output.push('  ✓ Creating /kid/build page');
+        output.push('  ✓ Adding button to kid home page');
+        output.push('  ✓ Setting up drawing canvas');
+        output.push('  ✓ Configuring white board');
+        output.push('  ✓ Adding color picker');
+        output.push('  ✓ Implementing drag-to-draw');
+        output.push('  ✓ Adding app builder logic');
+        output.push('');
+        output.push('✨ Feature created! Button will appear at top-right of kid home.');
+        output.push('📍 New page: /kid/build');
+        // Store feature activation in localStorage
+        localStorage.setItem('feature_buildApp', 'true');
         break;
       
       case 'clear':
