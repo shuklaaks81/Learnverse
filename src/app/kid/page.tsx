@@ -25,6 +25,64 @@ export default function KidPage() {
         </Link>
       )}
 
+      {/* Custom Features from Terminal */}
+      {customFeatures.map((feature, index) => {
+        const getPositionClass = (location: string) => {
+          const loc = location.toLowerCase();
+          if (loc.includes('top') && loc.includes('left')) return 'top-4 left-4';
+          if (loc.includes('top') && loc.includes('right')) return 'top-20 right-4';
+          if (loc.includes('bottom') && loc.includes('left')) return 'bottom-4 left-4';
+          if (loc.includes('bottom') && loc.includes('right')) return 'bottom-4 right-4';
+          if (loc.includes('corner')) return 'top-36 right-4';
+          return 'top-52 right-4';
+        };
+
+        const getColorClass = (color: string) => {
+          const colorMap: { [key: string]: string } = {
+            'blue': 'from-blue-500 to-blue-600',
+            'red': 'from-red-500 to-red-600',
+            'green': 'from-green-500 to-green-600',
+            'purple': 'from-purple-500 to-purple-600',
+            'pink': 'from-pink-500 to-pink-600',
+            'yellow': 'from-yellow-500 to-yellow-600',
+            'orange': 'from-orange-500 to-orange-600',
+            'white': 'from-gray-100 to-gray-200 text-gray-800',
+          };
+          return colorMap[color.toLowerCase()] || 'from-blue-500 to-blue-600';
+        };
+
+        if (feature.type === 'button') {
+          return (
+            <Link key={feature.id} href={feature.pageUrl} className={`fixed ${getPositionClass(feature.location)} z-40`}>
+              <button className={`bg-gradient-to-r ${getColorClass(feature.color)} text-white px-6 py-3 rounded-2xl font-bold shadow-2xl hover:scale-110 transition-transform border-4 border-white/50`}>
+                {feature.displayText}
+              </button>
+            </Link>
+          );
+        }
+
+        if (feature.type === 'board') {
+          return (
+            <Link key={feature.id} href={feature.pageUrl} className={`fixed ${getPositionClass(feature.location)} z-40`}>
+              <button className={`bg-gradient-to-r ${getColorClass(feature.color)} px-6 py-3 rounded-2xl font-bold shadow-2xl hover:scale-110 transition-transform border-4 border-black`}>
+                🎨 Drawing Board
+              </button>
+            </Link>
+          );
+        }
+
+        if (feature.type === 'custom') {
+          return (
+            <div key={feature.id} className={`fixed ${getPositionClass(feature.location)} z-40 bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-lg border-2 border-purple-400`}>
+              <p className="font-bold text-sm">⭐ {feature.name}</p>
+              <p className="text-xs text-gray-600">{feature.featureType}</p>
+            </div>
+          );
+        }
+
+        return null;
+      })}
+
       {/* Profile Header Bar */}
     // Sign out logic
     alert("Signed out!");

@@ -124,7 +124,10 @@ export default function ParentDashboard() {
 
   // Terminal command processor
   const processCommand = (cmd: string) => {
-    const command = cmd.toLowerCase().trim();
+    const fullCommand = cmd.trim();
+    const parts = fullCommand.split(' ');
+    const command = parts[0].toLowerCase();
+    const args = parts.slice(1);
     const output: string[] = [...terminalHistory, `> ${cmd}`];
 
     switch (command) {
@@ -133,9 +136,17 @@ export default function ParentDashboard() {
         output.push('  stats    - Show app statistics');
         output.push('  kids     - List all registered kids');
         output.push('  logs     - View recent activity');
-        output.push('  build    - Add "Build Your App" feature');
         output.push('  clear    - Clear terminal');
-        output.push('  help     - Show this message');
+        output.push('');
+        output.push('🛠️ Feature Creation (Custom Commands):');
+        output.push('  add button at <location> display <text> page <url> color <color>');
+        output.push('  add board at <location> page <url> color <color> drawable <state>');
+        output.push('  add feature <name> at <location> type <type>');
+        output.push('');
+        output.push('📝 Examples:');
+        output.push('  add button at "top right" display "My Feature!" page "/kid/custom" color "blue"');
+        output.push('  add board at "corner" page "/kid/draw" color "white" drawable "always"');
+        output.push('  add feature "music player" at "bottom" type "audio"');
         break;
       
       case 'stats':
@@ -171,20 +182,96 @@ export default function ParentDashboard() {
         output.push(`  Update available: ${updateAvailable ? 'Yes' : 'No'}`);
         break;
       
-      case 'build':
-        output.push('🏗️ Building "Build Your App" feature...');
-        output.push('  ✓ Creating /kid/build page');
-        output.push('  ✓ Adding button to kid home page');
-        output.push('  ✓ Setting up drawing canvas');
-        output.push('  ✓ Configuring white board');
-        output.push('  ✓ Adding color picker');
-        output.push('  ✓ Implementing drag-to-draw');
-        output.push('  ✓ Adding app builder logic');
-        output.push('');
-        output.push('✨ Feature created! Button will appear at top-right of kid home.');
-        output.push('📍 New page: /kid/build');
-        // Store feature activation in localStorage
-        localStorage.setItem('feature_buildApp', 'true');
+      case 'add':
+        if (args.length === 0) {
+          output.push('❌ Error: Missing arguments');
+          output.push('Usage: add button/board/feature ...');
+          output.push('Type "help" for examples');
+          break;
+        }
+
+        const featureType = args[0].toLowerCase();
+        const fullArgs = args.join(' ');
+
+        // Parse command arguments
+        const parseArg = (key: string) => {
+          const match = fullArgs.match(new RegExp(`${key}\\s+"([^"]+)"|${key}\\s+(\\S+)`, 'i'));
+          return match ? (match[1] || match[2]) : null;
+        };
+
+        const location = parseArg('at') || 'top right';
+        const displayText = parseArg('display') || 'New Feature!';
+        const pageUrl = parseArg('page') || '/kid/custom';
+        const color = parseArg('color') || 'blue';
+        const drawable = parseArg('drawable') || 'true';
+        const featureName = parseArg('feature') || args[1] || 'Custom Feature';
+        const type = parseArg('type') || 'button';
+
+        if (featureType === 'button') {
+          output.push(`🔘 Creating button feature...`);
+          output.push(`  ✓ Location: ${location}`);
+          output.push(`  ✓ Display text: "${displayText}"`);
+          output.push(`  ✓ Page URL: ${pageUrl}`);
+          output.push(`  ✓ Color: ${color}`);
+          output.push('');
+          output.push('✨ Button created successfully!');
+          
+          // Store custom button in localStorage
+          const customFeatures = JSON.parse(localStorage.getItem('customFeatures') || '[]');
+          customFeatures.push({
+            type: 'button',
+            location,
+            displayText,
+            pageUrl,
+            color,
+            id: `button_${Date.now()}`
+          });
+          localStorage.setItem('customFeatures', JSON.stringify(customFeatures));
+          
+        } else if (featureType === 'board') {
+          output.push(`🎨 Creating drawing board feature...`);
+          output.push(`  ✓ Location: ${location}`);
+          output.push(`  ✓ Page URL: ${pageUrl}`);
+          output.push(`  ✓ Board color: ${color}`);
+          output.push(`  ✓ Drawable state: ${drawable}`);
+          output.push('');
+          output.push('✨ Drawing board created successfully!');
+          
+          // Store custom board in localStorage
+          const customFeatures = JSON.parse(localStorage.getItem('customFeatures') || '[]');
+          customFeatures.push({
+            type: 'board',
+            location,
+            pageUrl,
+            color,
+            drawable,
+            id: `board_${Date.now()}`
+          });
+          localStorage.setItem('customFeatures', JSON.stringify(customFeatures));
+          
+        } else if (featureType === 'feature') {
+          output.push(`⭐ Creating custom feature...`);
+          output.push(`  ✓ Name: ${featureName}`);
+          output.push(`  ✓ Location: ${location}`);
+          output.push(`  ✓ Type: ${type}`);
+          output.push('');
+          output.push('✨ Custom feature created successfully!');
+          
+          // Store custom feature in localStorage
+          const customFeatures = JSON.parse(localStorage.getItem('customFeatures') || '[]');
+          customFeatures.push({
+            type: 'custom',
+            name: featureName,
+            location,
+            featureType: type,
+            id: `feature_${Date.now()}`
+          });
+          localStorage.setItem('customFeatures', JSON.stringify(customFeatures));
+          
+        } else {
+          output.push(`❌ Unknown feature type: "${featureType}"`);
+          output.push('Supported types: button, board, feature');
+        }
         break;
       
       case 'clear':
