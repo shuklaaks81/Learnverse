@@ -32,6 +32,32 @@ function LessonContent() {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [practiceMode, setPracticeMode] = useState(false);
   const [practiceScore, setPracticeScore] = useState(0);
+  const [quizMode, setQuizMode] = useState(false);
+  const [quizScore, setQuizScore] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState<boolean[]>([]);
+  const [showRetry, setShowRetry] = useState(false);
+  
+  // Quiz questions - 4 questions per lesson
+  const getQuizQuestions = (title: string) => {
+    switch (title) {
+      case "Addition Basics":
+        return [
+          { q: "What is 2 + 3?", a: "5" },
+          { q: "What is 4 + 4?", a: "8" },
+          { q: "What is 1 + 6?", a: "7" },
+          { q: "What is 5 + 2?", a: "7" }
+        ];
+      default:
+        return [
+          { q: "What did we just learn about?", a: title.toLowerCase() },
+          { q: "Can you remember the main topic?", a: title.toLowerCase() },
+          { q: "What was this lesson teaching?", a: title.toLowerCase() },
+          { q: "Did you understand the lesson?", a: "yes" }
+        ];
+    }
+  };
+  
+  const [quizQuestions] = useState(getQuizQuestions(lessonTitle));
   const [practiceQuestions] = useState([
     { q: "What did we just learn about?", a: lessonTitle.toLowerCase() },
     { q: "Can you remember the main topic?", a: lessonTitle.toLowerCase() },
@@ -491,7 +517,7 @@ function LessonContent() {
                 key={currentStep}
                 className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 mb-6 relative"
               >
-                {!practiceMode ? (
+                {!quizMode ? (
                   <>
                     <div className="flex items-center gap-4 mb-4">
                       {lessonSteps[currentStep].emoji && (
@@ -520,26 +546,39 @@ function LessonContent() {
                       ))}
                     </div>
                   </>
+                ) : showRetry ? (
+                  <>
+                    {/* Retry Screen - Need More Practice! */}
+                    <div className="text-center py-12">
+                      <div className="text-8xl mb-6 animate-bounce">😅</div>
+                      <h2 className="text-5xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent mb-4 animate-pulse">
+                        Need a Little More Practice!
+                      </h2>
+                      <p className="text-2xl text-gray-700 mb-6">
+                        You got {quizScore} out of {quizQuestions.length} correct.
+                      </p>
+                      <p className="text-xl text-gray-600 mb-8">
+                        You need at least {Math.ceil(quizQuestions.length / 2)} correct answers to pass. Let's try the lesson again! 💪
+                      </p>
+                    </div>
+                  </>
                 ) : (
                   <>
-                    {/* Practice Questions Mode */}
+                    {/* Quiz Mode */}
                     <div className="text-center mb-6">
-                      <h2 className="text-4xl font-bold text-purple-600 mb-2 animate-bounce">
-                        🎯 PRACTICE TIME! 🎯
+                      <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2 animate-bounce">
+                        🎯 QUIZ TIME! 🎯
                       </h2>
                       <p className="text-lg text-gray-600">
-                        Score: {practiceScore} / {practiceQuestions.length}
+                        Question {currentStep + 1} of {quizQuestions.length}
                       </p>
                     </div>
                     
-                    {currentStep < practiceQuestions.length ? (
+                    {currentStep < quizQuestions.length ? (
                       <>
-                        <div className="bg-gradient-to-r from-yellow-100 to-orange-100 p-6 rounded-xl border-2 border-yellow-400 mb-6">
-                          <p className="text-2xl font-bold text-gray-800 mb-4">
-                            Question {currentStep + 1}:
-                          </p>
-                          <div className="text-3xl text-gray-900">
-                            {practiceQuestions[currentStep].q.split('').map((char, index) => (
+                        <div className="bg-gradient-to-r from-yellow-100 to-orange-100 p-6 rounded-xl border-4 border-yellow-400 mb-6 shadow-lg">
+                          <div className="text-3xl font-bold text-gray-900 mb-2">
+                            {quizQuestions[currentStep].q.split('').map((char, index) => (
                               <span
                                 key={index}
                                 style={{
@@ -562,14 +601,24 @@ function LessonContent() {
                           className="w-full px-6 py-4 border-4 border-purple-400 rounded-xl focus:ring-4 focus:ring-purple-300 focus:border-purple-600 text-2xl transition-all duration-300 hover:shadow-xl mb-4"
                           onKeyPress={(e) => {
                             if (e.key === 'Enter' && userAnswer.trim()) {
-                              const correct = userAnswer.toLowerCase().includes(practiceQuestions[currentStep].a);
+                              const correct = userAnswer.toLowerCase().trim() === quizQuestions[currentStep].a.toLowerCase();
+                              const newAnswers = [...quizAnswers, correct];
+                              setQuizAnswers(newAnswers);
                               if (correct) {
                                 sounds?.playCorrect();
-                                setPracticeScore(practiceScore + 1);
+                                setQuizScore(quizScore + 1);
                               } else {
                                 sounds?.playWrong();
                               }
                               setUserAnswer('');
+                              if (currentStep + 1 >= quizQuestions.length) {
+                                // Quiz complete - check if passed
+                                const finalScore = correct ? quizScore + 1 : quizScore;
+                                const passThreshold = Math.ceil(quizQuestions.length / 2);
+                                if (finalScore < passThreshold) {
+                                  setShowRetry(true);
+                                }
+                              }
                               setCurrentStep(currentStep + 1);
                             }
                           }}
@@ -578,46 +627,52 @@ function LessonContent() {
                         
                         <button
                           onClick={() => {
-                            const correct = userAnswer.toLowerCase().includes(practiceQuestions[currentStep].a);
+                            const correct = userAnswer.toLowerCase().trim() === quizQuestions[currentStep].a.toLowerCase();
+                            const newAnswers = [...quizAnswers, correct];
+                            setQuizAnswers(newAnswers);
                             if (correct) {
                               sounds?.playCorrect();
-                              setPracticeScore(practiceScore + 1);
+                              setQuizScore(quizScore + 1);
                             } else {
                               sounds?.playWrong();
                             }
                             setUserAnswer('');
+                            if (currentStep + 1 >= quizQuestions.length) {
+                              // Quiz complete - check if passed
+                              const finalScore = correct ? quizScore + 1 : quizScore;
+                              const passThreshold = Math.ceil(quizQuestions.length / 2);
+                              if (finalScore < passThreshold) {
+                                setShowRetry(true);
+                              }
+                            }
                             setCurrentStep(currentStep + 1);
                           }}
                           disabled={!userAnswer.trim()}
-                          className="w-full px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold text-xl hover:from-green-600 hover:to-emerald-600 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                          className="w-full px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold text-xl hover:from-green-600 hover:to-emerald-600 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg"
                         >
                           Submit Answer ✓
                         </button>
                       </>
-                    ) : (
+                    ) : !showRetry ? (
                       <>
-                        {/* Results Screen */}
-                        <div className="text-center">
-                          <h3 className="text-5xl font-bold mb-4">
-                            {practiceScore === practiceQuestions.length ? '🎉 PERFECT SCORE! 🎉' : 
-                             practiceScore >= practiceQuestions.length / 2 ? '⭐ GREAT JOB! ⭐' : 
-                             '💪 Keep Practicing! 💪'}
+                        {/* Quiz Results - PASSED! */}
+                        <div className="text-center py-8">
+                          <div className="text-8xl mb-6 animate-bounce">🎉</div>
+                          <h3 className="text-5xl font-bold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent mb-4">
+                            {quizScore === quizQuestions.length ? 'PERFECT SCORE!' : 'YOU PASSED!'}
                           </h3>
                           <p className="text-3xl text-gray-700 mb-6">
-                            You got {practiceScore} out of {practiceQuestions.length} correct!
+                            You got {quizScore} out of {quizQuestions.length} correct!
                           </p>
-                          <div className="text-6xl mb-4 animate-bounce">
-                            {practiceScore === practiceQuestions.length ? '🏆' : 
-                             practiceScore >= practiceQuestions.length / 2 ? '⭐' : '💪'}
-                          </div>
+                          <div className="text-6xl mb-4 animate-bounce">🏆</div>
                         </div>
                       </>
-                    )}
+                    ) : null}
                   </>
                 )}
               </div>
             
-            {!practiceMode && lessonSteps[currentStep].isQuestion && (
+            {!quizMode && lessonSteps[currentStep].isQuestion && (
               <div className="mt-4 animate-[slideIn_0.5s_ease-out]">
                 <input
                   type="text"
@@ -669,16 +724,32 @@ function LessonContent() {
               >
                 Next →
               </button>
-            ) : !practiceMode ? (
+            ) : !quizMode ? (
               <button 
                 onClick={() => {
                   sounds?.playClick();
-                  setPracticeMode(true);
+                  setQuizMode(true);
                   setCurrentStep(0);
+                  setQuizScore(0);
+                  setQuizAnswers([]);
                 }}
                 className="px-6 py-3 bg-yellow-500 text-white rounded-lg font-semibold hover:bg-yellow-600 hover:scale-110 hover:shadow-xl active:scale-95 transition-all duration-200 animate-[bounce_1s_ease-in-out_infinite]"
               >
-                🎯 Practice Questions!
+                🎯 Take the Quiz!
+              </button>
+            ) : showRetry ? (
+              <button 
+                onClick={() => {
+                  sounds?.playClick();
+                  setCurrentStep(0);
+                  setQuizMode(false);
+                  setShowRetry(false);
+                  setQuizScore(0);
+                  setQuizAnswers([]);
+                }}
+                className="px-6 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 hover:scale-110 hover:shadow-xl active:scale-95 transition-all duration-200 animate-[bounce_1s_ease-in-out_infinite]"
+              >
+                🔄 Try Lesson Again
               </button>
             ) : (
               <Link href="/kid/lessons">
