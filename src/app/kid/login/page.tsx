@@ -14,13 +14,26 @@ export default function KidLogin() {
   const soundEffects = useSoundEffects();
   const deviceInfo = useDeviceDetection();
 
-  // Check if Premium version is selected
+  // Check if Premium version is selected and auto-login if already logged in
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const version = localStorage.getItem('learnverseVersion') || 'original';
       setIsPremium(version === 'premium');
+      
+      // Check if there are multiple accounts - redirect to selector
+      const kidAccounts = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
+      if (kidAccounts.length > 1) {
+        router.push('/kid/select-account');
+        return;
+      }
+      
+      // Auto-redirect if already logged in
+      const currentKid = localStorage.getItem('currentKid');
+      if (currentKid && currentKid !== '{}') {
+        router.push('/kid');
+      }
     }
-  }, []);
+  }, [router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

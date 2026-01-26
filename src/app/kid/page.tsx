@@ -9,84 +9,33 @@ export default function KidPage() {
   const [coins, setCoins] = useState(250);
   const [streak, setStreak] = useState(7);
   const [showBuildButton, setShowBuildButton] = useState(false);
+  const [hasMultipleAccounts, setHasMultipleAccounts] = useState(false);
 
   useEffect(() => {
     // Check if Build Your App feature is enabled
     const featureEnabled = localStorage.getItem('feature_buildApp');
     setShowBuildButton(featureEnabled === 'true');
-  return (
-    <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100 p-8">
-      {/* Build Your App Button - Top Right Corner */}
-      {showBuildButton && (
-        <Link href="/kid/build" className="fixed top-4 right-4 z-50">
-          <button className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-6 py-3 rounded-2xl font-bold text-lg shadow-2xl hover:scale-110 transition-transform animate-pulse border-4 border-yellow-300">
-            🏗️ Build Your App!!!
-          </button>
-        </Link>
-      )}
+    
+    // Check if there are multiple accounts
+    const kidAccounts = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
+    setHasMultipleAccounts(kidAccounts.length > 1);
+  }, []);
 
-      {/* Custom Features from Terminal */}
-      {customFeatures.map((feature, index) => {
-        const getPositionClass = (location: string) => {
-          const loc = location.toLowerCase();
-          if (loc.includes('top') && loc.includes('left')) return 'top-4 left-4';
-          if (loc.includes('top') && loc.includes('right')) return 'top-20 right-4';
-          if (loc.includes('bottom') && loc.includes('left')) return 'bottom-4 left-4';
-          if (loc.includes('bottom') && loc.includes('right')) return 'bottom-4 right-4';
-          if (loc.includes('corner')) return 'top-36 right-4';
-          return 'top-52 right-4';
-        };
-
-        const getColorClass = (color: string) => {
-          const colorMap: { [key: string]: string } = {
-            'blue': 'from-blue-500 to-blue-600',
-            'red': 'from-red-500 to-red-600',
-            'green': 'from-green-500 to-green-600',
-            'purple': 'from-purple-500 to-purple-600',
-            'pink': 'from-pink-500 to-pink-600',
-            'yellow': 'from-yellow-500 to-yellow-600',
-            'orange': 'from-orange-500 to-orange-600',
-            'white': 'from-gray-100 to-gray-200 text-gray-800',
-          };
-          return colorMap[color.toLowerCase()] || 'from-blue-500 to-blue-600';
-        };
-
-        if (feature.type === 'button') {
-          return (
-            <Link key={feature.id} href={feature.pageUrl} className={`fixed ${getPositionClass(feature.location)} z-40`}>
-              <button className={`bg-gradient-to-r ${getColorClass(feature.color)} text-white px-6 py-3 rounded-2xl font-bold shadow-2xl hover:scale-110 transition-transform border-4 border-white/50`}>
-                {feature.displayText}
-              </button>
-            </Link>
-          );
-        }
-
-        if (feature.type === 'board') {
-          return (
-            <Link key={feature.id} href={feature.pageUrl} className={`fixed ${getPositionClass(feature.location)} z-40`}>
-              <button className={`bg-gradient-to-r ${getColorClass(feature.color)} px-6 py-3 rounded-2xl font-bold shadow-2xl hover:scale-110 transition-transform border-4 border-black`}>
-                🎨 Drawing Board
-              </button>
-            </Link>
-          );
-        }
-
-        if (feature.type === 'custom') {
-          return (
-            <div key={feature.id} className={`fixed ${getPositionClass(feature.location)} z-40 bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-lg border-2 border-purple-400`}>
-              <p className="font-bold text-sm">⭐ {feature.name}</p>
-              <p className="text-xs text-gray-600">{feature.featureType}</p>
-            </div>
-          );
-        }
-
-        return null;
-      })}
-
-      {/* Profile Header Bar */}
-    // Sign out logic
-    alert("Signed out!");
-  }
+  const handleSignOut = () => {
+    // Check if there are multiple accounts
+    const kidAccounts = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
+    
+    if (kidAccounts.length > 1) {
+      // Multiple accounts - go to selector
+      localStorage.removeItem('currentKid');
+      window.location.href = '/kid/select-account';
+    } else {
+      // Single account - go to login
+      localStorage.removeItem('currentKid');
+      alert("Signed out successfully!");
+      window.location.href = '/kid/login';
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100 p-8">
@@ -147,7 +96,7 @@ export default function KidPage() {
             onClick={handleSignOut}
             className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold transition"
           >
-            Sign Out
+            {hasMultipleAccounts ? '🔄 Switch Account' : 'Sign Out'}
           </button>
         </div>
       </div>

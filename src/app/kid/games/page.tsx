@@ -15,6 +15,16 @@ function GamesContent() {
   const games = [
     {
       id: 1,
+      title: "Blobo's Castle Escape",
+      description: "Help Blobo escape the castle by answering questions!",
+      emoji: "🟣",
+      color: "from-purple-500 to-indigo-600",
+      difficulty: "Medium",
+      isSpecial: true,
+      link: "/kid/games/blobo-escape"
+    },
+    {
+      id: 2,
       title: "Math Race",
       description: "Solve addition problems as fast as you can!",
       emoji: "🏎️",
@@ -22,7 +32,7 @@ function GamesContent() {
       difficulty: "Easy"
     },
     {
-      id: 2,
+      id: 3,
       title: "Word Builder",
       description: "Create words from letters to score points!",
       emoji: "📝",
@@ -30,7 +40,7 @@ function GamesContent() {
       difficulty: "Medium"
     },
     {
-      id: 3,
+      id: 4,
       title: "Memory Match",
       description: "Match pairs of cards to win!",
       emoji: "🃏",
@@ -38,7 +48,7 @@ function GamesContent() {
       difficulty: "Easy"
     },
     {
-      id: 4,
+      id: 5,
       title: "Shape Sorter",
       description: "Sort shapes by color and type!",
       emoji: "🔷",
@@ -46,7 +56,7 @@ function GamesContent() {
       difficulty: "Easy"
     },
     {
-      id: 5,
+      id: 6,
       title: "Number Detective",
       description: "Find the missing numbers in sequences!",
       emoji: "🔍",
@@ -54,7 +64,7 @@ function GamesContent() {
       difficulty: "Medium"
     },
     {
-      id: 6,
+      id: 7,
       title: "Spelling Bee",
       description: "Spell words correctly to collect honey!",
       emoji: "🐝",
@@ -86,11 +96,18 @@ function GamesContent() {
           {games.map((game) => (
             <Link
               key={game.id}
-              href={`/kid/games/play?game=${game.id}&title=${game.title}&name=${kidName}&id=${kidId}`}
+              href={game.isSpecial ? game.link : `/kid/games/play?game=${game.id}&title=${game.title}&name=${kidName}&id=${kidId}`}
               onClick={() => sounds?.playClick()}
             >
-              <div className={`bg-gradient-to-br ${game.color} p-6 rounded-3xl shadow-2xl hover:scale-105 transition-all cursor-pointer border-4 border-white/50`}>
+              <div className={`bg-gradient-to-br ${game.color} p-6 rounded-3xl shadow-2xl hover:scale-105 transition-all cursor-pointer border-4 border-white/50 ${game.isSpecial ? 'ring-4 ring-yellow-400 animate-pulse' : ''}`}>
                 <div className="text-6xl mb-4 text-center">{game.emoji}</div>
+                {game.isSpecial && (
+                  <div className="text-center mb-2">
+                    <span className="bg-yellow-400 text-purple-900 px-3 py-1 rounded-full text-sm font-bold">
+                      ⭐ NEW! ⭐
+                    </span>
+                  </div>
+                )}
                 <h3 className="text-2xl font-bold text-white mb-2 text-center">
                   {game.title}
                 </h3>

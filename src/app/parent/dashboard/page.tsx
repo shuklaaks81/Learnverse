@@ -446,12 +446,23 @@ export default function ParentDashboard() {
               </h1>
               <p className="text-gray-700 mt-2 font-semibold text-lg">Monitor your family&apos;s learning progress 📊</p>
             </div>
-            <Link 
-              href="/"
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:shadow-xl transition-all font-bold hover:scale-105"
-            >
-              ← Home
-            </Link>
+            <div className="flex gap-3">
+              <Link 
+                href="/"
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:shadow-xl transition-all font-bold hover:scale-105"
+              >
+                ← Home
+              </Link>
+              <button
+                onClick={() => {
+                  localStorage.removeItem('parentLoggedIn');
+                  window.location.href = '/parent/login';
+                }}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
 

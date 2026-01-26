@@ -78,48 +78,6 @@ export default function ShopPage() {
 
   const handlePurchase = (item: ShopItem) => {
     if (coins >= item.price && !purchasedItems.includes(item.id)) {
-          oscillator.type = 'square';
-          
-          gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
-          
-          oscillator.start(audioContext.currentTime);
-          oscillator.stop(audioContext.currentTime + 0.05);
-        }, 50); // Super fast glitching!
-        
-        // After 15 seconds of INTENSE glitching, ASCEND!
-        setTimeout(() => {
-          clearInterval(godGlitchSounds);
-          setIsGlitching(false);
-          
-          const newCoins = coins - item.price;
-          const newPurchased = [...purchasedItems, item.id];
-          
-          setCoins(newCoins);
-          setPurchasedItems(newPurchased);
-          
-          const currentKid = JSON.parse(localStorage.getItem('currentKid') || '{}');
-          const updatedKid = { ...currentKid, coins: newCoins };
-          localStorage.setItem('currentKid', JSON.stringify(updatedKid));
-          
-          const kidAccounts = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
-          const updatedAccounts = kidAccounts.map((kid: any) => 
-            kid.id === currentKid.id ? updatedKid : kid
-          );
-          localStorage.setItem('kidAccounts', JSON.stringify(updatedAccounts));
-          
-          localStorage.setItem(`purchased_${currentKid.id}`, JSON.stringify(newPurchased));
-          localStorage.setItem('godMode', 'true'); // GOD MODE ACTIVATED!!!
-          
-          soundEffects?.playVictory();
-          setTimeout(() => {
-            alert('✨🌟💫 GOD MODE ACTIVATED 💫🌟✨\n\nYOU HAVE TRANSCENDED REALITY!\n\n🌌 Infinite Knowledge Unlocked\n⚡ Control Over Time and Space\n✨ Reality Bends to Your Will\n💎 All Secrets Revealed\n🚀 Unlimited Power\n\n🔮 THE UNIVERSE IS NOW YOURS 🔮\n\nYou are no longer bound by mortal limits...\nReload to witness your ASCENSION!');
-          }, 500);
-        }, 15000); // 15 seconds of reality-breaking!
-        
-        return;
-      }
-      
       // Special unlock for legendary item!
       if (item.id === 999) {
         // Start glitching effect

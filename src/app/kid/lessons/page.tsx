@@ -191,19 +191,24 @@ export default function LessonsPage() {
                 </div>
               </div>
 
-              <Link href={`/kid/lesson-player?title=${encodeURIComponent(lesson.title)}`}>
-                <button
-                  onClick={() => !lesson.completed && sounds?.playClick()}
-                  className={`w-full py-3 px-4 rounded-lg font-semibold transition-all ${
-                    lesson.completed
-                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                      : "bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 shadow-lg"
-                  }`}
-                  disabled={lesson.completed}
-                >
-                  {lesson.completed ? "Completed" : "Start Lesson"}
-                </button>
-              </Link>
+              <div className="flex gap-2">
+                <Link href={`/kid/interactive-lesson?id=${lesson.id}`} className="flex-1">
+                  <button
+                    onClick={() => sounds?.playClick()}
+                    className="w-full py-3 px-4 rounded-lg font-bold transition-all bg-gradient-to-r from-green-500 to-blue-500 text-white hover:from-green-600 hover:to-blue-600 shadow-lg hover:scale-105"
+                  >
+                    🎮 Interactive
+                  </button>
+                </Link>
+                <Link href={`/kid/lesson-player?title=${encodeURIComponent(lesson.title)}`} className="flex-1">
+                  <button
+                    onClick={() => sounds?.playClick()}
+                    className="w-full py-3 px-4 rounded-lg font-semibold transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 shadow-lg hover:scale-105"
+                  >
+                    📖 Classic
+                  </button>
+                </Link>
+              </div>
             </div>
           ))}
         </div>
