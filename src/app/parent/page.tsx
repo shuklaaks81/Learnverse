@@ -1,3 +1,9 @@
+/**
+ * Parent Account Entry Page
+ * 
+ * Simple redirect page that automatically routes parent accounts to the login screen.
+ * Displays a loading message while the redirect happens.
+ */
 "use client";
 
 import { useEffect } from "react";

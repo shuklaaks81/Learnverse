@@ -128,23 +128,23 @@ Production Build: PASSING ✅
 Route (app)                              Size     First Load JS
 ┌ ○ /                                    3.98 kB         108 kB
 ├ ○ /kid/achievements                    7.13 kB         113 kB
-├ ○ /kid/all-you-can-learn               6.14 kB         112 kB
-├ ƒ /kid/all-you-can-learn/[pathId]      3.7 kB          112 kB
-├ ○ /kid/choose-design                   4.03 kB         106 kB
+├ ○ /kid/community-learning               6.14 kB         112 kB
+├ ƒ /kid/community-learning/[pathId]      3.7 kB          112 kB
+├ ○ /kid/appearance-customizer                   4.03 kB         106 kB
 ├ ○ /kid/daily-challenge                 11.3 kB         117 kB
-├ ○ /kid/draw-buddy                      4.89 kB         107 kB
+├ ○ /kid/drawing-studio                      4.89 kB         107 kB
 ├ ○ /kid/games                           3.42 kB         109 kB
 ├ ○ /kid/games/play                      4.86 kB         111 kB
-├ ○ /kid/lesson-player                   17.4 kB         123 kB
+├ ○ /kid/content-viewer                   17.4 kB         123 kB
 ├ ○ /kid/lessons                         7.16 kB         114 kB
 ├ ○ /kid/login                           3.81 kB         109 kB
 ├ ○ /kid/map                             7.94 kB         114 kB
-├ ○ /kid/name-setup                      4.84 kB         111 kB
+├ ○ /kid/profile-setup                      4.84 kB         111 kB
 ├ ○ /kid/setup                           3.77 kB         106 kB
 ├ ○ /kid/shop                            9.34 kB         115 kB
 ├ ƒ /kid/topic/[id]                      10.7 kB         116 kB
 ├ ○ /kid/units                           5.23 kB         111 kB
-├ ○ /kid/voice-setup                     4.29 kB         106 kB
+├ ○ /kid/voice-config                     4.29 kB         106 kB
 ├ ○ /kid/welcome                         4.25 kB         110 kB
 ├ ○ /owner                               2.58 kB         108 kB
 ├ ○ /parent                              508 B           103 kB
@@ -217,16 +217,16 @@ None required - app uses localStorage for all data.
 ## 🎯 What Was Fixed in This Review
 
 ### Files Modified: 15
-1. src/app/kid/all-you-can-learn/[pathId]/page.tsx
-2. src/app/kid/all-you-can-learn/page.tsx
-3. src/app/kid/choose-design/page.tsx
+1. src/app/kid/community-learning/[pathId]/page.tsx
+2. src/app/kid/community-learning/page.tsx
+3. src/app/kid/appearance-customizer/page.tsx
 4. src/app/kid/daily-challenge/page.tsx
-5. src/app/kid/draw-buddy/page.tsx
+5. src/app/kid/drawing-studio/page.tsx
 6. src/app/kid/login/page.tsx
 7. src/app/kid/map/page.tsx
 8. src/app/kid/setup/page.tsx
 9. src/app/kid/topic/[id]/page.tsx
-10. src/app/kid/voice-setup/page.tsx
+10. src/app/kid/voice-config/page.tsx
 11. src/app/page.tsx
 12. src/app/parent/dashboard/page.tsx
 13. src/app/parent/kid-details/page.tsx

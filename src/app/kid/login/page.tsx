@@ -23,7 +23,7 @@ export default function KidLogin() {
       // Check if there are multiple accounts - redirect to selector
       const kidAccounts = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
       if (kidAccounts.length > 1) {
-        router.push('/kid/select-account');
+        router.push('/kid/kid-selector');
         return;
       }
       

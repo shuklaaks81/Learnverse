@@ -192,7 +192,7 @@ export default function LessonsPage() {
               </div>
 
               <div className="flex gap-2">
-                <Link href={`/kid/interactive-lesson?id=${lesson.id}`} className="flex-1">
+                <Link href={`/kid/lesson-module?id=${lesson.id}`} className="flex-1">
                   <button
                     onClick={() => sounds?.playClick()}
                     className="w-full py-3 px-4 rounded-lg font-bold transition-all bg-gradient-to-r from-green-500 to-blue-500 text-white hover:from-green-600 hover:to-blue-600 shadow-lg hover:scale-105"
@@ -200,7 +200,7 @@ export default function LessonsPage() {
                     🎮 Interactive
                   </button>
                 </Link>
-                <Link href={`/kid/lesson-player?title=${encodeURIComponent(lesson.title)}`} className="flex-1">
+                <Link href={`/kid/content-viewer?title=${encodeURIComponent(lesson.title)}`} className="flex-1">
                   <button
                     onClick={() => sounds?.playClick()}
                     className="w-full py-3 px-4 rounded-lg font-semibold transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 shadow-lg hover:scale-105"

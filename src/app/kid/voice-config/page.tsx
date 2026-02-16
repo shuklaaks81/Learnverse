@@ -12,7 +12,7 @@ export default function VoiceSetup() {
   const handleUseDefaultVoice = () => {
     localStorage.setItem('buddyVoice', 'default');
     alert('✅ Got it! Your buddy will use the default voice!');
-    router.push('/kid/name-setup');
+    router.push('/kid/profile-setup');
   };
 
   const startRecording = () => {
@@ -30,7 +30,7 @@ export default function VoiceSetup() {
   const saveVoiceRecording = () => {
     localStorage.setItem('buddyVoice', 'custom');
     alert('✨ Perfect! Your buddy will use your voice!');
-    router.push('/kid/name-setup');
+    router.push('/kid/profile-setup');
   };
 
   if (useOwnVoice === null) {

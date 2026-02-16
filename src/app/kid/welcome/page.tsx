@@ -72,7 +72,7 @@ export default function KidWelcome() {
   // Effects
   useEffect(() => {
     if (startCreateNew) {
-      router.push('/kid/choose-design');
+      router.push('/kid/appearance-customizer');
     }
   }, [startCreateNew, router]);
 

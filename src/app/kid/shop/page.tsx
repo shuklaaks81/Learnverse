@@ -199,15 +199,19 @@ export default function ShopPage() {
       
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-3xl shadow-xl p-6 mb-6">
-          <div className="flex justify-between items-center mb-4">
+        <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-3xl shadow-2xl p-8 mb-8 border-2 border-orange-200">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-6">
             <div>
-              <h1 className="text-4xl font-bold text-orange-600">🏪 Learning Shop</h1>
-              <p className="text-gray-600 mt-1">Spend your coins on cool items!</p>
+              <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text text-transparent flex items-center gap-3">
+                <span className="text-5xl">🏪</span> Learning Shop
+              </h1>
+              <p className="text-gray-700 mt-2 font-semibold text-lg">Spend your coins on awesome items! ✨</p>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-500">Your Balance</p>
-              <p className="text-3xl font-bold text-yellow-500">🪙 {coins}</p>
+            <div className="text-center bg-white/90 backdrop-blur rounded-2xl p-6 border-2 border-yellow-300 shadow-lg">
+              <p className="text-sm text-gray-600 font-semibold">Your Balance</p>
+              <p className="text-4xl font-bold bg-gradient-to-r from-yellow-500 to-orange-600 bg-clip-text text-transparent">
+                🪙 {coins}
+              </p>
             </div>
           </div>
 
@@ -273,7 +277,7 @@ export default function ShopPage() {
           </div>
 
           {/* Category Filter */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3 mt-6 p-4 bg-white/80 backdrop-blur rounded-2xl">
             {categories.map(cat => (
               <button
                 key={cat.id}
@@ -281,13 +285,13 @@ export default function ShopPage() {
                   setSelectedCategory(cat.id);
                   soundEffects?.playClick();
                 }}
-                className={`px-4 py-2 rounded-full font-semibold transition-all ${
+                className={`px-5 py-3 rounded-2xl font-bold transition-all transform hover:scale-110 ${
                   selectedCategory === cat.id
-                    ? 'bg-gradient-to-r from-orange-400 to-pink-400 text-white shadow-lg scale-105'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-xl scale-110'
+                    : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 hover:from-gray-200 hover:to-gray-300 shadow-md'
                 }`}
               >
-                {cat.emoji} {cat.name}
+                <span className="text-xl mr-2">{cat.emoji}</span> {cat.name}
               </button>
             ))}
           </div>
@@ -339,48 +343,63 @@ export default function ShopPage() {
 
         {/* Shop Items Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
-          {filteredItems.map(item => {
+          {filteredItems.map((item, index) => {
             const isPurchased = purchasedItems.includes(item.id);
             const canAfford = coins >= item.price;
 
             return (
               <div
                 key={item.id}
-                className={`rounded-2xl shadow-lg p-6 transition-all hover:shadow-xl relative overflow-hidden ${
-                  isPurchased ? 'border-4 border-green-400 bg-white' : 'bg-white'
+                className={`rounded-3xl shadow-xl p-6 transition-all transform hover:scale-105 hover:shadow-2xl relative overflow-hidden group animate-slideInUp ${
+                  isPurchased 
+                    ? 'border-4 border-green-400 bg-gradient-to-br from-green-50 to-emerald-50' 
+                    : 'bg-white/95 backdrop-blur border-2 border-gray-200 hover:border-orange-300'
                 }`}
+                style={{ animationDelay: `${index * 0.05}s` }}
               >
-                <div className="text-center mb-4 relative z-10">
-                  <div className="mb-3 text-6xl">
+                {/* Owned Badge */}
+                {isPurchased && (
+                  <div className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg flex items-center gap-1">
+                    <span>✓</span> Owned
+                  </div>
+                )}
+
+                {/* Item Content */}
+                <div className="text-center mb-5 relative z-10">
+                  <div className="mb-4 text-7xl group-hover:scale-125 transition-transform">
                     {item.emoji}
                   </div>
-                  <h3 className="font-bold text-xl text-gray-800">
+                  <h3 className="font-bold text-2xl bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                     {item.name}
                   </h3>
-                  <p className="mt-2 text-sm text-gray-600">
+                  <p className="mt-3 text-sm text-gray-700 leading-relaxed font-semibold">
                     {item.description}
                   </p>
                 </div>
 
-                <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200 relative z-10">
-                  <div className="font-bold text-2xl text-yellow-500">
-                    🪙 {item.price.toLocaleString()}
+                {/* Price and Action */}
+                <div className="flex flex-col gap-3 mt-5 pt-5 border-t-2 border-gray-200 relative z-10">
+                  <div className="text-center">
+                    <p className="text-xs text-gray-600 mb-1">Price</p>
+                    <p className="font-bold text-3xl bg-gradient-to-r from-yellow-500 to-orange-600 bg-clip-text text-transparent">
+                      🪙 {item.price.toLocaleString()}
+                    </p>
                   </div>
                   {isPurchased ? (
-                    <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full font-semibold">
-                      ✓ Owned
+                    <div className="bg-gradient-to-r from-green-400 to-emerald-400 text-white px-4 py-3 rounded-2xl font-bold text-center text-lg shadow-lg">
+                      ✨ Already Yours! ✨
                     </div>
                   ) : (
                     <button
                       onClick={() => handlePurchase(item)}
                       disabled={!canAfford}
-                      className={`px-6 py-2 rounded-full font-semibold transition-all ${
+                      className={`px-6 py-3 rounded-2xl font-bold transition-all transform hover:scale-105 text-lg ${
                         canAfford
-                        ? 'bg-gradient-to-r from-orange-400 to-pink-400 text-white hover:shadow-lg hover:scale-105'
-                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white hover:shadow-xl shadow-lg'
+                        : 'bg-gray-300 text-gray-600 cursor-not-allowed opacity-50'
                       }`}
                     >
-                      {canAfford ? 'Buy' : 'Need more'}
+                      {canAfford ? '🛒 Buy Now' : '❌ Need ' + (item.price - coins) + ' more'}
                     </button>
                   )}
                 </div>

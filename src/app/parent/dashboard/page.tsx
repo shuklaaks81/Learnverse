@@ -1,7 +1,35 @@
+/**
+ * Parent Dashboard Page
+ * 
+ * Complex admin interface for parent account management with:
+ * - Update notification system with changelog viewing
+ * - Add new kid to family functionality
+ * - Family leaderboard (sorted by progress %)
+ * - Individual kid cards with detailed stats
+ * - Admin terminal for debugging/commands
+ * - Real-time kid data loading from localStorage
+ * 
+ * State Management:
+ * - Loads kidAccounts array from localStorage
+ * - Tracks update availability and version info
+ * - Manages terminal commands (dev/admin only)
+ * 
+ * Note: This page is 718 lines. Consider further component extraction:
+ * - UpdateNotificationBanner (extracted ✓)
+ * - KidsLeaderboard (extracted ✓)
+ * - FamilyCardsGrid (extracted ✓)
+ * - AdminTerminal (pending)
+ * - DashboardHeader (pending)
+ * - AddKidForm (pending)
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { UpdateNotificationBanner } from "./components/UpdateNotificationBanner";
+import { KidsLeaderboard } from "./components/KidsLeaderboard";
+import { FamilyCardsGrid } from "./components/FamilyCardsGrid";
 
 interface Kid {
   id: string;
@@ -380,62 +408,20 @@ export default function ParentDashboard() {
       `}</style>
       
       <div className="max-w-7xl mx-auto">
-        {/* Update Notification Banner (always show download button) */}
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-3xl shadow-2xl p-6 mb-6 border-4 border-white/50">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div className="text-center sm:text-left">
-                <h2 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 justify-center sm:justify-start">
-                  🎉 New Update Available!
-                </h2>
-                <p className="text-white/90 mt-2 font-semibold">
-                  Version {latestVersion} • Released {updateInfo?.releaseDate}
-                </p>
-                <p className="text-white/80 mt-1 text-sm italic">
-                  Some updates may have been downloaded automatically if the app was stopped or restarted.
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowChangelog(!showChangelog)}
-                  className="bg-white/20 text-white px-6 py-3 rounded-xl hover:bg-white/30 transition-all font-bold hover:scale-105 border-2 border-white/40"
-                >
-                  📋 {showChangelog ? 'Hide' : 'View'} Changes
-                </button>
-                <button
-                  onClick={() => {
-                    // Mark this version as installed
-                    localStorage.setItem('installedAppVersion', latestVersion);
-                    setCurrentVersion(latestVersion); // Update state so effect logic matches
-                    setUpdateAvailable(false);
-                    alert('🎉 Update installed successfully!\n\nThe app is now up to date!');
-                  }}
-                  className="bg-white text-green-600 px-8 py-4 rounded-xl hover:shadow-2xl transition-all font-bold text-lg hover:scale-105"
-                >
-                  ⬇️ Install Now
-                </button>
-              </div>
-            </div>
-            {/* Changelog inside banner */}
-            {showChangelog && updateInfo?.changelog && (
-              <div className="mt-4 bg-white/10 backdrop-blur rounded-2xl p-6 border-2 border-white/20">
-                <h3 className="text-xl font-bold mb-4">📝 What&apos;s New in {latestVersion}</h3>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {Object.entries(updateInfo.changelog).map(([category, items]: [string, any]) => (
-                    <div key={category} className="bg-white/10 rounded-xl p-4">
-                      <h4 className="font-bold text-lg mb-2">{category}</h4>
-                      <ul className="space-y-1">
-                        {items.map((item: string, index: number) => (
-                          <li key={index} className="text-sm text-white/90">• {item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Update Notification Banner */}
+        <UpdateNotificationBanner 
+          latestVersion={latestVersion}
+          currentVersion={currentVersion}
+          updateInfo={updateInfo}
+          showChangelog={showChangelog}
+          onToggleChangelog={() => setShowChangelog(!showChangelog)}
+          onInstall={() => {
+            localStorage.setItem('installedAppVersion', latestVersion);
+            setCurrentVersion(latestVersion);
+            setUpdateAvailable(false);
+            alert('🎉 Update installed successfully!\n\nThe app is now up to date!');
+          }}
+        />
         
         {/* Header */}
         <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-6 sm:p-8 mb-6 border-4 border-white/50">
@@ -467,72 +453,94 @@ export default function ParentDashboard() {
         </div>
 
         {/* Permanent What's New / Changelog Section */}
-        <div className="bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50 rounded-3xl shadow-xl p-6 mb-8 border-4 border-blue-100">
-          <h2 className="text-2xl font-bold text-blue-700 mb-4 flex items-center gap-2">📝 What&apos;s New in {latestVersion}</h2>
+        <div className="bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 rounded-3xl shadow-2xl p-6 sm:p-8 mb-10 border-2 border-cyan-200">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent mb-6 flex items-center gap-3">
+            <span className="text-4xl">🎉</span> What's New in {latestVersion}
+          </h2>
           {updateError && (
-            <div className="text-red-600 font-bold mb-4">{updateError}</div>
+            <div className="bg-red-100 border border-red-400 text-red-700 font-bold p-4 rounded-2xl mb-4">
+              ⚠️ {updateError}
+            </div>
           )}
           {updateInfo?.changelog ? (
             <div className="grid sm:grid-cols-2 gap-4">
               {Object.entries(updateInfo.changelog).map(([category, items]: [string, any]) => (
-                <div key={category} className="bg-white/60 rounded-xl p-4">
-                  <h4 className="font-bold text-lg mb-2 text-blue-800">{category}</h4>
-                  <ul className="space-y-1">
+                <div key={category} className="bg-white/90 backdrop-blur rounded-2xl p-5 border border-blue-100 shadow-md hover:shadow-lg transition-all hover:scale-105 transform">
+                  <h4 className="font-bold text-lg mb-3 text-blue-700 flex items-center gap-2">
+                    <span className="text-2xl">
+                      {category.includes('Features') ? '✨' : category.includes('Bug') ? '🐛' : category.includes('Improvement') ? '⚡' : '📌'}
+                    </span>
+                    {category}
+                  </h4>
+                  <ul className="space-y-2">
                     {items.map((item: string, index: number) => (
-                      <li key={index} className="text-sm text-gray-800">• {item}</li>
+                      <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
+                        <span className="text-green-500 font-bold mt-0.5">✓</span>
+                        <span>{item}</span>
+                      </li>
                     ))}
                   </ul>
                 </div>
               ))}
             </div>
           ) : !updateError ? (
-            <div className="text-gray-600">No updates found.</div>
+            <div className="text-gray-600 text-center py-4">No updates found.</div>
           ) : null}
         </div>
 
         {/* Add New Kid Button */}
-        <div className="mb-6">
+        <div className="mb-8">
           <button
             onClick={() => setShowAddKid(!showAddKid)}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-8 rounded-2xl hover:shadow-2xl transition-all font-bold text-lg hover:scale-105 shadow-lg"
+            className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 hover:from-purple-700 hover:via-pink-700 hover:to-red-700 text-white py-4 px-8 rounded-2xl shadow-2xl transition-all font-bold text-lg hover:scale-105 transform"
           >
-            + Add New Kid to Family ✨
+            <span className="text-2xl mr-2">➕</span> Add New Kid to Family <span className="text-2xl ml-2">✨</span>
           </button>
         </div>
 
         {/* Add Kid Form */}
         {showAddKid && (
-          <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-6 sm:p-8 mb-6 border-4 border-purple-300">
-            <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">Add New Kid 🎓</h2>
-            <form onSubmit={handleAddKid} className="flex gap-4">
-              <input
-                type="text"
-                required
-                value={newKidId}
-                onChange={(e) => setNewKidId(e.target.value)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="Enter Kid ID (e.g., Emma789012)"
-                maxLength={1000}
-              />
-              {newKidId.length > 200 && (
-                <p className="text-xs text-orange-600">⚠️ Warning: ID is long ({newKidId.length} characters)</p>
-              )}
-              <button
-                type="submit"
-                className="bg-purple-600 text-white py-2 px-6 rounded-lg hover:bg-purple-700 transition-colors font-semibold"
-              >
-                Add Kid
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAddKid(false);
-                  setNewKidId("");
-                }}
-                className="bg-gray-300 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-400 transition-colors"
-              >
-                Cancel
-              </button>
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 backdrop-blur rounded-3xl shadow-2xl p-6 sm:p-8 mb-8 border-2 border-purple-200 animate-slideInDown">
+            <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6 flex items-center gap-2">
+              <span className="text-4xl">🎓</span> Add New Kid
+            </h2>
+            <form onSubmit={handleAddKid} className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  required
+                  value={newKidId}
+                  onChange={(e) => setNewKidId(e.target.value)}
+                  className="w-full px-5 py-3 border-2 border-purple-300 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/80 font-semibold transition-all"
+                  placeholder="Enter Kid ID (e.g., Emma789012)"
+                  maxLength={1000}
+                />
+                {newKidId.length > 0 && (
+                  <p className={`text-xs mt-2 font-semibold ${newKidId.length > 200 ? 'text-orange-600' : 'text-green-600'}`}>
+                    {newKidId.length > 200 
+                      ? `⚠️ ID is long (${newKidId.length} characters)` 
+                      : `✓ ID length: ${newKidId.length}`}
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-3 sm:flex-col lg:flex-row">
+                <button
+                  type="submit"
+                  className="flex-1 sm:flex-none bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-3 px-8 rounded-2xl transition-all font-bold shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  Add Kid ✓
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddKid(false);
+                    setNewKidId("");
+                  }}
+                  className="flex-1 sm:flex-none bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 px-8 rounded-2xl transition-all font-bold shadow-md hover:shadow-lg"
+                >
+                  Cancel ✕
+                </button>
+              </div>
             </form>
           </div>
         )}
@@ -545,130 +553,10 @@ export default function ParentDashboard() {
         )}
 
         {/* Leaderboard Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
-          <h2 className="text-2xl font-bold text-amber-600 mb-6">🏆 Family Leaderboard</h2>
-          
-          {kids.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
-              Add kids to see the leaderboard!
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {[...kids]
-                .sort((a, b) => b.progress - a.progress)
-                .map((kid, index) => (
-                  <div
-                    key={kid.id}
-                    className={`flex items-center justify-between p-4 rounded-lg ${
-                      index === 0
-                        ? "bg-gradient-to-r from-amber-100 to-yellow-100 border-2 border-amber-300"
-                        : index === 1
-                        ? "bg-gradient-to-r from-gray-100 to-gray-200 border-2 border-gray-300"
-                        : index === 2
-                        ? "bg-gradient-to-r from-orange-100 to-amber-100 border-2 border-orange-300"
-                        : "bg-gray-50 border border-gray-200"
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="text-2xl font-bold w-8">
-                        {index === 0 && "🥇"}
-                        {index === 1 && "🥈"}
-                        {index === 2 && "🥉"}
-                        {index > 2 && `#${index + 1}`}
-                      </div>
-                      <div>
-                        <p className="font-bold text-lg text-gray-800">{kid.name}</p>
-                        <p className="text-sm text-gray-600">
-                          {kid.lessonsCompleted} lessons • {kid.achievements} achievements
-                        </p>
-                        {kid.streakDays !== undefined && kid.streakDays > 0 && (
-                          <p className="text-xs text-orange-600 font-semibold">
-                            🔥 {kid.streakDays} day streak!
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-indigo-600">{kid.progress}%</p>
-                      <p className="text-xs text-gray-500">progress</p>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          )}
-        </div>
+        <KidsLeaderboard kids={kids} />
 
         {/* Your Family Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-6">
-          <h2 className="text-2xl font-bold text-indigo-600 mb-6">Your Family</h2>
-          
-          {kids.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
-              No kids added yet. Click &quot;Add New Kid to Family&quot; to get started!
-            </p>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {kids.map((kid) => (
-                <div
-                  key={kid.id}
-                  className="border-2 border-purple-200 rounded-xl p-6 hover:shadow-lg transition-shadow bg-gradient-to-br from-purple-50 to-pink-50"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold text-purple-700">{kid.name}</h3>
-                    <span className="text-2xl">🎓</span>
-                  </div>
-                  
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600">Overall Progress</span>
-                      <span className="font-semibold text-purple-600">{kid.progress}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all"
-                        style={{ width: `${kid.progress}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">📚 Lessons:</span>
-                      <span className="font-semibold">{kid.lessonsCompleted}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">🏆 Achievements:</span>
-                      <span className="font-semibold">{kid.achievements}</span>
-                    </div>
-                    {kid.streakDays !== undefined && kid.streakDays > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">🔥 Streak:</span>
-                        <span className="font-semibold text-orange-600">{kid.streakDays} days</span>
-                      </div>
-                    )}
-                    {kid.lastActive && (
-                      <div className="text-xs text-gray-500 mt-2">
-                        Last active: {new Date(kid.lastActive).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric'
-                        })}
-                      </div>
-                    )}
-                  </div>
-
-                  <Link 
-                    href={`/parent/kid-details?id=${kid.id}&name=${kid.name}&progress=${kid.progress}`}
-                    className="block w-full mt-4 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold text-center"
-                  >
-                    View Details
-                  </Link>
-
-                  <p className="text-xs text-gray-400 mt-2 text-center">ID: {kid.id}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <FamilyCardsGrid kids={kids} />
 
         {/* Terminal Section */}
         <div className="mt-8">

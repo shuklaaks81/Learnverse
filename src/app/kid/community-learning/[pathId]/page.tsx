@@ -137,7 +137,7 @@ export default function LearningPathPage() {
               </div>
             </div>
             <Link
-              href="/kid/all-you-can-learn"
+              href="/kid/community-learning"
               className="bg-gray-200 text-gray-700 font-bold px-6 py-3 rounded-xl hover:bg-gray-300 transition-colors"
             >
               ← Back

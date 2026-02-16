@@ -176,7 +176,7 @@ export default function TimeMachinePage() {
                       onClick={() => {
                         if (v.status === "available") {
                           if (v.id === "v1") {
-                            router.push("/kid/v1-hub");
+                            router.push("/kid/home-classic");
                           } else if (v.id !== "v4") {
                             switchVersion(v.id as any);
                           }

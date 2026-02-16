@@ -89,7 +89,7 @@ export default function DrawBuddy() {
     localStorage.setItem('buddyDrawing', dataURL);
 
     alert('✨ Awesome drawing! Your buddy looks amazing!');
-    router.push('/kid/voice-setup');
+    router.push('/kid/voice-config');
   };
 
   return (

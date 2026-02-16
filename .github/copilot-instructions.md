@@ -145,7 +145,7 @@ useEffect(() => {
 2. **Client-side routing only**: No API routes, no server-side data fetching.
 3. **TypeScript strict mode**: Use proper types, avoid `any` where possible.
 4. **Browser API checks**: Always wrap Web Audio, localStorage in `typeof window !== 'undefined'`.
-5. **Multi-account sign-out logic**: Check `kidAccounts.length` to route to either `/kid/select-account` or `/kid/login`.
+5. **Multi-account sign-out logic**: Check `kidAccounts.length` to route to either `/kid/kid-selector` or `/kid/login`.
 6. **Version system**: `learnverseVersion` localStorage key enables A/B testing of UI variants.
 
 ## Key Files Reference

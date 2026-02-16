@@ -212,7 +212,7 @@ export default function AllYouCanLearn() {
 
                 {/* Start Button */}
                 <Link
-                  href={`/kid/all-you-can-learn/${path.id}`}
+                  href={`/kid/community-learning/${path.id}`}
                   className={`block w-full bg-gradient-to-r ${path.color} text-white font-bold py-3 rounded-xl hover:shadow-lg transition-all text-center`}
                 >
                   Start Learning! 🚀

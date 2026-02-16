@@ -141,18 +141,23 @@ function KidSetupContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 p-8 animate-gradient-shift">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-6xl font-bold text-white mb-4 text-center drop-shadow-2xl animate-bounce-slow">
-          🎨 Let&apos;s Set Up Your Learning Buddy! ✨
-        </h1>
-        <p className="text-2xl text-white mb-8 text-center font-semibold drop-shadow-lg">
-          Customize everything, {kidName}!
-        </p>
+        {/* Enhanced Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-6xl font-bold text-white mb-4 text-center drop-shadow-2xl animate-bounce-slow flex items-center justify-center gap-3">
+            <span className="text-7xl animate-spin" style={{ animationDuration: '3s' }}>🎨</span>
+            Let&apos;s Set Up Your Learning Buddy!
+            <span className="text-7xl animate-pulse">✨</span>
+          </h1>
+          <p className="text-2xl text-white font-semibold drop-shadow-lg">
+            Customize everything, <span className="bg-gradient-to-r from-yellow-200 to-white bg-clip-text text-transparent">{kidName}</span>!
+          </p>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Left side - Buddy Preview */}
-          <div className="bg-gradient-to-br from-white to-purple-100 rounded-3xl p-8 shadow-2xl border-4 border-white transform hover:scale-105 transition-transform">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6 text-center">
-              Your Learning Buddy
+          <div className="bg-gradient-to-br from-white to-purple-100 rounded-3xl p-8 shadow-2xl border-4 border-white transform hover:scale-105 transition-transform duration-300 animate-slideInUp">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6 text-center flex items-center justify-center gap-2">
+              <span className="text-5xl">👤</span> Your Learning Buddy
             </h2>
             
             {/* Buddy Preview */}
@@ -195,56 +200,70 @@ function KidSetupContent() {
             </div>
 
             {/* Buddy Customization */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-lg font-semibold text-gray-700 mb-2">
-                  Shirt Color
+            <div className="space-y-6">
+              <div className="bg-white/80 rounded-2xl p-5 backdrop-blur">
+                <label className="block text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <span className="text-3xl">👕</span> Shirt Color
                 </label>
-                <div className="flex gap-3 flex-wrap">
-                  {['#FFD700', '#FF6B6B', '#4ECDC4', '#95E1D3', '#A8E6CF', '#C7CEEA'].map(color => (
+                <div className="flex gap-4 flex-wrap justify-center">
+                  {[{ color: '#FFD700', name: 'Gold' }, { color: '#FF6B6B', name: 'Red' }, { color: '#4ECDC4', name: 'Teal' }, { color: '#95E1D3', name: 'Mint' }, { color: '#A8E6CF', name: 'Green' }, { color: '#C7CEEA', name: 'Lavender' }].map(({ color, name }) => (
                     <button
                       key={color}
                       onClick={() => setBuddyColor(color)}
-                      className={`w-12 h-12 rounded-full border-4 transition-all ${
-                        buddyColor === color ? 'border-purple-600 scale-110' : 'border-gray-300'
+                      className={`flex flex-col items-center transition-all transform hover:scale-110 duration-200 ${
+                        buddyColor === color ? 'scale-110' : ''
                       }`}
-                      style={{ backgroundColor: color }}
-                    />
+                    >
+                      <div
+                        className={`w-16 h-16 rounded-2xl border-4 shadow-lg transition-all ${
+                          buddyColor === color ? 'border-purple-600 ring-4 ring-purple-300' : 'border-gray-300'
+                        }`}
+                        style={{ backgroundColor: color }}
+                      />
+                      <p className="text-xs font-bold text-gray-700 mt-2">{name}</p>
+                    </button>
                   ))}
                 </div>
               </div>
 
-              <div>
-                <label className="block text-lg font-semibold text-gray-700 mb-2">
-                  Skin Tone
+              <div className="bg-white/80 rounded-2xl p-5 backdrop-blur">
+                <label className="block text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <span className="text-3xl">🎨</span> Skin Tone
                 </label>
-                <div className="flex gap-3 flex-wrap">
-                  {['#FFE4B5', '#F5CBA7', '#D4A574', '#C68642', '#8D5524', '#4A2511'].map(color => (
+                <div className="flex gap-4 flex-wrap justify-center">
+                  {[{ color: '#FFE4B5', name: 'Light' }, { color: '#F5CBA7', name: 'Fair' }, { color: '#D4A574', name: 'Medium' }, { color: '#C68642', name: 'Olive' }, { color: '#8D5524', name: 'Brown' }, { color: '#4A2511', name: 'Dark' }].map(({ color, name }) => (
                     <button
                       key={color}
                       onClick={() => setSkinColor(color)}
-                      className={`w-12 h-12 rounded-full border-4 transition-all ${
-                        skinColor === color ? 'border-purple-600 scale-110' : 'border-gray-300'
+                      className={`flex flex-col items-center transition-all transform hover:scale-110 duration-200 ${
+                        skinColor === color ? 'scale-110' : ''
                       }`}
-                      style={{ backgroundColor: color }}
-                    />
+                    >
+                      <div
+                        className={`w-16 h-16 rounded-2xl border-4 shadow-lg transition-all ${
+                          skinColor === color ? 'border-purple-600 ring-4 ring-purple-300' : 'border-gray-300'
+                        }`}
+                        style={{ backgroundColor: color }}
+                      />
+                      <p className="text-xs font-bold text-gray-700 mt-2">{name}</p>
+                    </button>
                   ))}
                 </div>
               </div>
 
-              <div>
-                <label className="block text-lg font-semibold text-gray-700 mb-2">
-                  Expression
+              <div className="bg-white/80 rounded-2xl p-5 backdrop-blur">
+                <label className="block text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <span className="text-3xl">😊</span> Expression
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   {['happy', 'excited', 'friendly', 'cheerful'].map(expr => (
                     <button
                       key={expr}
                       onClick={() => setExpressionType(expr)}
-                      className={`px-4 py-2 rounded-xl font-semibold capitalize transition-all ${
+                      className={`px-5 py-3 rounded-2xl font-bold capitalize transition-all transform hover:scale-105 duration-200 ${
                         expressionType === expr
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg scale-105'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
                       {expr}
@@ -257,16 +276,21 @@ function KidSetupContent() {
 
           {/* Right side - Voice & Music Settings */}
           <div className="bg-white/90 backdrop-blur rounded-3xl p-8 shadow-2xl">
-            <h2 className="text-3xl font-bold text-purple-600 mb-6 text-center">
-              Voice & Sound Settings
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent mb-6 text-center flex items-center justify-center gap-2">
+              <span className="text-4xl">🎵</span> Voice & Sound
             </h2>
 
             <div className="space-y-6">
               {/* Voice Speed */}
-              <div>
-                <label className="block text-lg font-semibold text-gray-700 mb-2">
-                  Voice Speed: {voiceRate.toFixed(2)}
-                </label>
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-5 border border-purple-100">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <span>🏃‍♂️</span> Voice Speed
+                  </label>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    {voiceRate.toFixed(2)}x
+                  </span>
+                </div>
                 <input
                   type="range"
                   min="0.5"
@@ -274,19 +298,24 @@ function KidSetupContent() {
                   step="0.05"
                   value={voiceRate}
                   onChange={(e) => setVoiceRate(parseFloat(e.target.value))}
-                  className="w-full h-3 bg-purple-200 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-4 bg-gradient-to-r from-purple-300 to-pink-300 rounded-lg appearance-none cursor-pointer accent-purple-600"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
-                  <span>Slower</span>
-                  <span>Faster</span>
+                <div className="flex justify-between text-xs font-semibold text-gray-600 mt-2">
+                  <span>🐢 Slower</span>
+                  <span>⚡ Faster</span>
                 </div>
               </div>
 
               {/* Voice Pitch */}
-              <div>
-                <label className="block text-lg font-semibold text-gray-700 mb-2">
-                  Voice Pitch: {voicePitch.toFixed(2)}
-                </label>
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-5 border border-blue-100">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <span>🎼</span> Voice Pitch
+                  </label>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    {voicePitch.toFixed(2)}
+                  </span>
+                </div>
                 <input
                   type="range"
                   min="0.8"
@@ -294,19 +323,24 @@ function KidSetupContent() {
                   step="0.05"
                   value={voicePitch}
                   onChange={(e) => setVoicePitch(parseFloat(e.target.value))}
-                  className="w-full h-3 bg-purple-200 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-4 bg-gradient-to-r from-blue-300 to-purple-300 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
-                  <span>Lower</span>
-                  <span>Higher</span>
+                <div className="flex justify-between text-xs font-semibold text-gray-600 mt-2">
+                  <span>🔉 Lower</span>
+                  <span>🎺 Higher</span>
                 </div>
               </div>
 
               {/* Voice Volume */}
-              <div>
-                <label className="block text-lg font-semibold text-gray-700 mb-2">
-                  Voice Volume: {voiceVolume.toFixed(2)}
-                </label>
+              <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl p-5 border border-orange-100">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <span>🔊</span> Voice Volume
+                  </label>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text text-transparent">
+                    {Math.round(voiceVolume * 100)}%
+                  </span>
+                </div>
                 <input
                   type="range"
                   min="0.3"
@@ -314,11 +348,11 @@ function KidSetupContent() {
                   step="0.05"
                   value={voiceVolume}
                   onChange={(e) => setVoiceVolume(parseFloat(e.target.value))}
-                  className="w-full h-3 bg-purple-200 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-4 bg-gradient-to-r from-orange-300 to-yellow-300 rounded-lg appearance-none cursor-pointer accent-orange-600"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
-                  <span>Quieter</span>
-                  <span>Louder</span>
+                <div className="flex justify-between text-xs font-semibold text-gray-600 mt-2">
+                  <span>🤫 Quiet</span>
+                  <span>📢 Loud</span>
                 </div>
               </div>
 
@@ -329,43 +363,43 @@ function KidSetupContent() {
                   testVoice();
                 }}
                 disabled={isSpeaking}
-                className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
+                className={`w-full py-4 rounded-2xl font-bold text-lg transition-all transform hover:scale-105 ${
                   isSpeaking
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg'
+                    ? 'bg-gradient-to-r from-gray-400 to-gray-500 text-white cursor-not-allowed animate-pulse shadow-lg'
+                    : 'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white shadow-2xl'
                 }`}
               >
                 {isSpeaking ? '🔊 Speaking...' : '🎤 Test Voice'}
               </button>
 
               {/* Name Pronunciation Section */}
-              <div className="border-t-2 border-gray-200 pt-6">
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                  Teach Buddy Your Name 🎙️
+              <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6 border-2 border-pink-200 mt-6">
+                <h3 className="text-2xl font-bold text-transparent bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text mb-2 flex items-center gap-2">
+                  <span className="text-3xl">🎙️</span> Your Name Pronunciation
                 </h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  Record yourself saying &quot;{kidName}&quot; so your buddy says it perfectly!
+                <p className="text-sm text-gray-700 mb-4 leading-relaxed">
+                  Help your buddy say &quot;<span className="font-bold text-pink-600">{kidName}</span>&quot; perfectly by recording yourself! 🎉
                 </p>
                 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <button
                     onClick={() => {
                       sounds?.playClick();
                       recordNamePronunciation();
                     }}
-                    className={`w-full py-3 rounded-xl font-bold transition-all ${
+                    className={`w-full py-4 rounded-2xl font-bold text-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2 ${
                       isRecording
-                        ? 'bg-red-500 text-white animate-pulse'
+                        ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white animate-pulse shadow-2xl scale-105'
                         : hasRecordedName
-                        ? 'bg-green-500 hover:bg-green-600 text-white'
-                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                        ? 'bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white shadow-lg'
+                        : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-xl'
                     }`}
                   >
                     {isRecording 
-                      ? '🔴 Recording... (3 sec)' 
+                      ? (<><span className="animate-bounce">🔴</span> Recording... (3 sec)</>) 
                       : hasRecordedName 
-                      ? '✅ Re-record Name' 
-                      : '🎙️ Record My Name'}
+                      ? (<><span>🔄</span> Re-record Name</>) 
+                      : (<><span>🎙️</span> Record My Name</>)}
                   </button>
                   
                   {hasRecordedName && (
@@ -374,9 +408,9 @@ function KidSetupContent() {
                         sounds?.playClick();
                         playRecordedName();
                       }}
-                      className="w-full py-3 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-xl font-semibold transition-all"
+                      className="w-full py-3 bg-gradient-to-r from-purple-200 to-pink-200 hover:from-purple-300 hover:to-pink-300 text-purple-700 rounded-2xl font-bold transition-all transform hover:scale-105 flex items-center justify-center gap-2 shadow-md"
                     >
-                      ▶️ Play Recording
+                      <span>▶️</span> Play Recording
                     </button>
                   )}
                 </div>

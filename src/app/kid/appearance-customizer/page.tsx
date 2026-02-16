@@ -19,7 +19,7 @@ export default function ChooseDesign() {
     localStorage.setItem('selectedDesign', designId.toString());
     
     setTimeout(() => {
-      router.push('/kid/draw-buddy');
+      router.push('/kid/drawing-studio');
     }, 500);
   };
 

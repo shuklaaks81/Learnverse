@@ -49,7 +49,7 @@ export default function V1HubPage() {
         {/* Footer */}
         <div className="mt-12 text-center text-gray-500 text-sm">
           <p>Learnverse v0.1 - The Beginning</p>
-          <Link href="/kid/time-machine">
+          <Link href="/kid/history-timeline">
             <button className="mt-4 text-blue-500 hover:text-blue-700 underline">
               ← Back to Time Machine
             </button>

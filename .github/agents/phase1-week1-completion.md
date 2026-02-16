@@ -90,13 +90,13 @@
 ### TypeScript Nullability Issues Fixed
 Fixed 9 pages for strict TypeScript compliance:
 - `src/app/kid/achievements/page.tsx` - useSearchParams()
-- `src/app/kid/all-you-can-learn/[pathId]/page.tsx` - useParams()
+- `src/app/kid/community-learning/[pathId]/page.tsx` - useParams()
 - `src/app/kid/games/page.tsx` - useSearchParams()
 - `src/app/kid/map/page.tsx` - useSearchParams()
-- `src/app/kid/lesson-player/page.tsx` - useSearchParams()
+- `src/app/kid/content-viewer/page.tsx` - useSearchParams()
 - `src/app/kid/games/play/page.tsx` - useSearchParams()
 - `src/app/kid/setup/page.tsx` - useSearchParams()
-- `src/app/kid/interactive-lesson/page.tsx` - useSearchParams()
+- `src/app/kid/lesson-module/page.tsx` - useSearchParams()
 - `src/app/kid/topic/[id]/page.tsx` - useParams()
 - `src/parent/kid-details/page.tsx` - useSearchParams()
 
@@ -123,13 +123,13 @@ Fixed 9 pages for strict TypeScript compliance:
 ### Modified Files (10)
 - `src/app/kid/page.tsx` - Added Tutor button to navigation
 - `src/app/kid/achievements/page.tsx` - Fixed nullability
-- `src/app/kid/all-you-can-learn/[pathId]/page.tsx` - Fixed nullability
+- `src/app/kid/community-learning/[pathId]/page.tsx` - Fixed nullability
 - `src/app/kid/games/page.tsx` - Fixed nullability
 - `src/app/kid/map/page.tsx` - Fixed nullability
-- `src/app/kid/lesson-player/page.tsx` - Fixed nullability
+- `src/app/kid/content-viewer/page.tsx` - Fixed nullability
 - `src/app/kid/games/play/page.tsx` - Fixed nullability
 - `src/app/kid/setup/page.tsx` - Fixed nullability
-- `src/app/kid/interactive-lesson/page.tsx` - Fixed nullability
+- `src/app/kid/lesson-module/page.tsx` - Fixed nullability
 - `src/app/parent/kid-details/page.tsx` - Fixed nullability
 
 **Total Lines Added:** 2,452  
