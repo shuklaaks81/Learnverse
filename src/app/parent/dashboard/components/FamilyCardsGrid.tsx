@@ -106,7 +106,7 @@ export function FamilyCardsGrid({ kids }: FamilyCardsGridProps) {
             </Link>
 
             <p className="text-xs text-gray-500 mt-3 text-center opacity-60">
-              ID: {kid.id.substring(0, 12)}...
+              ID: {kid.id ? kid.id.substring(0, 12) : 'N/A'}...
             </p>
           </div>
         ))}
