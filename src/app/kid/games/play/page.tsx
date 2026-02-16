@@ -8,10 +8,10 @@ import { useSoundEffects } from '@/utils/soundEffects';
 
 function GamePlayContent() {
   const searchParams = useSearchParams();
-  const gameId = parseInt(searchParams.get('game') || '1');
-  const gameTitle = searchParams.get('title') || 'Game';
-  const kidName = searchParams.get('name') || 'Friend';
-  const kidId = searchParams.get('id') || '';
+  const gameId = parseInt(searchParams?.get('game') || '1');
+  const gameTitle = searchParams?.get('title') || 'Game';
+  const kidName = searchParams?.get('name') || 'Friend';
+  const kidId = searchParams?.get('id') || '';
   const sounds = useSoundEffects();
 
   const [score, setScore] = useState(0);

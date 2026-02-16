@@ -151,6 +151,19 @@ export default function KidPage() {
             <span className="font-black text-xl text-white drop-shadow-glow relative z-10">Lessons</span>
             <span className="text-xs text-yellow-200 mt-2 text-center relative z-10">Continue your learning journey.</span>
           </Link>
+          <Link href="/kid/tutor" className="relative bg-gradient-to-br from-pink-500/90 to-rose-600/90 hover:from-pink-400/90 hover:to-rose-500/90 backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(244,63,94,0.5)] border-2 border-pink-400/30 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_50px_rgba(244,63,94,0.8)] group overflow-hidden h-48">
+            {/* Animated particles */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute w-2 h-2 bg-blue-400 rounded-full top-2 right-2 animate-ping animation-delay-300"></div>
+              <div className="absolute w-2 h-2 bg-yellow-400 rounded-full bottom-2 left-2 animate-ping"></div>
+            </div>
+            {/* Holographic shimmer */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            
+            <span className="text-5xl mb-3 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] animate-bounce animation-delay-500">🧑‍🏫</span>
+            <span className="font-black text-xl text-white drop-shadow-glow relative z-10">Ask Tutor</span>
+            <span className="text-xs text-pink-200 mt-2 text-center relative z-10">Get AI help anytime!</span>
+          </Link>
           <Link href="/kid/book-holiday" className="relative bg-gradient-to-br from-cyan-500/90 to-blue-600/90 hover:from-cyan-400/90 hover:to-blue-500/90 backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(6,182,212,0.6)] border-2 border-cyan-300/30 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_60px_rgba(6,182,212,0.9)] group overflow-hidden h-48">
             {/* Beach vibes */}
             <div className="absolute inset-0 pointer-events-none">

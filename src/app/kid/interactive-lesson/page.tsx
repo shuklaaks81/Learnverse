@@ -35,7 +35,7 @@ interface LessonActivity {
 function InteractiveLessonContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const lessonId = searchParams.get("id") || "101";
+  const lessonId = searchParams?.get("id") || "101";
   const sounds = useSoundEffects();
 
   const [currentActivity, setCurrentActivity] = useState(0);

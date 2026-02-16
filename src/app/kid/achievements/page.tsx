@@ -19,8 +19,8 @@ interface Achievement {
 
 function AchievementsContent() {
   const searchParams = useSearchParams();
-  const kidName = searchParams.get('name') || 'Friend';
-  const kidId = searchParams.get('id') || '';
+  const kidName = searchParams?.get('name') || 'Friend';
+  const kidId = searchParams?.get('id') || '';
   const sounds = useSoundEffects();
 
   const [achievements, setAchievements] = useState<Achievement[]>([

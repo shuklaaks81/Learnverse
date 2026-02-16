@@ -20,7 +20,7 @@ interface World {
 
 function MapContent() {
   const searchParams = useSearchParams();
-  const subjectFilter = searchParams.get('subject');
+  const subjectFilter = searchParams?.get('subject');
   const [currentKid, setCurrentKid] = useState<any>(null);
   const [completedLessons, setCompletedLessons] = useState(0);
   const [hoveredWorld, setHoveredWorld] = useState<number | null>(null);

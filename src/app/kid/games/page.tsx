@@ -8,8 +8,8 @@ import { useSoundEffects } from '@/utils/soundEffects';
 
 function GamesContent() {
   const searchParams = useSearchParams();
-  const kidName = searchParams.get('name') || 'Friend';
-  const kidId = searchParams.get('id') || '';
+  const kidName = searchParams?.get('name') || 'Friend';
+  const kidId = searchParams?.get('id') || '';
   const sounds = useSoundEffects();
 
   const games = [

@@ -19,7 +19,7 @@ interface LessonStep {
 function LessonContent() {
     const [buddyVisible, setBuddyVisible] = useState(true);
   const searchParams = useSearchParams();
-  const lessonTitle = searchParams.get("title") || "Lesson";
+  const lessonTitle = searchParams?.get("title") || "Lesson";
   const sounds = useSoundEffects();
   const deviceInfo = getStoredDeviceInfo();
   

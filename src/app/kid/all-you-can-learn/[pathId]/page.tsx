@@ -14,7 +14,7 @@ interface GradeLevel {
 export default function LearningPathPage() {
   const params = useParams();
   const router = useRouter();
-  const pathId = params.pathId as string;
+  const pathId = (params?.pathId as string) || '';
   const [currentKid, setCurrentKid] = useState<any>(null);
   const [gradeLevel, setGradeLevel] = useState(3);
   const [unlockedGrades, setUnlockedGrades] = useState<number[]>([]);
