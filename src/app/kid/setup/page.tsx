@@ -136,6 +136,8 @@ function KidSetupContent() {
     excited: 'M 33 43 Q 40 52 47 43',
     friendly: 'M 35 46 Q 40 49 45 46',
     cheerful: 'M 34 44 Q 40 51 46 44'
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 p-8 animate-gradient-shift">
       <div className="max-w-6xl mx-auto">
@@ -150,8 +152,6 @@ function KidSetupContent() {
           {/* Left side - Buddy Preview */}
           <div className="bg-gradient-to-br from-white to-purple-100 rounded-3xl p-8 shadow-2xl border-4 border-white transform hover:scale-105 transition-transform">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6 text-center">
-              Your Learning Buddy
-            </h2>lassName="text-3xl font-bold text-purple-600 mb-6 text-center">
               Your Learning Buddy
             </h2>
             

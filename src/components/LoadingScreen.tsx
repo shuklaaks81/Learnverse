@@ -57,39 +57,7 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
         return false;
       }
     }},
-    { name: "Checking if app is awake", test: () => {
-      // Check if app is in maintenance mode
-      const isDown = localStorage.getItem('appMaintenance') === 'true';
-      if (isDown) {
-        const modes = ['dance', 'vacation', 'coffee', 'nap', 'strike', 'cold'];
-        const funnyReasons = [
-          "We're teaching the servers to dance 💃",
-          "Our pixels are on vacation 🏖️",
-          "The hamsters need a coffee break ☕",
-          "The code is taking a nap 😴",
-          "The app trolls are on strike 🧌",
-          "Sorry, the app is catching a cold 🤧"
-        ];
-        const randomIndex = Math.floor(Math.random() * funnyReasons.length);
-        const reason = funnyReasons[randomIndex];
-        const mode = modes[randomIndex];
-        
-        // Store the mode for the maintenance page
-        localStorage.setItem('maintenanceReason', mode);
-        
-        setChecks(prev => prev.map((c, i) => 
-          i === currentCheck ? { ...c, message: reason } : c
-        ));
-        
-        // Redirect to maintenance page after showing error
-        setTimeout(() => {
-          window.location.href = '/maintenance';
-        }, 2000);
-        
-        return false;
-      }
-      return true;
-    }},
+    { name: "Checking if app is awake", test: () => true },
     { name: "Checking app features", test: () => true },
     { name: "Loading Lab components", test: () => true },
     { name: "Verifying game engine", test: () => true },

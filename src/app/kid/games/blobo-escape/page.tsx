@@ -192,7 +192,7 @@ export default function BloboEscapeGame() {
       
       // Jump
       if ((e.key === ' ' || e.key === 'ArrowUp') && bloboY >= 300) {
-        setBloboVelocityY(-15);
+        setBloboVelocityY(-20); // Increased from -15 to -20 for higher jumps!
         sounds?.playClick();
       }
     };

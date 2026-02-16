@@ -93,9 +93,9 @@ export default function SelectAccountPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {accounts.map((kid) => (
+            {accounts.map((kid, index) => (
               <button
-                key={kid.id}
+                key={kid.id || `${kid.name}-${index}`}
                 onClick={() => handleSelectAccount(kid)}
                 className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border-2 border-cyan-400/30 rounded-3xl p-8 hover:scale-105 transition-all duration-300 hover:shadow-[0_0_50px_rgba(6,182,212,0.6)] group relative overflow-hidden"
               >
@@ -170,9 +170,9 @@ export default function SelectAccountPage() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {accounts.map((kid) => (
+          {accounts.map((kid, index) => (
             <button
-              key={kid.id}
+              key={kid.id || `${kid.name}-${index}`}
               onClick={() => handleSelectAccount(kid)}
               className="bg-white/95 backdrop-blur rounded-3xl p-8 hover:scale-105 transition-all duration-300 hover:shadow-2xl group border-4 border-white/50"
             >

@@ -7,8 +7,8 @@ export default function PWAInstallPrompt() {
   const [showInstallButton, setShowInstallButton] = useState(false);
 
   useEffect(() => {
-    // Register service worker
-    if ('serviceWorker' in navigator) {
+    // Register service worker ONLY IN PRODUCTION
+    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
       window.addEventListener('load', () => {
         navigator.serviceWorker
           .register('/sw.js')
@@ -18,6 +18,14 @@ export default function PWAInstallPrompt() {
           .catch((error) => {
             console.log('❌ Service Worker registration failed:', error);
           });
+      });
+    } else if ('serviceWorker' in navigator) {
+      // UNREGISTER all service workers in development
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => {
+          registration.unregister();
+          console.log('🔥 Service Worker unregistered for development');
+        });
       });
     }
 

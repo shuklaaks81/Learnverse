@@ -171,6 +171,21 @@ export default function KidPage() {
             <span className="text-xs text-gray-500 mt-1">Read the latest, print-friendly newspaper!</span>
           </Link>
           
+          {/* TIME MACHINE - NEW! */}
+          <Link href="/kid/time-machine" className="relative bg-gradient-to-br from-purple-600/90 to-pink-600/90 hover:from-purple-500/90 hover:to-pink-500/90 backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(147,51,234,0.6)] border-2 border-purple-400/30 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_60px_rgba(147,51,234,0.9)] group overflow-hidden h-48">
+            {/* Time particles */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute w-2 h-2 bg-cyan-400 rounded-full top-2 left-2 animate-ping"></div>
+              <div className="absolute w-2 h-2 bg-pink-400 rounded-full bottom-2 right-2 animate-ping animation-delay-500"></div>
+            </div>
+            {/* Holographic shimmer */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            
+            <span className="text-6xl mb-3 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] animate-pulse">🕰️</span>
+            <span className="font-black text-xl text-white drop-shadow-glow relative z-10">Time Machine</span>
+            <span className="text-xs text-purple-200 mt-2 text-center relative z-10">Switch versions!</span>
+          </Link>
+          
           {/* MOVIE THEATER - NEW! */}
           <Link href="/kid/theater" className="relative bg-gradient-to-br from-red-600/90 to-purple-700/90 hover:from-red-500/90 hover:to-purple-600/90 backdrop-blur-xl rounded-2xl p-8 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(220,38,38,0.6)] border-2 border-red-400/30 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_60px_rgba(220,38,38,0.9)] group overflow-hidden col-span-2 sm:col-span-4 h-48">
             {/* Cinema curtain effect */}

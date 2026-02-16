@@ -44,6 +44,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip POST requests - only cache GET
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {

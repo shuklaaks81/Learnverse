@@ -68,7 +68,7 @@ export default function RootLayout({
             {/* OceanSounds must be rendered in a client component */}
             <ClientOceanSoundsWrapper />
             <PWAInstallPrompt />
-            <HolidayBlocker />
+            {/* <HolidayBlocker /> */}
             <VersionLayoutClient>{children}</VersionLayoutClient>
             <Analytics />
           </SecretEventProvider>

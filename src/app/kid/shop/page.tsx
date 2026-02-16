@@ -74,6 +74,17 @@ export default function ShopPage() {
     // Check if weekly animation is unlocked
     const weeklyUnlocked = localStorage.getItem(`weeklyAnimation_week${currentWeek}`) === 'true';
     setWeeklyAnimationUnlocked(weeklyUnlocked);
+
+    // Refresh coins every second to catch updates from games
+    const coinRefreshInterval = setInterval(() => {
+      const updatedKid = JSON.parse(localStorage.getItem('currentKid') || '{}');
+      const updatedCoins = updatedKid.coins || 0;
+      if (updatedCoins !== coins) {
+        setCoins(updatedCoins);
+      }
+    }, 1000);
+
+    return () => clearInterval(coinRefreshInterval);
   }, []);
 
   const handlePurchase = (item: ShopItem) => {
