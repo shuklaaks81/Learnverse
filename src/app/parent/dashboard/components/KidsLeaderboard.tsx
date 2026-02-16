@@ -47,7 +47,7 @@ export function KidsLeaderboard({ kids }: KidsLeaderboardProps) {
           .sort((a, b) => b.progress - a.progress)
           .map((kid, index) => (
             <div
-              key={kid.id}
+              key={`${kid.id}-${index}`}
               className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-2xl transition-all transform hover:scale-102 hover:shadow-lg ${
                 index === 0
                   ? "bg-gradient-to-r from-amber-200 via-yellow-200 to-orange-200 border-3 border-amber-400 shadow-xl animate-slideInUp"
