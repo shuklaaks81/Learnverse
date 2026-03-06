@@ -4,6 +4,7 @@ body.premium {
   overflow-x: hidden;
 }
 
+/* Disabled - each premium page has its own background
 body.premium::before {
   content: '';
   position: fixed;
@@ -16,6 +17,7 @@ body.premium::before {
   filter: blur(60px) brightness(1.2);
   opacity: 0.7;
 }
+*/
 
 body.premium .futuristic-glass {
   background: rgba(30, 30, 60, 0.7);
@@ -43,6 +45,7 @@ body.premium .glow-text {
   to { text-shadow: 0 0 32px #0ff, 0 0 64px #f0f, 0 0 8px #fff; }
 }
 
+/* Disabled - particles are added per-page to avoid conflicts
 body.premium .futuristic-particles {
   position: fixed;
   inset: 0;
@@ -59,6 +62,8 @@ body.premium .futuristic-particles {
   0% { background-position: 0 0, 0 0; }
   100% { background-position: 120px 80px, -80px 120px; }
 }
+*/
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

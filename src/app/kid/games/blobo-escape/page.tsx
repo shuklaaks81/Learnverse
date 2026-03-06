@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSoundEffects } from "@/utils/soundEffects";
 
@@ -11,6 +11,22 @@ interface Guard {
   options: string[];
   correctAnswer: number;
   defeated: boolean;
+}
+
+interface Boss {
+  x: number;
+  y: number;
+  name: string;
+  emoji: string;
+  health: number;
+  maxHealth: number;
+  questions: {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+  }[];
+  defeated: boolean;
+  currentQuestionIndex: number;
 }
 
 interface Coin {
@@ -47,6 +63,15 @@ export default function BloboEscapeGame() {
   const [showQuestion, setShowQuestion] = useState(false);
   const [currentGuard, setCurrentGuard] = useState<Guard | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  
+  // Boss battle state
+  const [showBossBattle, setShowBossBattle] = useState(false);
+  const [currentBoss, setCurrentBoss] = useState<Boss | null>(null);
+  const [bossSelectedAnswer, setBossSelectedAnswer] = useState<number | null>(null);
+  
+  // Touch controls state
+  const [touchingLeft, setTouchingLeft] = useState(false);
+  const [touchingRight, setTouchingRight] = useState(false);
   
   // Guards with educational questions
   const [guards, setGuards] = useState<Guard[]>([
@@ -113,11 +138,74 @@ export default function BloboEscapeGame() {
       options: ["7", "10", "12", "15"],
       correctAnswer: 2,
       defeated: false
+    },
+    // MORE GUARDS for bigger level!
+    { x: 6000, y: 260, question: "What is 10 + 15?", options: ["20", "25", "30", "35"], correctAnswer: 1, defeated: false },
+    { x: 6800, y: 150, question: "How many days in a week?", options: ["5", "6", "7", "8"], correctAnswer: 2, defeated: false },
+    { x: 7600, y: 260, question: "What is 20 - 8?", options: ["10", "11", "12", "13"], correctAnswer: 2, defeated: false },
+    { x: 8400, y: 150, question: "Which is biggest: Earth, Moon, or Sun?", options: ["Earth", "Moon", "Sun", "Same"], correctAnswer: 2, defeated: false },
+    { x: 9200, y: 260, question: "What is 5 × 5?", options: ["20", "25", "30", "35"], correctAnswer: 1, defeated: false },
+    { x: 10000, y: 150, question: "How many continents are there?", options: ["5", "6", "7", "8"], correctAnswer: 2, defeated: false },
+    { x: 11000, y: 260, question: "What is 100 - 45?", options: ["45", "50", "55", "60"], correctAnswer: 2, defeated: false },
+    { x: 12000, y: 150, question: "What shape is a stop sign?", options: ["Circle", "Square", "Triangle", "Octagon"], correctAnswer: 3, defeated: false },
+    { x: 13000, y: 260, question: "What is 6 × 7?", options: ["35", "40", "42", "48"], correctAnswer: 2, defeated: false },
+    { x: 14000, y: 150, question: "How many minutes in an hour?", options: ["50", "60", "70", "100"], correctAnswer: 1, defeated: false }
+  ]);
+  
+  // BOSS BATTLES! 👑
+  const [bosses, setBosses] = useState<Boss[]>([
+    {
+      x: 5500,
+      y: 200,
+      name: "The Math Wizard",
+      emoji: "🧙‍♂️",
+      health: 3,
+      maxHealth: 3,
+      currentQuestionIndex: 0,
+      defeated: false,
+      questions: [
+        { question: "What is 7 + 8?", options: ["13", "14", "15", "16"], correctAnswer: 2 },
+        { question: "What is 9 × 2?", options: ["16", "17", "18", "19"], correctAnswer: 2 },
+        { question: "What is 25 - 13?", options: ["10", "11", "12", "13"], correctAnswer: 2 }
+      ]
+    },
+    {
+      x: 10500,
+      y: 200,
+      name: "The Science Dragon",
+      emoji: "🐉",
+      health: 4,
+      maxHealth: 4,
+      currentQuestionIndex: 0,
+      defeated: false,
+      questions: [
+        { question: "What planet do we live on?", options: ["Mars", "Earth", "Venus", "Jupiter"], correctAnswer: 1 },
+        { question: "How many legs does an insect have?", options: ["4", "6", "8", "10"], correctAnswer: 1 },
+        { question: "What gas do plants make?", options: ["Carbon Dioxide", "Oxygen", "Nitrogen", "Hydrogen"], correctAnswer: 1 },
+        { question: "What is H2O?", options: ["Oxygen", "Water", "Air", "Fire"], correctAnswer: 1 }
+      ]
+    },
+    {
+      x: 14800,
+      y: 200,
+      name: "The Final Guardian",
+      emoji: "👑",
+      health: 5,
+      maxHealth: 5,
+      currentQuestionIndex: 0,
+      defeated: false,
+      questions: [
+        { question: "What is 12 × 3?", options: ["33", "34", "36", "38"], correctAnswer: 2 },
+        { question: "How many months in a year?", options: ["10", "11", "12", "13"], correctAnswer: 2 },
+        { question: "What is the capital of USA?", options: ["New York", "Los Angeles", "Washington DC", "Chicago"], correctAnswer: 2 },
+        { question: "What is 50 ÷ 5?", options: ["5", "10", "15", "20"], correctAnswer: 1 },
+        { question: "Which is faster: cheetah or turtle?", options: ["Cheetah", "Turtle", "Same", "Depends"], correctAnswer: 0 }
+      ]
     }
   ]);
   
-  // Maze walls
-  const walls: Wall[] = [
+  // Maze walls (memoized to prevent re-creation on every render)
+  const walls: Wall[] = useMemo(() => [
     // Starting area walls
     { x: 200, y: 200, width: 20, height: 150 },
     { x: 400, y: 100, width: 20, height: 150 },
@@ -160,19 +248,41 @@ export default function BloboEscapeGame() {
     // Final section
     { x: 4700, y: 100, width: 20, height: 200 },
     { x: 4900, y: 150, width: 20, height: 200 },
-  ];
+    
+    // EXTENDED LEVEL - MORE WALLS!
+    { x: 5800, y: 200, width: 20, height: 150 },
+    { x: 6000, y: 100, width: 20, height: 150 },
+    { x: 6600, y: 200, width: 20, height: 150 },
+    { x: 6800, y: 100, width: 20, height: 150 },
+    { x: 7400, y: 200, width: 20, height: 150 },
+    { x: 7600, y: 100, width: 20, height: 150 },
+    { x: 8200, y: 200, width: 20, height: 150 },
+    { x: 8400, y: 100, width: 20, height: 150 },
+    { x: 9000, y: 200, width: 20, height: 150 },
+    { x: 9200, y: 100, width: 20, height: 150 },
+    { x: 9800, y: 200, width: 20, height: 150 },
+    { x: 10000, y: 100, width: 20, height: 150 },
+    { x: 10800, y: 200, width: 20, height: 150 },
+    { x: 11000, y: 100, width: 20, height: 150 },
+    { x: 11800, y: 200, width: 20, height: 150 },
+    { x: 12000, y: 100, width: 20, height: 150 },
+    { x: 12800, y: 200, width: 20, height: 150 },
+    { x: 13000, y: 100, width: 20, height: 150 },
+    { x: 13800, y: 200, width: 20, height: 150 },
+    { x: 14000, y: 100, width: 20, height: 150 },
+  ], []);
   
-  // Generate 100 coins scattered throughout the maze
+  // Generate TONS of coins scattered throughout the MASSIVE maze!
   const generateCoins = (): Coin[] => {
     const coins: Coin[] = [];
-    const sections = 10;
-    const coinsPerSection = 10;
+    const sections = 30; // 3x more sections!
+    const coinsPerSection = 12; // More coins per section!
     
     for (let section = 0; section < sections; section++) {
-      const startX = section * 550;
+      const startX = section * 520;
       for (let i = 0; i < coinsPerSection; i++) {
         coins.push({
-          x: startX + 100 + (i * 45) + Math.random() * 30,
+          x: startX + 100 + (i * 40) + Math.random() * 30,
           y: 150 + Math.random() * 150,
           collected: false
         });
@@ -215,9 +325,9 @@ export default function BloboEscapeGame() {
     if (!gameStarted || showQuestion || gameWon) return;
 
     const gameLoop = setInterval(() => {
-      // Move Blobo with wall collision
+      // Move Blobo with wall collision (keyboard OR touch controls)
       let newX = bloboX;
-      if (keysPressed.current['ArrowLeft'] || keysPressed.current['a']) {
+      if (keysPressed.current['ArrowLeft'] || keysPressed.current['a'] || touchingLeft) {
         const testX = Math.max(0, bloboX - 5);
         // Check wall collision
         let collision = false;
@@ -234,8 +344,8 @@ export default function BloboEscapeGame() {
         }
         if (!collision) newX = testX;
       }
-      if (keysPressed.current['ArrowRight'] || keysPressed.current['d']) {
-        const testX = Math.min(5400, bloboX + 5);
+      if (keysPressed.current['ArrowRight'] || keysPressed.current['d'] || touchingRight) {
+        const testX = Math.min(15400, bloboX + 5);
         // Check wall collision
         let collision = false;
         for (const wall of walls) {
@@ -281,7 +391,7 @@ export default function BloboEscapeGame() {
       setBloboVelocityY(newVelocityY);
 
       // Camera follows Blobo
-      const newCameraX = Math.max(0, Math.min(newX - 300, 5400 - 800));
+      const newCameraX = Math.max(0, Math.min(newX - 300, 15400 - 800));
       setCameraX(newCameraX);
 
       // Check coin collision
@@ -308,9 +418,19 @@ export default function BloboEscapeGame() {
         setCurrentGuard(activeGuard);
         setShowQuestion(true);
       }
+      
+      // Check BOSS collision!
+      const activeBoss = bosses.find(b => 
+        !b.defeated && Math.abs(newX - b.x) < 80 && Math.abs(bloboY - b.y) < 80
+      );
+
+      if (activeBoss) {
+        setCurrentBoss(activeBoss);
+        setShowBossBattle(true);
+      }
 
       // Check if reached exit (end of level)
-      if (newX >= 5300) {
+      if (newX >= 15300) {
         setGameWon(true);
         sounds?.playCelebration();
         
@@ -326,7 +446,15 @@ export default function BloboEscapeGame() {
     }, 1000 / 60); // 60 FPS
 
     return () => clearInterval(gameLoop);
-  }, [gameStarted, bloboX, bloboY, bloboVelocityY, guards, showQuestion, gameWon, coins, sounds, walls]);
+  }, [gameStarted, bloboX, bloboY, bloboVelocityY, guards, bosses, showQuestion, showBossBattle, gameWon, coins, sounds, walls, touchingLeft, touchingRight]);
+
+  // Touch control handlers
+  const handleTouchJump = () => {
+    if (bloboY >= 300) {
+      setBloboVelocityY(-20);
+      sounds?.playClick();
+    }
+  };
 
   // Answer question
   const handleAnswerQuestion = () => {
@@ -352,6 +480,51 @@ export default function BloboEscapeGame() {
     }
   };
 
+  // Answer BOSS question - multi-question battle!
+  const handleBossAnswer = () => {
+    if (bossSelectedAnswer === null || !currentBoss) return;
+
+    const currentQuestion = currentBoss.questions[currentBoss.currentQuestionIndex];
+    
+    if (bossSelectedAnswer === currentQuestion.correctAnswer) {
+      // Correct answer! Damage the boss
+      sounds?.playCorrect();
+      
+      const newHealth = currentBoss.health - 1;
+      const nextQuestionIndex = currentBoss.currentQuestionIndex + 1;
+      
+      if (newHealth <= 0) {
+        // BOSS DEFEATED! 🎉
+        sounds?.playCelebration();
+        setBosses(prev =>
+          prev.map(b =>
+            b.x === currentBoss.x ? { ...b, defeated: true, health: 0 } : b
+          )
+        );
+        setScore(prev => prev + 500); // BIG score bonus!
+        setShowBossBattle(false);
+        setCurrentBoss(null);
+        setBossSelectedAnswer(null);
+      } else {
+        // Boss loses health, next question
+        setBosses(prev =>
+          prev.map(b =>
+            b.x === currentBoss.x 
+              ? { ...b, health: newHealth, currentQuestionIndex: nextQuestionIndex } 
+              : b
+          )
+        );
+        setCurrentBoss({ ...currentBoss, health: newHealth, currentQuestionIndex: nextQuestionIndex });
+        setBossSelectedAnswer(null);
+      }
+    } else {
+      // Wrong answer - boss stays strong!
+      sounds?.playWrong();
+      alert("❌ Wrong answer! The boss laughs! Try again!");
+      setBossSelectedAnswer(null);
+    }
+  };
+
   // Start game
   const startGame = () => {
     setGameStarted(true);
@@ -367,6 +540,7 @@ export default function BloboEscapeGame() {
     setGameWon(false);
     setGameStarted(false);
     setGuards(guards.map(g => ({ ...g, defeated: false })));
+    setBosses(bosses.map(b => ({ ...b, defeated: false, health: b.maxHealth, currentQuestionIndex: 0 })));
     setCoinsList(coinsList.map(c => ({ ...c, collected: false })));
     setCameraX(0);
   };
@@ -375,10 +549,13 @@ export default function BloboEscapeGame() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-8">
         <div className="bg-white/95 rounded-3xl p-12 max-w-2xl text-center shadow-2xl">
-          <div className="text-8xl mb-6 animate-bounce">🟣</div>
-          <h1 className="text-5xl font-bold text-purple-700 mb-4">Blobo&apos;s Castle Escape!</h1>
-          <p className="text-xl text-gray-700 mb-6">
-            Help Blobo the floating blob escape from the castle! 🏰
+          <div className="text-8xl mb-6">🟣</div>
+          <h1 className="text-5xl font-bold text-purple-700 mb-4">Blobo&apos;s EPIC Castle Escape!</h1>
+          <p className="text-xl text-gray-700 mb-4">
+            Help Blobo the floating blob escape from the MASSIVE castle! 🏰
+          </p>
+          <p className="text-lg text-red-600 font-bold mb-6">
+            ⚠️ New: HUGE level with 3 EPIC BOSS BATTLES! ⚔️
           </p>
           
           <div className="bg-purple-100 rounded-2xl p-6 mb-8 text-left">
@@ -386,9 +563,11 @@ export default function BloboEscapeGame() {
             <ul className="space-y-2 text-lg text-gray-700">
               <li>⬅️➡️ <strong>Arrow Keys</strong> or <strong>A/D</strong> - Move Blobo left/right</li>
               <li>⬆️ <strong>Arrow Up</strong> or <strong>Space</strong> - Jump</li>
-              <li>🪙 Collect coins for points!</li>
-              <li>💂 Answer questions correctly to pass guards!</li>
-              <li>🚪 Reach the exit to escape!</li>
+              <li>📱 <strong>Touch Controls</strong> - Use on-screen buttons on mobile/tablet!</li>
+              <li>🪙 Collect <strong>360+ coins</strong> across the MASSIVE level!</li>
+              <li>💂 Answer questions to pass <strong>19 guards</strong>!</li>
+              <li>⚔️ <strong>BOSS BATTLES!</strong> Fight 3 epic bosses with multiple questions!</li>
+              <li>🚪 Reach the exit at the end to escape!</li>
             </ul>
           </div>
 
@@ -438,12 +617,12 @@ export default function BloboEscapeGame() {
         <div className="absolute inset-0 bg-gradient-to-b from-blue-900 via-purple-900 to-gray-800"></div>
         
         {/* Game World */}
-        <div style={{ position: 'relative', transform: `translateX(-${cameraX}px)`, width: '5500px', height: '100%' }}>
+        <div style={{ position: 'relative', transform: `translateX(-${cameraX}px)`, width: '15500px', height: '100%' }}>
           {/* Castle Floor */}
           <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-gray-700 to-gray-900 border-t-4 border-gray-600"></div>
           
-          {/* Castle Wall Pattern */}
-          {[...Array(110)].map((_, i) => (
+          {/* Castle Wall Pattern - Optimized */}
+          {[...Array(150)].map((_, i) => (
             <div
               key={i}
               className="absolute bottom-32 w-12 h-48 bg-gradient-to-b from-gray-600 to-gray-700 border-r-2 border-gray-800"
@@ -465,12 +644,12 @@ export default function BloboEscapeGame() {
             ></div>
           ))}
 
-          {/* Coins */}
+          {/* Coins - Removed animate-bounce for performance */}
           {coinsList.map((coin, i) => (
             !coin.collected && (
               <div
                 key={i}
-                className="absolute text-4xl animate-bounce"
+                className="absolute text-4xl"
                 style={{ left: coin.x, top: coin.y }}
               >
                 🪙
@@ -490,24 +669,96 @@ export default function BloboEscapeGame() {
               </div>
             )
           ))}
+          
+          {/* BOSSES - Epic Encounters! */}
+          {bosses.map((boss, i) => (
+            !boss.defeated && (
+              <div
+                key={i}
+                className="absolute"
+                style={{ left: boss.x - 20, top: boss.y - 20 }}
+              >
+                <div className="relative">
+                  {/* Boss Zone Indicator - Removed animate-pulse */}
+                  <div className="absolute -inset-8 bg-red-500/20 rounded-full border-4 border-red-500"></div>
+                  {/* Boss Character - Removed animate-bounce */}
+                  <div className="text-9xl relative z-10">{boss.emoji}</div>
+                  {/* Boss Health Bar */}
+                  <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-32 bg-gray-800 rounded-full p-1 border-2 border-yellow-400">
+                    <div 
+                      className="h-2 bg-gradient-to-r from-red-600 to-red-400 rounded-full transition-all"
+                      style={{ width: `${(boss.health / boss.maxHealth) * 100}%` }}
+                    ></div>
+                  </div>
+                  {/* Boss Name Tag */}
+                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-red-600 text-white px-3 py-1 rounded-full font-bold text-sm whitespace-nowrap">
+                    {boss.name}
+                  </div>
+                </div>
+              </div>
+            )
+          ))}
 
           {/* Exit Door */}
-          <div className="absolute text-8xl" style={{ left: 5350, top: 240 }}>
+          <div className="absolute text-8xl" style={{ left: 15350, top: 240 }}>
             🚪
           </div>
 
-          {/* Blobo */}
+          {/* Blobo - Simplified animation */}
           <div
-            className="absolute text-6xl transition-all duration-100"
+            className="absolute text-6xl"
             style={{ 
               left: bloboX - 30, 
-              top: bloboY - 30,
-              transform: `rotate(${Math.sin(Date.now() / 200) * 10}deg)`
+              top: bloboY - 30
             }}
           >
             🟣
           </div>
         </div>
+      </div>
+
+      {/* Touch Controls for Mobile/Tablet */}
+      <div className="max-w-6xl mx-auto mt-4 flex justify-between items-center px-4 select-none">
+        {/* Left Button */}
+        <button
+          onTouchStart={() => setTouchingLeft(true)}
+          onTouchEnd={() => setTouchingLeft(false)}
+          onMouseDown={() => setTouchingLeft(true)}
+          onMouseUp={() => setTouchingLeft(false)}
+          onMouseLeave={() => setTouchingLeft(false)}
+          className={`w-24 h-24 rounded-full font-bold text-4xl transition-all shadow-2xl ${
+            touchingLeft 
+              ? 'bg-blue-600 text-white scale-95' 
+              : 'bg-white/90 text-blue-600 hover:bg-blue-50'
+          }`}
+        >
+          ⬅️
+        </button>
+
+        {/* Jump Button */}
+        <button
+          onTouchStart={handleTouchJump}
+          onClick={handleTouchJump}
+          className="w-32 h-32 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-bold text-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all"
+        >
+          JUMP<br/>⬆️
+        </button>
+
+        {/* Right Button */}
+        <button
+          onTouchStart={() => setTouchingRight(true)}
+          onTouchEnd={() => setTouchingRight(false)}
+          onMouseDown={() => setTouchingRight(true)}
+          onMouseUp={() => setTouchingRight(false)}
+          onMouseLeave={() => setTouchingRight(false)}
+          className={`w-24 h-24 rounded-full font-bold text-4xl transition-all shadow-2xl ${
+            touchingRight 
+              ? 'bg-blue-600 text-white scale-95' 
+              : 'bg-white/90 text-blue-600 hover:bg-blue-50'
+          }`}
+        >
+          ➡️
+        </button>
       </div>
 
       {/* Question Modal */}
@@ -553,11 +804,83 @@ export default function BloboEscapeGame() {
         </div>
       )}
 
+      {/* BOSS BATTLE Modal - Epic Multi-Question Fight! */}
+      {showBossBattle && currentBoss && (
+        <div className="fixed inset-0 bg-gradient-to-br from-red-900/95 via-purple-900/95 to-black/95 flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-red-100 to-orange-100 rounded-3xl p-8 max-w-3xl w-full shadow-2xl animate-[popIn_0.3s_ease-out] border-8 border-red-600">
+            {/* Boss Header */}
+            <div className="text-center mb-6">
+              <div className="text-9xl mb-4">{currentBoss.emoji}</div>
+              <h2 className="text-4xl font-bold text-red-700 mb-2">
+                ⚔️ BOSS BATTLE! ⚔️
+              </h2>
+              <h3 className="text-3xl font-bold text-gray-800 mb-4">
+                {currentBoss.name}
+              </h3>
+              
+              {/* Health Bar */}
+              <div className="bg-gray-800 rounded-full p-2 mb-2 border-4 border-yellow-400">
+                <div 
+                  className="h-6 bg-gradient-to-r from-red-600 via-red-500 to-red-400 rounded-full transition-all duration-500 flex items-center justify-center text-white font-bold"
+                  style={{ width: `${(currentBoss.health / currentBoss.maxHealth) * 100}%` }}
+                >
+                  {currentBoss.health > 0 && `❤️ ${currentBoss.health}/${currentBoss.maxHealth}`}
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 font-semibold">
+                Question {currentBoss.currentQuestionIndex + 1} of {currentBoss.questions.length}
+              </p>
+            </div>
+
+            {/* Boss Question */}
+            <div className="bg-white rounded-2xl p-6 mb-6 shadow-lg border-4 border-red-300">
+              <p className="text-2xl text-center text-gray-800 font-bold">
+                {currentBoss.questions[currentBoss.currentQuestionIndex].question}
+              </p>
+            </div>
+
+            {/* Answer Options */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              {currentBoss.questions[currentBoss.currentQuestionIndex].options.map((option, i) => (
+                <button
+                  key={i}
+                  onClick={() => setBossSelectedAnswer(i)}
+                  className={`p-6 rounded-2xl text-xl font-bold transition-all ${
+                    bossSelectedAnswer === i
+                      ? 'bg-red-600 text-white scale-105 shadow-lg border-4 border-yellow-400'
+                      : 'bg-white text-gray-800 hover:bg-red-50 border-2 border-gray-300'
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+
+            {/* Submit Button */}
+            <button
+              onClick={handleBossAnswer}
+              disabled={bossSelectedAnswer === null}
+              className={`w-full py-6 rounded-2xl font-bold text-2xl transition-all ${
+                bossSelectedAnswer === null
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600 text-white hover:scale-105 shadow-lg'
+              }`}
+            >
+              ⚔️ ATTACK! ⚔️
+            </button>
+
+            <p className="text-center text-sm text-gray-700 mt-4 font-semibold">
+              💡 Answer correctly to damage the boss! Defeat all questions to win!
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Win Screen */}
       {gameWon && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="bg-gradient-to-br from-yellow-400 via-orange-400 to-pink-500 rounded-3xl p-12 max-w-2xl text-center shadow-2xl animate-[popIn_0.5s_ease-out]">
-            <div className="text-9xl mb-6 animate-bounce">🎉</div>
+            <div className="text-9xl mb-6">🎉</div>
             <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg">
               Blobo Escaped!
             </h1>

@@ -24,6 +24,7 @@ export default function ShopPage() {
   const [isGlitching, setIsGlitching] = useState(false);
   const [showWeeklyAnimation, setShowWeeklyAnimation] = useState(false);
   const [weeklyAnimationUnlocked, setWeeklyAnimationUnlocked] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
 
   // Get current week number (changes every week!)
   const getCurrentWeek = () => {
@@ -61,30 +62,52 @@ export default function ShopPage() {
     { id: 16, name: 'XP Boost', description: '1.5x XP for 10 lessons', price: 100, category: 'powerups', emoji: '⚡', unlocked: false },
   ];
 
+  // 💎 PREMIUM EXCLUSIVE ITEMS 💎
+  const premiumItems: ShopItem[] = [
+    { id: 1001, name: 'Holographic Skin', description: '✨ PREMIUM: Rainbow holographic effect!', price: 300, category: 'buddyColors', emoji: '💎', unlocked: false },
+    { id: 1002, name: 'Cyber Neon Outfit', description: '✨ PREMIUM: Futuristic glowing cyberpunk style', price: 350, category: 'buddyColors', emoji: '⚡', unlocked: false },
+    { id: 1003, name: 'Crystal Wings', description: '✨ PREMIUM: Diamond wings that sparkle', price: 500, category: 'accessories', emoji: '🦋', unlocked: false },
+    { id: 1004, name: 'Dragon Companion', description: '✨ PREMIUM: A baby dragon follows you!', price: 600, category: 'accessories', emoji: '🐉', unlocked: false },
+    { id: 1005, name: 'VIP Crown', description: '✨ PREMIUM: Ultimate status symbol', price: 800, category: 'accessories', emoji: '👸', unlocked: false },
+    { id: 1006, name: 'Matrix Theme', description: '✨ PREMIUM: Code-rain cyber background', price: 250, category: 'backgrounds', emoji: '💻', unlocked: false },
+    { id: 1007, name: 'Aurora Sky', description: '✨ PREMIUM: Northern lights background', price: 300, category: 'backgrounds', emoji: '🌌', unlocked: false },
+    { id: 1008, name: 'Mega XP Boost', description: '✨ PREMIUM: 3x XP for 20 lessons!', price: 400, category: 'powerups', emoji: '🚀', unlocked: false },
+    { id: 1009, name: 'Auto-Streak', description: '✨ PREMIUM: Never lose your streak!', price: 500, category: 'powerups', emoji: '🔥', unlocked: false },
+    { id: 1010, name: 'Coin Magnet', description: '✨ PREMIUM: Earn 50% more coins always!', price: 750, category: 'powerups', emoji: '🧲', unlocked: false },
+   { id: 1011, name: 'AI Buddy Pro', description: '✨ PREMIUM: Smart AI learning assistant', price: 900, category: 'powerups', emoji: '🤖', unlocked: false },
+    { id: 1012, name: 'Legendary Aura', description: '✨ PREMIUM: Glowing particle effects', price: 1000, category: 'accessories', emoji: '✨', unlocked: false },
+  ];
+
   useEffect(() => {
-    // Load coins from currentKid (same as daily challenge)
-    const currentKid = JSON.parse(localStorage.getItem('currentKid') || '{}');
-    const currentCoins = currentKid.coins || 0;
-    setCoins(currentCoins);
+    if (typeof window !== 'undefined') {
+      // Check for premium version
+      const version = localStorage.getItem('learnverseVersion') || 'original';
+      setIsPremium(version === 'premium');
+      
+      // Load coins from currentKid (same as daily challenge)
+      const currentKid = JSON.parse(localStorage.getItem('currentKid') || '{}');
+      const currentCoins = currentKid.coins || 0;
+      setCoins(currentCoins);
 
-    // Load purchased items
-    const purchased = JSON.parse(localStorage.getItem(`purchased_${currentKid.id}`) || '[]');
-    setPurchasedItems(purchased);
+      // Load purchased items
+      const purchased = JSON.parse(localStorage.getItem(`purchased_${currentKid.id}`) || '[]');
+      setPurchasedItems(purchased);
 
-    // Check if weekly animation is unlocked
-    const weeklyUnlocked = localStorage.getItem(`weeklyAnimation_week${currentWeek}`) === 'true';
-    setWeeklyAnimationUnlocked(weeklyUnlocked);
+      // Check if weekly animation is unlocked
+      const weeklyUnlocked = localStorage.getItem(`weeklyAnimation_week${currentWeek}`) === 'true';
+      setWeeklyAnimationUnlocked(weeklyUnlocked);
 
-    // Refresh coins every second to catch updates from games
-    const coinRefreshInterval = setInterval(() => {
-      const updatedKid = JSON.parse(localStorage.getItem('currentKid') || '{}');
-      const updatedCoins = updatedKid.coins || 0;
-      if (updatedCoins !== coins) {
-        setCoins(updatedCoins);
-      }
-    }, 1000);
+      // Refresh coins every second to catch updates from games
+      const coinRefreshInterval = setInterval(() => {
+        const updatedKid = JSON.parse(localStorage.getItem('currentKid') || '{}');
+        const updatedCoins = updatedKid.coins || 0;
+        if (updatedCoins !== coins) {
+          setCoins(updatedCoins);
+        }
+      }, 1000);
 
-    return () => clearInterval(coinRefreshInterval);
+      return () => clearInterval(coinRefreshInterval);
+    }
   }, []);
 
   const handlePurchase = (item: ShopItem) => {
@@ -173,7 +196,7 @@ export default function ShopPage() {
   };
 
   // Add special items based on coin thresholds
-  let allItems = [...shopItems];
+  let allItems = isPremium ? [...shopItems, ...premiumItems] : shopItems;
   
   // Filter items based on category AND affordability
   let filteredItems = selectedCategory === 'all' 
@@ -185,7 +208,16 @@ export default function ShopPage() {
     filteredItems = allItems.filter(item => item.price <= coins && !purchasedItems.includes(item.id));
   }
 
-  const categories = [
+  // Add premium category
+  const categories = isPremium ? [
+    { id: 'all', name: 'All Items', emoji: '🛍️' },
+    { id: 'affordable', name: 'What Can I Buy?', emoji: '💰' },
+    { id: 'premium', name: '💎 Premium Exclusives', emoji: '✨' },
+    { id: 'buddyColors', name: 'Buddy Styles', emoji: '👕' },
+    { id: 'backgrounds', name: 'Backgrounds', emoji: '🖼️' },
+    { id: 'accessories', name: 'Accessories', emoji: '🎩' },
+    { id: 'powerups', name: 'Power-ups', emoji: '⚡' },
+  ] : [
     { id: 'all', name: 'All Items', emoji: '🛍️' },
     { id: 'affordable', name: 'What Can I Buy?', emoji: '💰' },
     { id: 'buddyColors', name: 'Buddy Styles', emoji: '👕' },
@@ -193,7 +225,208 @@ export default function ShopPage() {
     { id: 'accessories', name: 'Accessories', emoji: '🎩' },
     { id: 'powerups', name: 'Power-ups', emoji: '⚡' },
   ];
+  
+  // Show premium items when premium category selected
+  if (selectedCategory === 'premium') {
+    filteredItems = premiumItems;
+  }
 
+  // 🚀 PREMIUM SHOP UI! 💎✨
+  if (isPremium) {
+    return (
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Cyber Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-purple-950 to-pink-950">
+          {/* Animated Grid */}
+          <div className="absolute inset-0 opacity-10">
+            {[...Array(20)].map((_, i) => (
+              <div key={`h-${i}`} className="absolute w-full h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent" style={{top: `${i * 5}%`}} />
+            ))}
+            {[...Array(20)].map((_, i) => (
+              <div key={`v-${i}`} className="absolute h-full w-px bg-gradient-to-b from-transparent via-purple-400 to-transparent" style={{left: `${i * 5}%`}} />
+            ))}
+          </div>
+          
+          {/* Floating Particles */}
+          {[...Array(30)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full animate-float-particle"
+              style={{
+                width: Math.random() * 4 + 2 + 'px',
+                height: Math.random() * 4 + 2 + 'px',
+                background: `${['#0ff', '#f0f', '#ff0'][Math.floor(Math.random() * 3)]}`,
+                top: Math.random() * 100 + '%',
+                left: Math.random() * 100 + '%',
+                boxShadow: `0 0 ${Math.random() * 20 + 10}px currentColor`,
+                animationDelay: Math.random() * 5 + 's',
+                animationDuration: Math.random() * 15 + 10 + 's'
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 p-6 max-w-7xl mx-auto">
+          {/* Premium Header */}
+          <div className="futuristic-glass p-8 mb-8 animate-card-appear">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-6">
+              <div>
+                <h1 className="text-5xl font-bold glow-text flex items-center gap-3 mb-3">
+                  <span className="text-6xl drop-shadow-[0_0_15px_#0ff">💎</span> Premium Shop
+                </h1>
+                <p className="text-cyan-300 font-semibold text-xl">Exclusive legendary items await! ✨</p>
+              </div>
+              <div className="text-center futuristic-glass p-6 border-4 border-yellow-400/50 shadow-[0_0_40px_rgba(255,215,0,0.5)]">
+                <p className="text-sm text-cyan-300 font-semibold mb-2">Your Balance</p>
+                <p className="text-5xl font-bold glow-text">
+                  🪙 {coins}
+                </p>
+              </div>
+            </div>
+
+            {/* Back to Hub Button */}
+            <Link href="/kid">
+              <button className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-6 py-3 rounded-xl font-bold shadow-[0_0_30px_rgba(0,255,255,0.5)] hover:shadow-[0_0_50px_rgba(0,255,255,0.8)] hover:scale-105 transition-all duration-300 border-2 border-white/30 mb-6">
+                ← Back to Hub
+              </button>
+            </Link>
+
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-3">
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    setSelectedCategory(cat.id);
+                    soundEffects?.playClick();
+                  }}
+                  className={`px-6 py-3 rounded-xl font-bold transition-all transform hover:scale-110 ${
+                    selectedCategory === cat.id
+                      ? 'bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white shadow-[0_0_30px_rgba(255,0,255,0.7)] scale-110 border-2 border-white/50'
+                      : 'bg-white/10 backdrop-blur-xl text-cyan-300 border-2 border-cyan-400/30 hover:border-cyan-400/60 hover:bg-white/20'
+                  }`}
+                >
+                  <span className="text-2xl mr-2">{cat.emoji}</span> {cat.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Premium Items Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredItems.map((item, index) => {
+              const isPurchased = purchasedItems.includes(item.id);
+              const canAfford = coins >= item.price;
+              const isPremiumItem = item.id >= 1000;
+
+              return (
+                <div
+                  key={item.id}
+                  className="group cursor-pointer"
+                  onClick={() => !isPurchased && handlePurchase(item)}
+                  style={{animationDelay: `${index * 0.05}s`}}
+                >
+                  <div className="relative preserve-3d hover:rotate-y-6 transition-all duration-500 animate-card-appear">
+                    {/* Glow effect */}
+                    <div className={`absolute inset-0 ${
+                      isPremiumItem 
+                        ? 'bg-gradient-to-br from-yellow-400/40 via-pink-500/40 to-purple-500/40' 
+                        : 'bg-gradient-to-br from-cyan-400/30 via-purple-500/30 to-pink-400/30'
+                    } rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100`} />
+                    
+                    {/* Card */}
+                    <div className={`relative futuristic-glass p-6 rounded-2xl ${
+                      isPurchased 
+                        ? 'border-4 border-green-400 shadow-[0_0_40px_rgba(0,255,0,0.6)]' 
+                        : canAfford 
+                          ? 'border-2 border-white/20 group-hover:border-white/60 group-hover:shadow-[0_0_60px_rgba(0,255,255,0.6)]' 
+                          : 'border-2 border-red-400/30 opacity-60'
+                    } transition-all duration-300`}>
+                      {/* Premium Badge */}
+                      {isPremiumItem && !isPurchased && (
+                        <div className="absolute -top-3 -right-3 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-white text-xs font-bold px-3 py-2 rounded-full shadow-[0_0_20px_rgba(255,215,0,0.8)] animate-pulse z-10">
+                          ✨ PREMIUM
+                        </div>
+                      )}
+                      
+                      {/* Owned Badge */}
+                      {isPurchased && (
+                        <div className="absolute -top-3 -right-3 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-sm font-bold px-4 py-2 rounded-full shadow-[0_0_20px_rgba(0,255,0,0.6)] z-10">
+                          ✓ Owned
+                        </div>
+                      )}
+                      
+                      {/* Icon */}
+                      <div className={`text-7xl mb-4 transition-all duration-300 ${
+                        isPurchased ? 'grayscale' : 'group-hover:scale-125 group-hover:rotate-12'
+                      } drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]`}>
+                        {item.emoji}
+                      </div>
+                      
+                      {/* Name */}
+                      <h3 className={`text-2xl font-bold mb-2 ${
+                        isPremiumItem ? 'glow-text' : 'text-white'
+                      } group-hover:drop-shadow-[0_0_20px_rgba(0,255,255,0.8)] transition-all duration-300`}>
+                        {item.name}
+                      </h3>
+                      
+                      {/* Description */}
+                      <p className="text-sm text-cyan-200 font-semibold mb-4">{item.description}</p>
+                      
+                      {/* Price & Action */}
+                      {!isPurchased && (
+                        <div className="flex items-center justify-between mt-4 pt-4 border-t-2 border-white/20">
+                          <div className="text-2xl font-bold text-yellow-400 drop-shadow-[0_0_10px_rgba(255,215,0,0.8)]">
+                            🪙 {item.price}
+                          </div>
+                          <div className={`px-4 py-2 rounded-lg font-bold text-sm ${
+                            canAfford 
+                              ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-[0_0_20px_rgba(0,255,0,0.5)]' 
+                              : 'bg-red-500/30 text-red-300 border border-red-400/50'
+                          }`}>
+                            {canAfford ? '✓ Buy Now' : '🔒 Locked'}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Holographic shine */}
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Animations */}
+        <style jsx>{`
+          @keyframes float-particle {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            50% { transform: translateY(-100px) translateX(50px); opacity: 1; }
+          }
+          @keyframes card-appear {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+          }
+          .perspective-1000 { perspective: 1000px; }
+          .preserve-3d { transform-style: preserve-3d; }
+          .rotate-y-6:hover { transform: rotateY(6deg) rotateX(-3deg); }
+        `}</style>
+
+        {/* Weekly Animation Modal */}
+        {showWeeklyAnimation && (
+          <WeeklyAnimation onClose={() => setShowWeeklyAnimation(false)} />
+        )}
+
+        {/* Background Music */}
+        <BackgroundMusic />
+      </div>
+    );
+  }
+
+  // Original Shop UI
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-400 via-orange-300 to-pink-300 p-6 relative">
       

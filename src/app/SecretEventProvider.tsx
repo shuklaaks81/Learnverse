@@ -38,6 +38,12 @@ if (typeof window !== 'undefined') {
       localStorage.removeItem('introDone');
       window.location.reload();
     }
+    
+    // Press 'T' for Tour replay
+    if (e.key === 't' || e.key === 'T') {
+      localStorage.removeItem('tourCompleted');
+      window.location.reload();
+    }
   });
 }
 

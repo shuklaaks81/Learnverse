@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 const versions = [
   {
@@ -26,23 +26,13 @@ const versions = [
 ];
 
 export default function VersionSelectModal({ onSelect }: { onSelect: (v: string) => void }) {
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    const chosen = localStorage.getItem("learnverseVersion");
-    if (!chosen) setShow(true);
-  }, []);
-
   const handleSelect = (key: string) => {
     localStorage.setItem("learnverseVersion", key);
-    setShow(false);
     onSelect(key);
   };
 
-  if (!show) return null;
-
   return (
-    <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black bg-opacity-70">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black bg-opacity-70">
       <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-3xl w-full flex flex-col items-center border-8 border-fuchsia-400">
         <h2 className="text-3xl font-extrabold text-fuchsia-700 mb-4 text-center">Choose Your Learnverse Version</h2>
         <div className="flex flex-col sm:flex-row gap-8 w-full justify-center items-center">

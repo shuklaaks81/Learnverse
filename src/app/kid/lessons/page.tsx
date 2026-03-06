@@ -20,8 +20,14 @@ export default function LessonsPage() {
   const sounds = useSoundEffects();
   const isLegendary = useLegendaryMode();
   const [styles, setStyles] = useState(getLegendaryStyles());
+  const [isPremium, setIsPremium] = useState(false);
+  
   // Ensure styles are updated on client after mount (SSR-safe)
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const version = localStorage.getItem('learnverseVersion') || 'original';
+      setIsPremium(version === 'premium');
+    }
     setStyles(getLegendaryStyles());
   }, []);
   const [lessons] = useState<Lesson[]>([
@@ -56,6 +62,223 @@ export default function LessonsPage() {
 
   const completedCount = lessons.filter(l => l.completed).length;
 
+  // 🚀 PREMIUM LESSONS HUB! 💎✨
+  if (isPremium) {
+    return (
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Cyber Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-purple-950 to-pink-950">
+          {/* Animated Grid */}
+          <div className="absolute inset-0 opacity-10">
+            {[...Array(20)].map((_, i) => (
+              <div key={`h-${i}`} className="absolute w-full h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent" style={{top: `${i * 5}%`}} />
+            ))}
+            {[...Array(20)].map((_, i) => (
+              <div key={`v-${i}`} className="absolute h-full w-px bg-gradient-to-b from-transparent via-purple-400 to-transparent" style={{left: `${i * 5}%`}} />
+            ))}
+          </div>
+          
+          {/* Floating Particles */}
+          {[...Array(30)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full animate-float-particle"
+              style={{
+                width: Math.random() * 4 + 2 + 'px',
+                height: Math.random() * 4 + 2 + 'px',
+                background: `${['#0ff', '#f0f', '#ff0'][Math.floor(Math.random() * 3)]}`,
+                top: Math.random() * 100 + '%',
+                left: Math.random() * 100 + '%',
+                boxShadow: `0 0 ${Math.random() * 20 + 10}px currentColor`,
+                animationDelay: Math.random() * 5 + 's',
+                animationDuration: Math.random() * 15 + 10 + 's'
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 p-8 max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="futuristic-glass p-8 mb-8 animate-card-appear">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+              <div>
+                <h1 className="text-5xl font-bold glow-text flex items-center gap-3 mb-3">
+                  <span className="text-6xl drop-shadow-[0_0_15px_#0ff]">📚</span> Your Lessons
+                </h1>
+                <p className="text-cyan-300 font-semibold text-xl">
+                  {completedCount} of {lessons.length} lessons completed
+                </p>
+              </div>
+              
+              <div className="flex gap-3 flex-wrap">
+                <Link 
+                  href="/kid/daily-challenge"
+                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-bold shadow-[0_0_30px_rgba(255,127,0,0.5)] hover:shadow-[0_0_50px_rgba(255,127,0,0.8)] hover:scale-105 transition-all border-2 border-white/30 animate-pulse"
+                >
+                  🎯 Daily Challenge
+                </Link>
+                <Link 
+                  href="/kid/units"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-bold shadow-[0_0_30px_rgba(147,51,234,0.5)] hover:shadow-[0_0_50px_rgba(147,51,234,0.8)] hover:scale-105 transition-all border-2 border-white/30"
+                >
+                  📚 Units
+                </Link>
+                <Link 
+                  href="/kid"
+                  className="bg-white/10 backdrop-blur-xl text-cyan-300 px-6 py-3 rounded-xl font-bold border-2 border-cyan-400/50 hover:bg-white/20 hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(0,255,255,0.5)] transition-all"
+                >
+                  ← Back
+                </Link>
+              </div>
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="mt-6">
+              <div className="w-full bg-white/10 backdrop-blur rounded-full h-4 border-2 border-white/20">
+                <div
+                  className="bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 h-full rounded-full transition-all shadow-[0_0_20px_rgba(0,255,0,0.5)]"
+                  style={{ width: `${(completedCount / lessons.length) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Subject Filter */}
+          <div className="futuristic-glass p-6 mb-8 animate-card-appear" style={{animationDelay: '0.1s'}}>
+            <h2 className="text-xl font-bold text-cyan-300 mb-4 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">
+              ⚡ Filter by Subject
+            </h2>
+            <div className="flex flex-wrap gap-3">
+              {subjects.map((subject) => (
+                <button
+                  key={subject}
+                  onClick={() => {
+                    setSelectedSubject(subject);
+                    sounds?.playClick();
+                  }}
+                  className={`px-6 py-3 rounded-xl font-bold transition-all transform hover:scale-110 ${
+                    selectedSubject === subject
+                      ? "bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 text-white shadow-[0_0_30px_rgba(255,0,255,0.7)] scale-110 border-2 border-white/50"
+                      : "bg-white/10 backdrop-blur-xl text-purple-300 border-2 border-purple-400/30 hover:border-purple-400/60 hover:bg-white/20"
+                  }`}
+                >
+                  {subject}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Lessons Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredLessons.map((lesson, index) => (
+              <div
+                key={lesson.id}
+                className="group cursor-pointer"
+                style={{animationDelay: `${index * 0.05}s`}}
+              >
+                <div className="relative preserve-3d hover:rotate-y-6 transition-all duration-500 animate-card-appear">
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/30 via-purple-500/30 to-pink-400/30 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100" />
+                  
+                  {/* Card */}
+                  <div className={`relative futuristic-glass p-6 rounded-2xl ${
+                    lesson.completed 
+                      ? "border-4 border-green-400 shadow-[0_0_40px_rgba(0,255,0,0.6)]" 
+                      : "border-2 border-white/20 group-hover:border-white/60 group-hover:shadow-[0_0_60px_rgba(0,255,255,0.6)]"
+                  } transition-all duration-300`}>
+                    {/* Completed Badge */}
+                    {lesson.completed && (
+                      <div className="absolute -top-3 -right-3 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-sm font-bold px-4 py-2 rounded-full shadow-[0_0_20px_rgba(0,255,0,0.6)] z-10 animate-pulse">
+                        ✓ Done
+                      </div>
+                    )}
+                    
+                    {/* Icon */}
+                    <div className="text-7xl mb-4 group-hover:scale-125 group-hover:rotate-12 transition-all duration-300 drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]">
+                      {lesson.icon}
+                    </div>
+                    
+                    {/* Title */}
+                    <h3 className="text-2xl font-bold text-white mb-4 group-hover:drop-shadow-[0_0_20px_rgba(0,255,255,0.8)] transition-all duration-300">
+                      {lesson.title}
+                    </h3>
+                    
+                    {/* Info */}
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-cyan-300 font-semibold">Subject:</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                          lesson.subject === "Math" ? "bg-blue-500/50 text-blue-200 shadow-[0_0_10px_rgba(59,130,246,0.5)]" :
+                          lesson.subject === "Science" ? "bg-green-500/50 text-green-200 shadow-[0_0_10px_rgba(34,197,94,0.5)]" :
+                          lesson.subject === "English" ? "bg-purple-500/50 text-purple-200 shadow-[0_0_10px_rgba(168,85,247,0.5)]" :
+                          "bg-pink-500/50 text-pink-200 shadow-[0_0_10px_rgba(236,72,153,0.5)]"
+                        }`}>
+                          {lesson.subject}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 text-purple-300">
+                        <span className="font-semibold">Level:</span>
+                        <span className="text-pink-200">{lesson.difficulty}</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 text-purple-300">
+                        <span className="font-semibold">Duration:</span>
+                        <span className="text-pink-200">{lesson.duration}</span>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 mt-6">
+                      <Link href={`/kid/lesson-module?id=${lesson.id}`} className="flex-1">
+                        <button
+                          onClick={() => sounds?.playClick()}
+                          className="w-full py-3 px-4 rounded-xl font-bold bg-gradient-to-r from-green-400 to-blue-500 text-white hover:from-green-500 hover:to-blue-600 shadow-[0_0_20px_rgba(0,255,0,0.4)] hover:shadow-[0_0_40px_rgba(0,255,0,0.7)] hover:scale-105 transition-all border-2 border-white/30"
+                        >
+                          🎮 Interactive
+                        </button>
+                      </Link>
+                      <Link href={`/kid/content-viewer?title=${encodeURIComponent(lesson.title)}`} className="flex-1">
+                        <button
+                          onClick={() => sounds?.playClick()}
+                          className="w-full py-3 px-4 rounded-xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-[0_0_20px_rgba(147,51,234,0.4)] hover:shadow-[0_0_40px_rgba(147,51,234,0.7)] hover:scale-105 transition-all border-2 border-white/30"
+                        >
+                          📖 Classic
+                        </button>
+                      </Link>
+                    </div>
+                    
+                    {/* Holographic shine */}
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Animations */}
+        <style jsx>{`
+          @keyframes float-particle {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            50% { transform: translateY(-100px) translateX(50px); opacity: 1; }
+          }
+          @keyframes card-appear {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+          }
+          .perspective-1000 { perspective: 1000px; }
+          .preserve-3d { transform-style: preserve-3d; }
+          .rotate-y-6:hover { transform: rotateY(6deg) rotateX(-3deg); }
+        `}</style>
+
+        <BackgroundMusic />
+      </div>
+    );
+  }
+
+  // Original UI
   return (
     <div className={`min-h-screen ${styles.background} p-8 ${isLegendary ? 'relative overflow-hidden' : ''}`}>
       {/* Legendary Mode Matrix Effect */}
