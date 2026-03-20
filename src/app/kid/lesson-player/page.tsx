@@ -1,27 +1,30 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   DragDropGame,
   MatchingGame,
   DrawingActivity,
   NumberCatchGame,
-  CountingAnimation
+  CountingAnimation,
+  TeachActivity
 } from '@/components/InteractiveLessonComponents';
 import { SoundEffects } from '@/utils/soundEffects';
 import { updateStreak } from '@/utils/streakTracker';
 
 interface GeneratedLesson {
-  id: string;
+  id?: string;
   title: string;
-  settings: any;
+  settings?: any;
   activities: any[];
-  timestamp: number;
+  timestamp?: number;
 }
 
 export default function LessonPlayer() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isPreview = (searchParams && searchParams.get('preview') === 'true') || false;
   const [lesson, setLesson] = useState<GeneratedLesson | null>(null);
   const [currentActivity, setCurrentActivity] = useState(0);
   const [coins, setCoins] = useState(0);
@@ -32,14 +35,26 @@ export default function LessonPlayer() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        // Load the active generated lesson
-        const activeLessonStr = localStorage.getItem('activeGeneratedLesson');
-        if (activeLessonStr) {
-          setLesson(JSON.parse(activeLessonStr));
+        // Check if this is a preview lesson from the generator
+        if (isPreview) {
+          const previewLessonStr = localStorage.getItem('previewLesson');
+          if (previewLessonStr) {
+            setLesson(JSON.parse(previewLessonStr));
+          } else {
+            console.warn('No preview lesson found');
+            router.push('/owner/generate-lessons');
+            return;
+          }
         } else {
-          // No lesson found - redirect instead of blank screen
-          console.warn('No active lesson found, redirecting...');
-          setTimeout(() => router.push('/kid/lesson-generator'), 1000);
+          // Load the active generated lesson
+          const activeLessonStr = localStorage.getItem('activeGeneratedLesson');
+          if (activeLessonStr) {
+            setLesson(JSON.parse(activeLessonStr));
+          } else {
+            // No lesson found - redirect instead of blank screen
+            console.warn('No active lesson found, redirecting...');
+            setTimeout(() => router.push('/kid/lesson-generator'), 1000);
+          }
         }
 
         // Initialize sounds
@@ -50,7 +65,7 @@ export default function LessonPlayer() {
         setTimeout(() => router.push('/kid/lesson-generator'), 1000);
       }
     }
-  }, [router]);
+  }, [router, isPreview]);
 
   const handleActivityComplete = () => {
     sounds?.playCorrect();
@@ -110,6 +125,17 @@ export default function LessonPlayer() {
 
   const renderActivity = () => {
     switch (currentActivityData.type) {
+      case 'teach':
+        return (
+          <TeachActivity
+            concept={currentActivityData.data.concept}
+            examples={currentActivityData.data.examples}
+            visualAid={currentActivityData.data.visualAid}
+            funFact={currentActivityData.data.funFact}
+            onComplete={handleActivityComplete}
+          />
+        );
+
       case 'intro':
         return (
           <div className="w-full max-w-4xl mx-auto p-12 text-center">
@@ -245,6 +271,27 @@ export default function LessonPlayer() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-400 to-red-400 p-4">
+      {/* Preview Mode Banner */}
+      {isPreview && (
+        <div className="max-w-6xl mx-auto mb-4">
+          <div className="bg-yellow-400 border-4 border-yellow-600 rounded-2xl p-4 flex items-center justify-between shadow-lg">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">👁️</span>
+              <div>
+                <div className="font-bold text-gray-900 text-lg">Preview Mode</div>
+                <div className="text-sm text-gray-700">Testing AI-generated lesson</div>
+              </div>
+            </div>
+            <button
+              onClick={() => router.push('/owner/generate-lessons')}
+              className="px-6 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold transition-all"
+            >
+              ← Back to Generator
+            </button>
+          </div>
+        </div>
+      )}
+      
       {/* Header with progress */}
       <div className="max-w-6xl mx-auto mb-6">
         <div className="bg-white/90 rounded-2xl shadow-2xl p-4">

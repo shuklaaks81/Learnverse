@@ -1,0 +1,234 @@
+Here's the new first-person rendering code to add after the message display (around line 822):
+
+```tsx
+      {/* Crafting Menu */}
+      {showCrafting && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-8">
+          <div className="bg-gradient-to-b from-gray-900 to-black rounded-3xl p-8 border-4 border-yellow-600 max-w-4xl max-h-[80vh] overflow-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-4xl font-bold text-yellow-400">🔨 Crafting</h2>
+              <button
+                onClick={() => setShowCrafting(false)}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold"
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {craftingRecipes.map(recipe => {
+                const canCraft = recipe.requires.every(req => {
+                  const item = inventory.find(i => i.id === req.itemId);
+                  return item && item.count >= req.count;
+                });
+
+                return (
+                  <div 
+                    key={recipe.id}
+                    className={`bg-gray-800 rounded-xl p-4 border-2 ${canCraft ? 'border-green-500' : 'border-gray-600'}`}
+                  >
+                    <div className="text-2xl mb-2">{recipe.emoji}</div>
+                    <h3 className="text-white font-bold text-lg mb-2">{recipe.name}</h3>
+                    <div className="text-gray-300 text-sm mb-3">
+                      <div className="font-bold mb-1">Requires:</div>
+                      {recipe.requires.map(req => {
+                        const item = inventory.find(i => i.id === req.itemId);
+                        const has = item?.count || 0;
+                        return (
+                          <div key={req.itemId} className={has >= req.count ? 'text-green-400' : 'text-red-400'}>
+                            • {req.itemId}: {has}/{req.count}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <button
+                      onClick={() => craftItem(recipe)}
+                      disabled={!canCraft}
+                      className={`w-full py-2 rounded-lg font-bold transition-all ${
+                        canCraft
+                          ? 'bg-green-600 hover:bg-green-700 text-white'
+                          : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {canCraft ? '✅ Craft' : '❌ Need Materials'}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-6 bg-gray-800 rounded-xl p-4 border-2 border-blue-500">
+              <h3 className="text-white font-bold mb-2">💡 Tip: Tool Progression</h3>
+              <p className="text-gray-300 text-sm">
+                Start by punching trees for wood, then craft a Wooden Pickaxe. Each better pickaxe lets you mine harder materials!
+                <br />
+                <span className="text-purple-400 font-bold">Ultimate Goal:</span> Craft a Lorite Pickaxe - the strongest tool!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* First-Person 3D View */}
+      <div className="w-full h-screen relative" style={{ perspective: '800px' }}>
+        {/* Sky */}
+        <div className="absolute inset-0 bg-gradient-to-b from-sky-400 via-blue-500 to-blue-600" />
+        
+        {/* Sun */}
+        <div 
+          className="absolute text-8xl"
+          style={{
+            top: '10%',
+            right: '20%',
+            transform: `rotate(${player.rotationY}deg)`,
+            transition: 'transform 0.1s',
+            textShadow: '0 0 50px rgba(255, 255, 0, 0.8)'
+          }}
+        >
+          ☀️
+        </div>
+
+        {/* Render blocks in view */}
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <div style={{
+            transform: `rotateX(${player.rotationX}deg) rotateY(${-player.rotationY}deg)`,
+            transformStyle: 'preserve-3d',
+            transition: 'transform 0.05s linear'
+          }}>
+            {blocks.filter(block => {
+              const dx = block.x - player.x;
+              const dy = block.y - player.y;
+              const dz = block.z - player.z;
+              const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+              return distance < renderDistance;
+            }).map((block) => {
+              const dx = (block.x - player.x) * 40;
+              const dy = -(block.y - player.y) * 40;
+              const dz = -(block.z - player.z) * 40;
+              
+              const isTarget = targetBlock && 
+                targetBlock.x === block.x && 
+                targetBlock.y === block.y && 
+                targetBlock.z === block.z;
+
+              const blockColor = block.type === 'ore-lorite' 
+                ? `linear-gradient(135deg, ${block.color}, #ff00ff, #ff00ff, ${block.color})`
+                : block.color;
+
+              return (
+                <div
+                  key={`${block.x}-${block.y}-${block.z}`}
+                  style={{
+                    position: 'absolute',
+                    width: '40px',
+                    height: '40px',
+                    transform: `translate3d(${dx}px, ${dy}px, ${dz}px)`,
+                    transformStyle: 'preserve-3d',
+                  }}
+                >
+                  {/* Front face*/}
+                  <div style={{
+                    position: 'absolute',
+                    width: '40px',
+                    height: '40px',
+                    background: blockColor,
+                    transform: 'translateZ(20px)',
+                    border: isTarget ? '2px solid yellow' : `1px solid rgba(0,0,0,0.2)`,
+                    boxShadow: isTarget ? '0 0 10px yellow' : 'none'
+                  }} />
+                  {/* Back */}
+                  <div style={{
+                    position: 'absolute',
+                    width: '40px',
+                    height: '40px',
+                    background: blockColor,
+                    transform: 'translateZ(-20px) rotateY(180deg)',
+                    border: isTarget ? '2px solid yellow' : `1px solid rgba(0,0,0,0.2)`,
+                  }} />
+                  {/* Left */}
+                  <div style={{
+                    position: 'absolute',
+                    width: '40px',
+                    height: '40px',
+                    background: blockColor,
+                    transform: 'rotateY(-90deg) translateZ(20px)',
+                    border: isTarget ? '2px solid yellow' : `1px solid rgba(0,0,0,0.2)`,
+                    filter: 'brightness(0.8)'
+                  }} />
+                  {/* Right */}
+                  <div style={{
+                    position: 'absolute',
+                    width: '40px',
+                    height: '40px',
+                    background: blockColor,
+                    transform: 'rotateY(90deg) translateZ(20px)',
+                    border: isTarget ? '2px solid yellow' : `1px solid rgba(0,0,0,0.2)`,
+                    filter: 'brightness(0.8)'
+                  }} />
+                  {/* Top */}
+                  <div style={{
+                    position: 'absolute',
+                    width: '40px',
+                    height: '40px',
+                    background: blockColor,
+                    transform: 'rotateX(90deg) translateZ(20px)',
+                    border: isTarget ? '2px solid yellow' : `1px solid rgba(0,0,0,0.2)`,
+                    filter: 'brightness(1.2)'
+                  }} />
+                  {/* Bottom */}
+                  <div style={{
+                    position: 'absolute',
+                    width: '40px',
+                    height: '40px',
+                    background: blockColor,
+                    transform: 'rotateX(-90deg) translateZ(20px)',
+                    border: isTarget ? '2px solid yellow' : `1px solid rgba(0,0,0,0.2)`,
+                    filter: 'brightness(0.6)'
+                  }} />
+                  
+                  {/* Lorite glow effect */}
+                  {block.type === 'ore-lorite' && (
+                    <div style={{
+                      position: 'absolute',
+                      width: '50px',
+                      height: '50px',
+                      transform: 'translate(-5px, -5px)',
+                      background: 'radial-gradient(circle, rgba(255,0,255,0.4), transparent)',
+                      borderRadius: '50%',
+                      animation: 'loriteGlow 2s ease-in-out infinite'
+                    }} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Back Button */}
+      <div className="fixed bottom-20 left-4 z-40">
+        <Link
+          href="/kid"
+          className="inline-block px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl font-bold transition-all border-2 border-gray-600"
+        >
+          ⬅️ Exit Game
+        </Link>
+      </div>
+```
+
+And add this to the styles section (before the closing style tag):
+
+```
+        @keyframes loriteGlow {
+          0%, 100% {
+            transform: translate(-5px, -5px) scale(1);
+            opacity: 0.6;
+          }
+          50% {
+            transform: translate(-5px, -5px) scale(1.5);
+            opacity: 0.3;
+          }
+        }
+```
+
+Delete everything from line 823 ("SURFACE VIEW") to line 1374 (the line before "<style jsx>")

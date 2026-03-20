@@ -573,3 +573,105 @@ export function CountingAnimation({ numbers, operation, answer, onComplete }: Co
     </div>
   );
 }
+
+// ============= TEACHING SECTION =============
+interface TeachActivityProps {
+  concept: string;
+  examples: string[];
+  visualAid?: string;
+  funFact?: string;
+  onComplete: () => void;
+}
+
+export function TeachActivity({ concept, examples, visualAid, funFact, onComplete }: TeachActivityProps) {
+  const [currentStep, setCurrentStep] = useState(0);
+  const totalSteps = 3 + (funFact ? 1 : 0);
+
+  const nextStep = () => {
+    if (currentStep < totalSteps - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      onComplete();
+    }
+  };
+
+  return (
+    <div className="w-full max-w-4xl mx-auto p-8">
+      <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl p-8 shadow-2xl">
+        {/* Progress */}
+        <div className="flex gap-2 mb-6">
+          {[...Array(totalSteps)].map((_, idx) => (
+            <div
+              key={idx}
+              className={`h-2 flex-1 rounded-full transition-all ${
+                idx <= currentStep ? 'bg-yellow-400' : 'bg-white/30'
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Step 0: Concept Explanation */}
+        {currentStep === 0 && (
+          <div className="text-center">
+            <div className="text-7xl mb-6">🎓</div>
+            <h2 className="text-4xl font-bold text-white mb-6">Let&apos;s Learn!</h2>
+            <div className="bg-white/20 rounded-2xl p-6 mb-6">
+              <p className="text-2xl text-white leading-relaxed">{concept}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Step 1: Visual Aid */}
+        {currentStep === 1 && visualAid && (
+          <div className="text-center">
+            <div className="text-7xl mb-6">👀</div>
+            <h2 className="text-4xl font-bold text-white mb-6">Picture This!</h2>
+            <div className="bg-white/20 rounded-2xl p-6 mb-6">
+              <p className="text-xl text-white">{visualAid}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Examples */}
+        {currentStep === 2 && (
+          <div className="text-center">
+            <div className="text-7xl mb-6">✨</div>
+            <h2 className="text-4xl font-bold text-white mb-6">Here are Examples!</h2>
+            <div className="space-y-4 mb-6">
+              {examples.map((example, idx) => (
+                <div
+                  key={idx}
+                  className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl p-4"
+                  style={{ animationDelay: `${idx * 0.2}s` }}
+                >
+                  <div className="text-2xl font-bold text-white">
+                    {idx + 1}. {example}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Fun Fact */}
+        {currentStep === 3 && funFact && (
+          <div className="text-center">
+            <div className="text-7xl mb-6">🤯</div>
+            <h2 className="text-4xl font-bold text-white mb-6">Fun Fact!</h2>
+            <div className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-2xl p-6 mb-6">
+              <p className="text-2xl text-white">{funFact}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Continue Button */}
+        <button
+          onClick={nextStep}
+          className="w-full py-4 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold text-2xl rounded-2xl transition-all hover:scale-105"
+        >
+          {currentStep < totalSteps - 1 ? '📖 Continue Learning' : '✅ Got It! Let\'s Practice!'}
+        </button>
+      </div>
+    </div>
+  );
+}

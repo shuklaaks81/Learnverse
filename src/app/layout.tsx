@@ -9,6 +9,8 @@ import HolidayBlocker from "@/components/HolidayBlocker";
 import { Analytics } from '@vercel/analytics/react';
 import ConditionalOceanBg from "./ConditionalOceanBg";
 import MigrationWrapper from "./MigrationWrapper";
+import { PerformanceManager } from "@/components/PerformanceManager";
+import { SafeModeManager } from "@/components/SafeModeManager";
 
 import VersionLayoutClient from "./VersionLayoutClient";
 
@@ -61,14 +63,18 @@ export default function RootLayout({
         <MigrationWrapper>
           <LoadingWrapper>
             <SecretEventProvider>
-              {/* Ocean background - only shows in non-premium mode */}
-              <ConditionalOceanBg />
-              {/* OceanSounds must be rendered in a client component */}
-              <ClientOceanSoundsWrapper />
-              <PWAInstallPrompt />
-              {/* <HolidayBlocker /> */}
-              <VersionLayoutClient>{children}</VersionLayoutClient>
-              <Analytics />
+              <PerformanceManager>
+                <SafeModeManager>
+                  {/* Ocean background - only shows in non-premium mode */}
+                  <ConditionalOceanBg />
+                  {/* OceanSounds must be rendered in a client component */}
+                  <ClientOceanSoundsWrapper />
+                  <PWAInstallPrompt />
+                  {/* <HolidayBlocker /> */}
+                  <VersionLayoutClient>{children}</VersionLayoutClient>
+                  <Analytics />
+                </SafeModeManager>
+              </PerformanceManager>
             </SecretEventProvider>
           </LoadingWrapper>
         </MigrationWrapper>

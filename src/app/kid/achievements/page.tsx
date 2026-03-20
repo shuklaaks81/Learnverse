@@ -146,8 +146,158 @@ function AchievementsContent() {
     }
   ]);
 
+  // Check for secret achievements in localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const secretAchievements = [
+      {
+        id: 101,
+        title: "Ghost Hunter",
+        description: "Found the abandoned Learnverse",
+        icon: "👻",
+        unlocked: localStorage.getItem('achievement_ghost') === 'true',
+        progress: localStorage.getItem('achievement_ghost') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Secret"
+      },
+      {
+        id: 102,
+        title: "Space Explorer",
+        description: "Traveled through the solar system",
+        icon: "🚀",
+        unlocked: localStorage.getItem('achievement_space') === 'true',
+        progress: localStorage.getItem('achievement_space') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Secret"
+      },
+      {
+        id: 103,
+        title: "Cool Dude",
+        description: "Met Cool Dude's groovy Learnverse",
+        icon: "😎",
+        unlocked: localStorage.getItem('achievement_cool') === 'true',
+        progress: localStorage.getItem('achievement_cool') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Secret"
+      },
+      {
+        id: 104,
+        title: "Pro Gamer",
+        description: "Discovered the ultimate gamer mode",
+        icon: "🎮",
+        unlocked: localStorage.getItem('achievement_gamer') === 'true',
+        progress: localStorage.getItem('achievement_gamer') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Secret"
+      },
+      {
+        id: 105,
+        title: "Master Miner",
+        description: "Explored the 3D voxel caves",
+        icon: "⛏️",
+        unlocked: localStorage.getItem('achievement_blocky') === 'true',
+        progress: localStorage.getItem('achievement_blocky') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Secret"
+      },
+      {
+        id: 106,
+        title: "Confused Explorer",
+        description: "Experienced total confusion",
+        icon: "🤔",
+        unlocked: localStorage.getItem('achievement_huh') === 'true',
+        progress: localStorage.getItem('achievement_huh') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Secret"
+      },
+      {
+        id: 107,
+        title: "Patient Soul",
+        description: "Waited 14 quadrillion years",
+        icon: "⏳",
+        unlocked: localStorage.getItem('achievement_bru') === 'true',
+        progress: localStorage.getItem('achievement_bru') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Secret"
+      },
+      {
+        id: 108,
+        title: "Legendary Typist",
+        description: "Typed an impossibly long URL",
+        icon: "⌨️",
+        unlocked: localStorage.getItem('achievement_ultrasecret') === 'true',
+        progress: localStorage.getItem('achievement_ultrasecret') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Secret"
+      },
+      {
+        id: 109,
+        title: "Master of Secrets",
+        description: "Found the ultimate goodbye",
+        icon: "👋",
+        unlocked: localStorage.getItem('achievement_okbye') === 'true',
+        progress: localStorage.getItem('achievement_okbye') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Secret"
+      },
+      {
+        id: 110,
+        title: "No Way That Just Worked!",
+        description: "Discovered your first Easter egg URL",
+        icon: "🔍",
+        unlocked: localStorage.getItem('achievement_easter_egg_finder') === 'true',
+        progress: localStorage.getItem('achievement_easter_egg_finder') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Performance"
+      },
+      {
+        id: 111,
+        title: "Version 2.0 Beta Tester",
+        description: "Discovered the upgraded Learnverse",
+        icon: "🚀",
+        unlocked: localStorage.getItem('achievement_the2point0') === 'true',
+        progress: localStorage.getItem('achievement_the2point0') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Secret"
+      },
+      {
+        id: 112,
+        title: "Construction Observer",
+        description: "Watched a worker build the page",
+        icon: "👷",
+        unlocked: localStorage.getItem('achievement_weird') === 'true',
+        progress: localStorage.getItem('achievement_weird') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Secret"
+      },
+      {
+        id: 113,
+        title: "Panic Attack Witness",
+        description: "Made a URL have an existential crisis",
+        icon: "😱",
+        unlocked: localStorage.getItem('achievement_panic') === 'true',
+        progress: localStorage.getItem('achievement_panic') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Secret"
+      },
+      {
+        id: 114,
+        title: "Cookie's #1 Fan",
+        description: "Witnessed Cookie's path to stardom",
+        icon: "🍪",
+        unlocked: localStorage.getItem('achievement_cookie') === 'true',
+        progress: localStorage.getItem('achievement_cookie') === 'true' ? 1 : 0,
+        requirement: 1,
+        category: "Secret"
+      }
+    ];
+
+    setAchievements(prev => [...prev, ...secretAchievements]);
+  }, []);
+
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const categories = ["All", "Lessons", "Games", "Performance", "Consistency", "Points"];
+  const categories = ["All", "Lessons", "Games", "Performance", "Consistency", "Points", "Secret"];
 
   const filteredAchievements = selectedCategory === "All" 
     ? achievements 

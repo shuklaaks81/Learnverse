@@ -265,6 +265,56 @@ export default function OwnerDashboard() {
           </div>
         </div>
 
+        {/* Admin Tools */}
+        <div className="mt-8 mb-8">
+          <h2 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
+            🛠️ Admin Tools
+            <span className="text-lg font-normal text-white/60">Powerful features for managing Learnverse</span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* AI Lesson Generator - Featured */}
+            <Link 
+              href="/owner/generate-lessons"
+              className="bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition border-4 border-yellow-400 relative overflow-hidden group"
+            >
+              <div className="absolute top-3 right-3 bg-yellow-400 text-purple-900 px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                ✨ NEW
+              </div>
+              <div className="text-6xl mb-4">🤖</div>
+              <h3 className="text-2xl font-bold text-white mb-3">AI Lesson Generator</h3>
+              <p className="text-white/90 text-sm mb-4">
+                Generate unlimited interactive lessons instantly using Groq AI! Choose subjects, topics, and difficulty levels.
+              </p>
+              <div className="flex items-center gap-2 text-white/80 text-sm">
+                <span>⚡ Ultra-fast generation</span>
+              </div>
+              <div className="flex items-center gap-2 text-white/80 text-sm mt-1">
+                <span>🎓 Real teaching + practice</span>
+              </div>
+              <div className="mt-4 bg-white/20 rounded-xl px-4 py-2 text-white font-bold text-center group-hover:bg-white/30 transition">
+                Open Generator →
+              </div>
+            </Link>
+
+            {/* Placeholder for future tools */}
+            <div className="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20 opacity-50">
+              <div className="text-6xl mb-4">📊</div>
+              <h3 className="text-2xl font-bold text-white mb-3">Analytics</h3>
+              <p className="text-white/80 text-sm">
+                Detailed insights and reports (Coming soon)
+              </p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20 opacity-50">
+              <div className="text-6xl mb-4">⚙️</div>
+              <h3 className="text-2xl font-bold text-white mb-3">Settings</h3>
+              <p className="text-white/80 text-sm">
+                Configure platform settings (Coming soon)
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Fun Stats */}
         <div className="mt-8 bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
           <h2 className="text-3xl font-bold text-white mb-6">🎉 Fun Stats</h2>

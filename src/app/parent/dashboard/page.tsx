@@ -432,12 +432,18 @@ export default function ParentDashboard() {
               </h1>
               <p className="text-gray-700 mt-2 font-semibold text-lg">Monitor your family&apos;s learning progress 📊</p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap justify-center sm:justify-end">
               <Link 
                 href="/"
                 className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:shadow-xl transition-all font-bold hover:scale-105"
               >
                 ← Home
+              </Link>
+              <Link 
+                href="/parent/settings"
+                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl hover:shadow-xl transition-all font-bold hover:scale-105"
+              >
+                ⚙️ Settings
               </Link>
               <button
                 onClick={() => {
