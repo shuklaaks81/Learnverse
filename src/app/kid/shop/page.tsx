@@ -417,7 +417,7 @@ export default function ShopPage() {
 
         {/* Weekly Animation Modal */}
         {showWeeklyAnimation && (
-          <WeeklyAnimation onClose={() => setShowWeeklyAnimation(false)} />
+          <WeeklyAnimation weekNumber={currentWeek} onClose={() => setShowWeeklyAnimation(false)} />
         )}
 
         {/* Background Music */}
