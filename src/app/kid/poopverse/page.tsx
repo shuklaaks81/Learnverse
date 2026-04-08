@@ -5,17 +5,29 @@ import { useRouter } from 'next/navigation';
 
 export default function Poopverse() {
   const router = useRouter();
-  const [poops, setPoops] = useState<Array<{ id: number; x: number; y: number; rotation: number; speed: number }>>([]);
+  const [poops, setPoops] = useState<Array<{ 
+    id: number; 
+    x: number; 
+    y: number; 
+    z: number;
+    rotation: number; 
+    rotationY: number;
+    speed: number;
+    size: number;
+  }>>([]);
   const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
-    // Generate flying poops
+    // Generate 3D flying poops with depth
     const newPoops = Array.from({ length: 50 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
+      z: Math.random() * 200 - 100, // Depth from -100 to 100
       rotation: Math.random() * 360,
+      rotationY: Math.random() * 360,
       speed: 3 + Math.random() * 7,
+      size: 0.5 + Math.random() * 1.5, // Size variation for depth effect
     }));
     setPoops(newPoops);
 
@@ -45,86 +57,126 @@ export default function Poopverse() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-900 via-yellow-800 to-orange-900 overflow-hidden relative">
-      {/* Animated Background Poops */}
+    <div className="min-h-screen bg-gradient-to-br from-amber-950 via-yellow-900 to-orange-950 overflow-hidden relative" style={{ perspective: '1000px' }}>
+      {/* Premium gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20 pointer-events-none" />
+      
+      {/* 3D Animated Background Poops with Shadows */}
       {poops.map((poop) => (
         <div
           key={poop.id}
-          className="absolute text-6xl animate-spin"
+          className="absolute text-6xl"
           style={{
             left: `${poop.x}%`,
             top: `${poop.y}%`,
-            animation: `spin ${poop.speed}s linear infinite, float ${poop.speed * 2}s ease-in-out infinite`,
-            transform: `rotate(${poop.rotation}deg)`,
+            animation: `float3d ${poop.speed}s ease-in-out infinite, rotate3d ${poop.speed * 1.5}s linear infinite`,
+            transform: `translateZ(${poop.z}px) rotateY(${poop.rotationY}deg) scale(${poop.size})`,
+            filter: `drop-shadow(0 ${Math.abs(poop.z) / 4}px ${Math.abs(poop.z) / 2}px rgba(0,0,0,${0.3 + Math.abs(poop.z) / 400}))`,
+            opacity: 0.7 + (poop.z / 400),
           }}
         >
           💩
         </div>
       ))}
 
-      {/* POOPVERSE Title */}
+      {/* PREMIUM POOPVERSE Content */}
       <div className={`relative z-10 flex flex-col items-center justify-center min-h-screen transition-all duration-1000 ${showMessage ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}`}>
-        <h1 className="text-9xl font-black text-yellow-300 mb-8 animate-bounce drop-shadow-2xl" style={{
-          textShadow: '0 0 20px rgba(139, 69, 19, 0.8), 0 0 40px rgba(139, 69, 19, 0.6), 0 0 60px rgba(139, 69, 19, 0.4)'
-        }}>
-          💩 POOPVERSE 💩
-        </h1>
+        
+        {/* Premium Title with 3D effect */}
+        <div className="relative mb-8">
+          <h1 className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500 animate-bounce drop-shadow-2xl" style={{
+            textShadow: '0 10px 30px rgba(139, 69, 19, 0.8), 0 20px 50px rgba(139, 69, 19, 0.5)',
+            transform: 'translateZ(50px)'
+          }}>
+            💩 POOPVERSE 💩
+          </h1>
+          {/* Premium shine effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" 
+               style={{ animation: 'shimmer 3s infinite' }} />
+        </div>
 
-        <p className="text-4xl text-amber-200 mb-12 text-center px-8 font-bold animate-pulse">
+        <p className="text-4xl text-amber-200 mb-12 text-center px-8 font-bold animate-pulse backdrop-blur-sm bg-black/20 py-4 px-8 rounded-2xl border border-yellow-600/30">
           You found the secret dimension of POOP!
         </p>
 
-        <div className="bg-yellow-900/80 backdrop-blur-sm p-8 rounded-3xl border-4 border-yellow-600 mb-8 max-w-2xl">
-          <p className="text-2xl text-yellow-100 text-center mb-4">
+        {/* Premium Info Card */}
+        <div className="bg-gradient-to-br from-yellow-900/90 to-amber-950/90 backdrop-blur-xl p-10 rounded-3xl border-2 border-yellow-500/50 mb-8 max-w-2xl shadow-2xl transform hover:scale-105 transition-transform" style={{
+          boxShadow: '0 25px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)'
+        }}>
+          <p className="text-2xl text-yellow-100 text-center mb-4 font-semibold">
             🚽 Welcome to the most CRAPPY dimension ever! 🚽
           </p>
           <p className="text-xl text-yellow-200 text-center mb-6">
             Here, everything is made of poop. The ground, the sky, even the air smells funny!
           </p>
-          <div className="text-center space-y-2">
-            <p className="text-lg text-yellow-300">🌀 You unlocked this by typing: HIHOWAREYOU</p>
+          <div className="text-center space-y-3 bg-black/30 p-6 rounded-2xl border border-yellow-700/40">
+            <p className="text-lg text-yellow-300">🌀 Secret URL discovered!</p>
             <p className="text-lg text-yellow-300">💩 Now you&apos;re stuck in... POOP WORLD!</p>
             <p className="text-lg text-yellow-300">🎉 Congrats on being a 💩 detective!</p>
           </div>
         </div>
 
-        {/* Floating Mega Poops */}
-        <div className="flex gap-8 mb-12">
-          <div className="text-9xl animate-bounce" style={{ animationDelay: '0s' }}>💩</div>
-          <div className="text-9xl animate-bounce" style={{ animationDelay: '0.2s' }}>💩</div>
-          <div className="text-9xl animate-bounce" style={{ animationDelay: '0.4s' }}>💩</div>
+        {/* Premium Floating Mega Poops with 3D shadows */}
+        <div className="flex gap-12 mb-12">
+          <div className="text-9xl animate-bounce transform hover:scale-125 transition-transform cursor-pointer" 
+               style={{ 
+                 animationDelay: '0s',
+                 filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.5))',
+                 transform: 'translateZ(30px)'
+               }}>💩</div>
+          <div className="text-9xl animate-bounce transform hover:scale-125 transition-transform cursor-pointer" 
+               style={{ 
+                 animationDelay: '0.2s',
+                 filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.5))',
+                 transform: 'translateZ(30px)'
+               }}>💩</div>
+          <div className="text-9xl animate-bounce transform hover:scale-125 transition-transform cursor-pointer" 
+               style={{ 
+                 animationDelay: '0.4s',
+                 filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.5))',
+                 transform: 'translateZ(30px)'
+               }}>💩</div>
         </div>
 
-        {/* Fun Stats */}
-        <div className="bg-amber-800/70 backdrop-blur p-6 rounded-2xl border-2 border-yellow-500 mb-8">
-          <h3 className="text-2xl font-bold text-yellow-200 mb-4 text-center">💩 POOP STATS 💩</h3>
-          <div className="grid grid-cols-2 gap-4 text-yellow-100">
-            <div className="text-center">
-              <div className="text-4xl mb-2">🚽</div>
-              <div className="text-sm">Toilets Flushed: ∞</div>
+        {/* Premium Stats Dashboard */}
+        <div className="bg-gradient-to-br from-amber-900/80 to-orange-950/80 backdrop-blur-lg p-8 rounded-3xl border-2 border-yellow-400/40 mb-8 shadow-2xl">
+          <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-amber-400 mb-6 text-center">💩 PREMIUM POOP STATS 💩</h3>
+          <div className="grid grid-cols-2 gap-6 text-yellow-100">
+            <div className="text-center bg-black/40 p-6 rounded-2xl border border-yellow-600/20 transform hover:scale-105 transition-transform">
+              <div className="text-5xl mb-3">🚽</div>
+              <div className="text-sm font-semibold">Toilets Flushed</div>
+              <div className="text-2xl font-bold text-yellow-300">∞</div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl mb-2">💩</div>
-              <div className="text-sm">Poops Flying: {poops.length}</div>
+            <div className="text-center bg-black/40 p-6 rounded-2xl border border-yellow-600/20 transform hover:scale-105 transition-transform">
+              <div className="text-5xl mb-3">💩</div>
+              <div className="text-sm font-semibold">Poops Flying</div>
+              <div className="text-2xl font-bold text-yellow-300">{poops.length}</div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl mb-2">🌪️</div>
-              <div className="text-sm">Swirl Speed: MAX</div>
+            <div className="text-center bg-black/40 p-6 rounded-2xl border border-yellow-600/20 transform hover:scale-105 transition-transform">
+              <div className="text-5xl mb-3">🌪️</div>
+              <div className="text-sm font-semibold">Swirl Speed</div>
+              <div className="text-2xl font-bold text-yellow-300">MAX</div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl mb-2">😂</div>
-              <div className="text-sm">Funniness: 100%</div>
+            <div className="text-center bg-black/40 p-6 rounded-2xl border border-yellow-600/20 transform hover:scale-105 transition-transform">
+              <div className="text-5xl mb-3">😂</div>
+              <div className="text-sm font-semibold">Funniness</div>
+              <div className="text-2xl font-bold text-yellow-300">100%</div>
             </div>
           </div>
         </div>
 
-        {/* Escape Buttons */}
-        <div className="flex gap-4">
+        {/* Premium Escape Buttons with 3D effects */}
+        <div className="flex gap-6">
           <button
             onClick={() => router.push('/kid')}
-            className="bg-yellow-600 hover:bg-yellow-500 text-yellow-100 font-bold text-xl px-8 py-4 rounded-full transition-all transform hover:scale-110 hover:rotate-3 shadow-xl"
+            className="relative bg-gradient-to-br from-yellow-500 to-orange-600 hover:from-yellow-400 hover:to-orange-500 text-white font-bold text-xl px-10 py-5 rounded-2xl transition-all transform hover:scale-110 hover:-translate-y-1 shadow-2xl border-2 border-yellow-400/50 overflow-hidden group"
+            style={{ 
+              boxShadow: '0 10px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3)',
+              transform: 'translateZ(20px)'
+            }}
           >
-            🚀 Escape POOPVERSE
+            <span className="relative z-10">🚀 Escape POOPVERSE</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
           </button>
           <button
             onClick={() => {
@@ -133,27 +185,51 @@ export default function Poopverse() {
                 alert('POOOOOOOOOP! 💩💩💩💩💩');
               }
             }}
-            className="bg-amber-700 hover:bg-amber-600 text-yellow-100 font-bold text-xl px-8 py-4 rounded-full transition-all transform hover:scale-110 hover:-rotate-3 shadow-xl"
+            className="relative bg-gradient-to-br from-amber-700 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-white font-bold text-xl px-10 py-5 rounded-2xl transition-all transform hover:scale-110 hover:-translate-y-1 shadow-2xl border-2 border-amber-500/50 overflow-hidden group"
+            style={{ 
+              boxShadow: '0 10px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3)',
+              transform: 'translateZ(20px)'
+            }}
           >
-            💩 Embrace the Poop
+            <span className="relative z-10">💩 Embrace the Poop</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
           </button>
         </div>
 
-        {/* Secret hint for other codes */}
-        <p className="text-yellow-500/50 text-sm mt-12 italic">
-          Psst... there might be other secret codes hidden in Learnverse... 🤫
+        {/* Premium secret hint */}
+        <p className="text-yellow-600/60 text-sm mt-12 italic backdrop-blur-sm bg-black/20 px-6 py-3 rounded-full border border-yellow-700/20">
+          Psst... there might be other secret dimensions hidden in Learnverse... 🤫
         </p>
       </div>
 
       <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-30px) rotate(180deg); }
+        @keyframes float3d {
+          0%, 100% { 
+            transform: translateY(0px) translateZ(var(--z)) rotateX(0deg) rotateY(0deg);
+          }
+          25% { 
+            transform: translateY(-40px) translateZ(calc(var(--z) + 20px)) rotateX(15deg) rotateY(90deg);
+          }
+          50% { 
+            transform: translateY(-60px) translateZ(var(--z)) rotateX(0deg) rotateY(180deg);
+          }
+          75% { 
+            transform: translateY(-40px) translateZ(calc(var(--z) - 20px)) rotateX(-15deg) rotateY(270deg);
+          }
         }
         
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        @keyframes rotate3d {
+          from { 
+            transform: rotateY(0deg) rotateX(0deg);
+          }
+          to { 
+            transform: rotateY(360deg) rotateX(360deg);
+          }
+        }
+        
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
         }
       `}</style>
     </div>

@@ -497,7 +497,14 @@ export default function KidPage() {
             : 'bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100'
         }`}
         onClick={handleBackgroundClick}
-        style={isSpaceMode ? { zIndex: 10 } : {}}
+        style={isSpaceMode ? { 
+          zIndex: 10,
+          perspective: '1200px',
+          transformStyle: 'preserve-3d',
+        } : { 
+          perspective: '1200px',
+          transformStyle: 'preserve-3d',
+        }}
       >
         {/* 🎨 CUSTOM TEXTURE PACK BACKGROUND 🎨 */}
         {isTexturePackActive && textures.background && (
