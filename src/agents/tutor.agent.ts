@@ -4,7 +4,7 @@ import { LRUCache } from 'lru-cache';
 import crypto from 'crypto';
 
 /**
- * Tutor Agent - Autonomous AI tutor using Llama 2 7B
+ * Tutor Agent - Autonomous AI tutor using Groq API
  * 
  * Responsibilities:
  * - Answer student questions about lessons
@@ -12,9 +12,9 @@ import crypto from 'crypto';
  * - Rate limit students (10 questions/day)
  * - Log interactions for analytics
  * 
- * Model: Meta Llama 2 7B Chat
- * Platform: HuggingFace Spaces (free GPU tier)
- * Quantization: 4-bit (13GB → 3.5GB)
+ * Model: Llama 3.3 70B (via Groq)
+ * Platform: Groq API (FREE & ULTRA FAST!)
+ * Speed: ~1-2 seconds per response
  */
 
 interface TutorResponse {
@@ -30,21 +30,26 @@ interface CacheStats {
   hitRate: string;
 }
 
+interface ConversationMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
+
 export class TutorAgent {
   private cache: LRUCache<string, string>;
-  private endpoint: string;
+  private apiKey: string;
+  private baseUrl: string = 'https://api.groq.com/openai/v1/chat/completions';
   private rateLimiter: Map<string, number[]>; // student_id -> timestamps
+  private conversationHistory: Map<string, ConversationMessage[]>; // student_id -> messages
   private stats = {
     cacheHits: 0,
     cacheMisses: 0,
     totalRequests: 0,
   };
   
-  constructor(endpoint?: string) {
-    // HuggingFace Spaces endpoint (free GPU tier)
-    this.endpoint = endpoint || 
-      process.env.NEXT_PUBLIC_TUTOR_ENDPOINT || 
-      'https://learnverse-tutor.hf.space/api/predict';
+  constructor() {
+    // Get Groq API key from environment (same as lesson generator!)
+    this.apiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY || '';
     
     // LRU cache: 1000 items, 30-day TTL
     this.cache = new LRUCache<string, string>({
@@ -55,11 +60,14 @@ export class TutorAgent {
     // Rate limiting: student_id → array of request timestamps
     this.rateLimiter = new Map();
     
-    console.log('[TutorAgent] Initialized with endpoint:', this.endpoint);
+    // Conversation history: student_id → array of messages
+    this.conversationHistory = new Map();
+    
+    console.log('[TutorAgent] Initialized with Groq API + Memory! 🧠');
   }
   
   /**
-   * Check if student has exceeded rate limit (10 questions/day)
+   * Check if student has exceeded rate limit (50 questions/day)
    * Returns true if request is allowed, false if limit exceeded
    */
   private checkRateLimit(studentId: string): boolean {
@@ -72,9 +80,9 @@ export class TutorAgent {
     // Filter out requests older than 24 hours
     requests = requests.filter(timestamp => (now - timestamp) < dayMs);
     
-    // Check if student has hit limit (10/day)
-    if (requests.length >= 10) {
-      console.log(`[TutorAgent] Rate limit exceeded for ${studentId}: ${requests.length}/10`);
+    // Check if student has hit limit (50/day - plenty for demos!)
+    if (requests.length >= 50) {
+      console.log(`[TutorAgent] Rate limit exceeded for ${studentId}: ${requests.length}/50`);
       return false;
     }
     
@@ -99,9 +107,9 @@ export class TutorAgent {
    * Main tutor method - answer student question
    * 
    * Workflow:
-   * 1. Check rate limit (10/day per student)
+   * 1. Check rate limit (50/day per student)
    * 2. Check cache (instant response if found)
-   * 3. Call Llama 2 on HuggingFace Spaces (if not cached)
+   * 3. Call Groq API with Llama 3.3 70B (if not cached)
    * 4. Cache response (for next student)
    * 5. Log to analytics (track engagement)
    */
@@ -115,7 +123,7 @@ export class TutorAgent {
     // Step 1: Rate limiting
     if (!this.checkRateLimit(studentId)) {
       return {
-        answer: "You've asked 10 questions today! 🌟 Come back tomorrow to ask more. You're doing great!",
+        answer: "You've asked 50 questions today! 🌟 Come back tomorrow to ask more. You're doing great!",
         cached: true,
         timestamp: Date.now(),
         latency: Date.now() - startTime,
@@ -142,10 +150,14 @@ export class TutorAgent {
     console.log(`[TutorAgent] Cache MISS, calling LLM for: "${question.substring(0, 50)}..."`);
     
     try {
-      const answer = await this.callLlamaAPI(question);
+      const answer = await this.callLlamaAPI(question, studentId);
       
       // Step 4: Cache response
       this.cache.set(cacheKey, answer);
+      
+      // Step 4.5: Add to conversation history
+      this.addToHistory(studentId, 'user', question);
+      this.addToHistory(studentId, 'assistant', answer);
       
       // Step 5: Log to analytics (async, don't block response)
       this.logTutorQuery(studentId, question, answer).catch(err =>
@@ -170,73 +182,115 @@ export class TutorAgent {
   }
   
   /**
-   * Call Llama 2 7B on HuggingFace Spaces
+   * Add message to conversation history
+   * Keeps last 10 messages (5 back-and-forth exchanges)
+   */
+  private addToHistory(studentId: string, role: 'user' | 'assistant', content: string): void {
+    let history = this.conversationHistory.get(studentId) || [];
+    
+    history.push({ role, content });
+    
+    // Keep only last 10 messages (5 exchanges) to avoid token limits
+    if (history.length > 10) {
+      history = history.slice(-10);
+    }
+    
+    this.conversationHistory.set(studentId, history);
+  }
+  
+  /**
+   * Get conversation history for a student
+   */
+  private getHistory(studentId: string): ConversationMessage[] {
+    return this.conversationHistory.get(studentId) || [];
+  }
+  
+  /**
+   * Clear conversation history for a student (fresh start)
+   */
+  clearHistory(studentId: string): void {
+    this.conversationHistory.delete(studentId);
+    console.log(`[TutorAgent] Cleared history for ${studentId}`);
+  }
+  
+  /**
+   * Call Groq API with Llama 3.3 70B
+   * Same API as lesson generator - FREE & ULTRA FAST!
    * 
    * System prompt ensures:
-   * - Simple language (grade 3 reading level)
+   * - Simple language (grades K-5)
    * - Encouraging tone
    * - Relatable examples
-   * - Short answer (< 200 words)
+   * - Short answer (2-4 sentences)
+   * 
+   * NOW WITH MEMORY! Includes conversation history!
    */
-  private async callLlamaAPI(question: string): Promise<string> {
-    const systemPrompt = `You are a friendly and encouraging 3rd grade math tutor named Buddy.
-Your job is to help students understand math concepts.
+  private async callLlamaAPI(question: string, studentId: string): Promise<string> {
+    if (!this.apiKey) {
+      throw new Error('Groq API key not configured');
+    }
 
-Rules:
-- Use VERY SIMPLE words (grade 3 reading level)
-- Use relatable examples: pizza, toys, animals, family
-- Be positive and encouraging
-- Keep answer under 150 words
-- Never give the answer directly - guide them to think
-- End with a friendly emoji like 🌟 or 🎉
-- Use simple math language: "groups of", "left over", "fair shares"
+    const systemPrompt = `You are an enthusiastic, patient AI tutor for elementary school students (grades K-5).
 
-Example:
-Question: "How do I understand multiplying 3 groups of 4?"
-Answer: "Great question! Think of 3 groups of 4 apples. 🍎
-If you have 1 group of 4 apples, that's 4 apples.
-If you have 2 groups, you have 4 + 4 = 8 apples.
-If you have 3 groups, you have 4 + 4 + 4 = 12 apples!
+Your teaching style:
+- Explain concepts in SIMPLE, fun language
+- Use everyday examples kids can relate to
+- Keep responses SHORT (2-4 sentences max)
+- Use emojis to make it engaging! 🎉
+- Encourage curiosity and ask follow-up questions
+- Break down complex topics into bite-sized pieces
+- Be positive and supportive!
 
-So 3 times 4 (or 3 × 4) = 12 apples. Does that make sense? 🎉"`;
+Remember: You're talking to KIDS, so keep it super simple and fun!`;
 
-    const payload = {
-      data: [
-        {
-          role: "system",
-          content: systemPrompt
-        },
-        {
-          role: "user",
-          content: question
-        }
-      ]
-    };
-
-    console.log('[TutorAgent] Calling LLM API at:', this.endpoint);
+    // Get conversation history
+    const history = this.getHistory(studentId);
+    
+    // Build messages array: system prompt + history + current question
+    const messages: ConversationMessage[] = [
+      {
+        role: 'system',
+        content: systemPrompt
+      },
+      ...history, // Include previous conversation!
+      {
+        role: 'user',
+        content: question
+      }
+    ];
+    
+    console.log(`[TutorAgent] Calling Groq API with ${history.length} previous messages...`);
     
     try {
-      const response = await fetch(this.endpoint, {
+      const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile', // Same as lesson generator!
+          messages,
+          temperature: 0.7,
+          max_tokens: 300,
+          top_p: 0.9,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error(`LLM API returned ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Groq API error ${response.status}: ${JSON.stringify(errorData)}`);
       }
 
       const data = await response.json();
       
-      // HuggingFace Spaces returns: { data: ["answer"] }
-      const answer = data.data?.[0] || data.answer || 
+      // Extract answer from Groq response
+      const answer = data.choices?.[0]?.message?.content?.trim() || 
         "I couldn't understand that question. Can you rephrase it? 😊";
       
       return answer;
     } catch (error) {
-      console.error('[TutorAgent] LLM API error:', error);
+      console.error('[TutorAgent] Groq API error:', error);
       throw error;
     }
   }

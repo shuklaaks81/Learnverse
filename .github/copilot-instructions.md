@@ -1,4 +1,4 @@
-# Learnverse - AI Agent Instructions
+gygttgtgygyvvt# Learnverse - AI Agent Instructions
 
 ## Project Overview
 Learnverse is a feature-rich educational platform for kids with parent monitoring. Built as a Next.js 16 (App Router) + React 19 + TypeScript PWA with client-side localStorage persistence (no backend/database).

@@ -19,6 +19,7 @@ interface ProfileHeaderProps {
   coins: number;
   streak: number;
   hasMultipleAccounts: boolean;
+  onProgressClick?: () => void;
 }
 
 export function ProfileHeader({
@@ -27,6 +28,7 @@ export function ProfileHeader({
   coins,
   streak,
   hasMultipleAccounts,
+  onProgressClick,
 }: ProfileHeaderProps) {
   const router = useRouter();
 
@@ -52,7 +54,7 @@ export function ProfileHeader({
             👦
           </div>
           {/* Progress ring around profile pic */}
-          <svg className="absolute top-0 left-0 w-16 h-16 -rotate-90">
+          <svg className="absolute top-0 left-0 w-16 h-16 -rotate-90 cursor-pointer" onClick={onProgressClick}>
             <circle cx="32" cy="32" r="30" stroke="#e5e7eb" strokeWidth="3" fill="none" />
             <circle 
               cx="32" 

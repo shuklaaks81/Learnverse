@@ -24,6 +24,13 @@ import { FeatureCard } from "./FeatureCard";
 
 const FEATURE_CARDS = [
   {
+    emoji: "🗺️",
+    title: "Learning Journey",
+    description: "Explore the lesson map!",
+    gradient: "bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600",
+    route: "/kid/lesson-map",
+  },
+  {
     emoji: "✨",
     title: "Lesson Generator",
     description: "Create custom lessons with AI!",
@@ -94,11 +101,11 @@ const FEATURE_CARDS = [
     route: "/kid/creation-studio",
   },
   {
-    emoji: "⭐",
-    title: "Units",
-    description: "Learn by units",
-    gradient: "bg-gradient-to-br from-indigo-500 to-blue-400",
-    route: "/kid/units",
+    emoji: "🤝",
+    title: "Unit Journey",
+    description: "Learn topics with your buddy!",
+    gradient: "bg-gradient-to-br from-purple-400 via-pink-500 to-orange-500",
+    route: "/kid/unit-map",
   },
   {
     emoji: "🧪",
@@ -106,6 +113,41 @@ const FEATURE_CARDS = [
     description: "Unlock crazy experiments! 🎮",
     gradient: "bg-gradient-to-br from-yellow-400 via-orange-500 to-pink-600 animate-gradient-shift",
     route: "/kid/fun-lab",
+  },
+  {
+    emoji: "📚",
+    title: "Book Creator",
+    description: "Write & publish books!",
+    gradient: "bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500",
+    route: "/kid/book-creator",
+  },
+  {
+    emoji: "🌍",
+    title: "Public Library",
+    description: "Read amazing books!",
+    gradient: "bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500",
+    route: "/kid/library",
+  },
+  {
+    emoji: "⚙️",
+    title: "Add-on Creator",
+    description: "Build custom content!",
+    gradient: "bg-gradient-to-br from-orange-500 via-yellow-500 to-pink-500",
+    route: "/kid/addon-creator",
+  },
+  {
+    emoji: "🛍️",
+    title: "Add-on Store",
+    description: "Download cool add-ons!",
+    gradient: "bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500",
+    route: "/kid/addon-store",
+  },
+  {
+    emoji: "🎨",
+    title: "Texture Creator",
+    description: "Draw your own theme!",
+    gradient: "bg-gradient-to-br from-red-500 via-yellow-500 to-green-500 animate-gradient-shift",
+    route: "/kid/texture-creator",
   },
   {
     emoji: "⚙️",
@@ -126,9 +168,11 @@ const FEATURE_CARDS = [
 
 interface FeatureGridProps {
   isPremium?: boolean;
+  isRealisticMode?: boolean;
+  isSpaceMode?: boolean;
 }
 
-export function FeatureGrid({ isPremium = false }: FeatureGridProps) {
+export function FeatureGrid({ isPremium = false, isRealisticMode = false, isSpaceMode = false }: FeatureGridProps) {
   const router = useRouter();
 
   // Filter cards based on premium status
@@ -200,6 +244,8 @@ export function FeatureGrid({ isPremium = false }: FeatureGridProps) {
           description={card.description}
           gradient={card.gradient}
           onClick={() => router.push(card.route)}
+          isRealisticMode={isRealisticMode}
+          isSpaceMode={isSpaceMode}
         />
       ))}
     </div>

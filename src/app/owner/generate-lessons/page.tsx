@@ -218,7 +218,10 @@ export default function LessonGeneratorPage() {
                 <div className="text-center py-12">
                   <div className="text-9xl mb-4 animate-bounce">🤖</div>
                   <p className="text-2xl text-white font-bold animate-pulse">
-                    AI is creating your lesson...
+                    AI is creating your comprehensive lesson...
+                  </p>
+                  <p className="text-lg text-white/80 mt-2">
+                    Generating 10-15 interactive activities! ⏱️
                   </p>
                 </div>
               )}
@@ -299,9 +302,10 @@ export default function LessonGeneratorPage() {
             <li>1. Choose a subject (Math, Science, Reading, etc.)</li>
             <li>2. Enter a specific topic or pick from suggestions</li>
             <li>3. Select grade level and difficulty</li>
-            <li>4. Click &ldquo;Generate Lesson&rdquo; and wait ~5-10 seconds</li>
-            <li>5. Download the JSON and add it to <code className="bg-black/30 px-2 py-1 rounded">src/data/interactiveLessons.ts</code></li>
-            <li>6. Kids can now learn that topic! 🎉</li>
+            <li>4. Click &ldquo;Generate Lesson&rdquo; and wait ~15-20 seconds</li>
+            <li>5. Each lesson now includes 10-15 comprehensive activities! 🎉</li>
+            <li>6. Download the JSON and add it to <code className="bg-black/30 px-2 py-1 rounded">src/data/interactiveLessons.ts</code></li>
+            <li>7. Kids can now learn that topic thoroughly! 🎓</li>
           </ol>
         </div>
       </div>

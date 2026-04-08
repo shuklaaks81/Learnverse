@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { FeatureGrid } from "./components/FeatureGrid";
 import { OnboardingTour } from "@/components/OnboardingTour";
+import { useTexturePack } from "@/hooks/useTexturePack";
+import { SpaceBackground } from "@/components/SpaceBackground";
+import { PerformanceIndicator } from "@/components/PerformanceIndicator";
 
 /**
  * Kid Hub Page
@@ -17,6 +20,8 @@ import { OnboardingTour } from "@/components/OnboardingTour";
  * - Onboarding tour with secrets contract
  * 
  * Premium Mode: Futuristic cyber interface with holographic effects
+ * 
+ * PERFORMANCE OPTIMIZED: useCallback to prevent unnecessary re-renders
  */
 export default function KidPage() {
   const [kidName, setKidName] = useState("Alex");
@@ -27,6 +32,23 @@ export default function KidPage() {
   const [hasMultipleAccounts, setHasMultipleAccounts] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
   const [showTour, setShowTour] = useState(false);
+  const [isOwnerMode, setIsOwnerMode] = useState(false);
+  
+  // 🕺 SECRET GROOVY MODE STATES 🕺
+  const [secretClicks, setSecretClicks] = useState({ progress: 0, background: 0 });
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [animationStep, setAnimationStep] = useState(0);
+  const [isGroovyMode, setIsGroovyMode] = useState(false);
+  
+  // ✨ HYPER REALISTIC MODE STATES ✨
+  const [isRealisticMode, setIsRealisticMode] = useState(false);
+  const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
+  
+  // 🚀 SPACE MODE STATES 🚀
+  const [isSpaceMode, setIsSpaceMode] = useState(false);
+  
+  // 🎨 CUSTOM TEXTURE PACK 🎨
+  const { isActive: isTexturePackActive, textures, deactivate: deactivateTexturePack } = useTexturePack();
 
   const premiumParticles = useMemo(
     () =>
@@ -46,6 +68,10 @@ export default function KidPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
+        // 👑 CHECK FOR SECRET OWNER MODE! 👑
+        const ownerUnlocked = localStorage.getItem('isSecretOwner') === 'true';
+        setIsOwnerMode(ownerUnlocked);
+        
         // Load current kid data
         const kidDataStr = localStorage.getItem('currentKid');
         if (kidDataStr) {
@@ -80,9 +106,100 @@ export default function KidPage() {
     }
   }, []);
 
-  const handleTourComplete = () => {
+  // 🎯 OPTIMIZED HANDLERS with useCallback
+  const handleTourComplete = useCallback(() => {
     setShowTour(false);
     localStorage.setItem('tourCompleted', 'true');
+  }, []);
+
+  const triggerGroovySequence = useCallback(() => {
+    setShowAnimation(true);
+    setAnimationStep(1);
+    
+    // Animation timeline
+    setTimeout(() => setAnimationStep(2), 2000);  // Portal
+    setTimeout(() => setAnimationStep(3), 4000);  // Walking dude
+    setTimeout(() => setAnimationStep(4), 6000);  // Brick fall
+    setTimeout(() => setAnimationStep(5), 7500);  // Enter groovy
+    setTimeout(() => {
+      setShowAnimation(false);
+      setIsGroovyMode(true);
+      localStorage.setItem('groovyModeActive', 'true');
+      setSecretClicks({ progress: 0, background: 0 }); // Reset
+    }, 9500);
+  }, []);
+
+  // 🎯 SECRET CLICK HANDLERS
+  const handleProgressClick = useCallback(() => {
+    const newCount = secretClicks.progress + 1;
+    setSecretClicks(prev => ({ ...prev, progress: newCount }));
+    
+    // Check if pattern is complete (2 progress + 10 background)
+    if (newCount === 2 && secretClicks.background === 10) {
+      triggerGroovySequence();
+    }
+  }, [secretClicks.progress, secretClicks.background, triggerGroovySequence]);
+
+  const handleBackgroundClick = useCallback(() => {
+    const newCount = secretClicks.background + 1;
+    setSecretClicks(prev => ({ ...prev, background: newCount }));
+    
+    // Check if pattern is complete (2 progress + 10 background)
+    if (secretClicks.progress === 2 && newCount === 10) {
+      triggerGroovySequence();
+    }
+  }, [secretClicks.progress, secretClicks.background, triggerGroovySequence]);
+
+  // Load groovy mode from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const groovyActive = localStorage.getItem('groovyModeActive') === 'true';
+      setIsGroovyMode(groovyActive);
+      
+      // 🕺 SECRET URL PARAMETER - Auto-trigger groovy mode!
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('groovy') === 'true' && !groovyActive) {
+        triggerGroovySequence();
+      }
+      
+      // ✨ Load realistic mode
+      const realisticActive = localStorage.getItem('realisticModeActive') === 'true';
+      setIsRealisticMode(realisticActive);
+      
+      // 🚀 Load space mode
+      const spaceActive = localStorage.getItem('spaceModeActive') === 'true';
+      setIsSpaceMode(spaceActive);
+    }
+  }, []);
+  
+  // ⏰ TIME TRACKING FOR REALISTIC MODE
+  useEffect(() => {
+    const updateTimeOfDay = () => {
+      const hour = new Date().getHours();
+      if (hour >= 6 && hour < 12) setTimeOfDay('morning');
+      else if (hour >= 12 && hour < 18) setTimeOfDay('afternoon');
+      else if (hour >= 18 && hour < 21) setTimeOfDay('evening');
+      else setTimeOfDay('night');
+    };
+    
+    updateTimeOfDay();
+    // Update every minute
+    const interval = setInterval(updateTimeOfDay, 60000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  // 🎨 Get background based on time of day
+  const getRealisticBackground = () => {
+    switch (timeOfDay) {
+      case 'morning':
+        return 'from-yellow-200 via-blue-200 to-cyan-200';
+      case 'afternoon':
+        return 'from-blue-300 via-cyan-200 to-blue-200';
+      case 'evening':
+        return 'from-orange-300 via-pink-300 to-purple-300';
+      case 'night':
+        return 'from-indigo-900 via-purple-900 to-blue-900';
+    }
   };
 
   // 🚀 PREMIUM FUTURISTIC KID HUB! 💎✨
@@ -123,7 +240,7 @@ export default function KidPage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center p-8 min-h-screen">
+        <div className="relative z-10 flex flex-col items-center p-8 min-h-screen" onClick={handleBackgroundClick}>
           {/* Premium Profile Header */}
           <div className="w-full max-w-6xl mb-8 futuristic-glass p-6 animate-card-appear">
             <div className="flex items-center justify-between flex-wrap gap-4">
@@ -134,7 +251,7 @@ export default function KidPage() {
                     👦
                   </div>
                   {/* Animated Progress Ring */}
-                  <svg className="absolute top-0 left-0 w-20 h-20 -rotate-90">
+                  <svg className="absolute top-0 left-0 w-20 h-20 -rotate-90 cursor-pointer" onClick={handleProgressClick}>
                     <circle cx="40" cy="40" r="36" stroke="rgba(255,255,255,0.2)" strokeWidth="4" fill="none" />
                     <circle 
                       cx="40" 
@@ -196,6 +313,13 @@ export default function KidPage() {
                     📋 Assignments
                   </button>
                 </Link>
+                {isOwnerMode && (
+                  <Link href="/owner">
+                    <button className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-bold shadow-[0_0_30px_rgba(255,215,0,0.8)] hover:shadow-[0_0_50px_rgba(255,215,0,1)] hover:scale-110 transition-all duration-300 border-4 border-yellow-300 animate-pulse">
+                      👑 OWNER DASHBOARD
+                    </button>
+                  </Link>
+                )}
                 <button 
                   onClick={() => {
                     const kidAccounts = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
@@ -251,6 +375,103 @@ export default function KidPage() {
             to { opacity: 1; transform: translateY(0) scale(1); }
           }
         `}</style>
+
+        {/* 🕺 GROOVY MODE OVERLAY */}
+        {isGroovyMode && (
+          <div className="fixed inset-0 pointer-events-none z-50">
+            {/* Disco balls */}
+            <div className="absolute top-10 left-10 text-6xl animate-spin" style={{animationDuration: '3s'}}>🪩</div>
+            <div className="absolute top-10 right-10 text-6xl animate-spin" style={{animationDuration: '4s'}}>🪩</div>
+            <div className="absolute bottom-10 left-1/4 text-6xl animate-spin" style={{animationDuration: '5s'}}>🪩</div>
+            
+            {/* Sunglasses floating */}
+            <div className="absolute top-1/4 left-1/2 text-4xl animate-bounce">🕶️</div>
+            <div className="absolute top-1/2 right-1/4 text-4xl animate-bounce" style={{animationDelay: '0.5s'}}>🕶️</div>
+            
+            {/* Groovy text */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-yellow-500 to-cyan-500 animate-pulse">
+              ✨ GROOVY MODE ACTIVE ✨
+            </div>
+            
+            {/* Exit button */}
+            <button 
+              onClick={() => {
+                setIsGroovyMode(false);
+                localStorage.removeItem('groovyModeActive');
+              }}
+              className="absolute top-4 right-4 pointer-events-auto bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg transition"
+            >
+              ❌ Exit Groovy Mode
+            </button>
+          </div>
+        )}
+
+        {/* 🌀 SECRET ANIMATION SEQUENCE */}
+        {showAnimation && (
+          <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center overflow-hidden">
+            {/* Step 1: WEEEEEEE */}
+            {animationStep === 1 && (
+              <div className="text-9xl font-bold text-yellow-400 animate-spin">
+                WEEEEEEEEEEEEEEEE
+              </div>
+            )}
+            
+            {/* Step 2: Portal */}
+            {animationStep === 2 && (
+              <div className="relative">
+                <div className="w-96 h-96 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-500 animate-spin" style={{animationDuration: '2s'}}></div>
+                <div className="absolute inset-0 flex items-center justify-center text-6xl animate-ping">🌀</div>
+              </div>
+            )}
+            
+            {/* Step 3: Super Cool Portal Transition */}
+            {animationStep === 3 && (
+              <div className="text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 animate-spin">
+                SUPER COOL PORTAL TRANSITION
+              </div>
+            )}
+            
+            {/* Step 4: Walking dude */}
+            {animationStep === 4 && (
+              <div className="relative w-full h-full flex items-center justify-center">
+                <div className="text-9xl absolute" style={{
+                  animation: 'walk 2s linear',
+                  position: 'absolute',
+                }}>🚶</div>
+                <div className="text-6xl absolute" style={{
+                  animation: 'fall 1.5s ease-in',
+                  position: 'absolute',
+                }}>🧱</div>
+              </div>
+            )}
+            
+            {/* Step 5: THE GROOVY LEARNVERSE */}
+            {animationStep === 5 && (
+              <div className="text-center">
+                <div className="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 mb-8 animate-pulse">
+                  THE GROOVY LEARNVERSE
+                </div>
+                <div className="flex gap-8 justify-center text-7xl">
+                  <span className="animate-bounce">🕺</span>
+                  <span className="animate-bounce" style={{animationDelay: '0.2s'}}>🪩</span>
+                  <span className="animate-bounce" style={{animationDelay: '0.4s'}}>🕶️</span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Animation Styles */}
+        <style jsx global>{`
+          @keyframes walk {
+            0% { left: -10%; top: 50%; }
+            100% { left: 50%; top: 50%; }
+          }
+          @keyframes fall {
+            0% { top: -10%; left: 45%; }
+            100% { top: 40%; left: 45%; }
+          }
+        `}</style>
         </div>
       </>
     );
@@ -260,30 +481,323 @@ export default function KidPage() {
   return (
     <>
       {showTour && <OnboardingTour onComplete={handleTourComplete} isPremium={false} />}
-      <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100 p-8">
+      
+      {/* 🚀 SPACE MODE BACKGROUND 🚀 */}
+      {isSpaceMode && <SpaceBackground />}
+      
+      {/* 🎮 PERFORMANCE INDICATOR (Space Mode Only) 🎮 */}
+      {isSpaceMode && <PerformanceIndicator />}
+      
+      <div 
+        className={`min-h-screen flex flex-col items-center p-8 transition-all duration-1000 relative ${
+          isSpaceMode
+            ? 'bg-transparent'
+            : isRealisticMode 
+            ? `bg-gradient-to-br ${getRealisticBackground()}` 
+            : 'bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100'
+        }`}
+        onClick={handleBackgroundClick}
+        style={isSpaceMode ? { zIndex: 10 } : {}}
+      >
+        {/* 🎨 CUSTOM TEXTURE PACK BACKGROUND 🎨 */}
+        {isTexturePackActive && textures.background && (
+          <div 
+            className="fixed inset-0 pointer-events-none z-0 opacity-40"
+            style={{
+              backgroundImage: `url(${textures.background})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              imageRendering: 'pixelated'
+            }}
+          />
+        )}
+        
         <ProfileHeader 
           kidName={kidName}
           progress={progress}
           coins={coins}
           streak={streak}
           hasMultipleAccounts={hasMultipleAccounts}
+          onProgressClick={handleProgressClick}
         />
 
-        <div className="max-w-5xl w-full bg-white rounded-3xl shadow-2xl p-10 flex flex-col items-center gap-8">
-          <h1 className="text-3xl font-bold text-blue-700 mb-2">Welcome to Learnverse!</h1>
+        {/* Owner Mode Access Button */}
+        {isOwnerMode && (
+          <div className="w-full max-w-5xl mb-4 flex justify-center">
+            <Link href="/owner">
+              <button className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white py-4 px-8 rounded-2xl font-bold text-xl shadow-[0_0_30px_rgba(255,215,0,0.8)] hover:shadow-[0_0_50px_rgba(255,215,0,1)] hover:scale-110 transition-all duration-300 border-4 border-white/50 animate-pulse">
+                👑 OWNER DASHBOARD
+              </button>
+            </Link>
+          </div>
+        )}
+        
+        {/* ✨ HYPER REALISTIC MODE TOGGLE ✨ */}
+        <div className="fixed top-6 right-6 z-40 flex flex-col gap-3">
+          <button
+            onClick={() => {
+              const newMode = !isRealisticMode;
+              setIsRealisticMode(newMode);
+              if (newMode) setIsSpaceMode(false); // Disable space mode if enabling realistic
+              localStorage.setItem('realisticModeActive', String(newMode));
+            }}
+            className={`group px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-500 transform hover:scale-110 ${
+              isRealisticMode
+                ? 'bg-white/20 backdrop-blur-xl text-white border-2 border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.3)]'
+                : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-xl hover:shadow-2xl'
+            }`}
+            style={isRealisticMode ? {
+              boxShadow: '0 8px 32px rgba(31, 38, 135, 0.37), inset 0 0 48px rgba(255, 255, 255, 0.1)',
+              transform: 'translateZ(20px)'
+            } : {}}
+          >
+            {isRealisticMode ? '✨ Realistic Mode' : '🎨 Normal Mode'}
+            <div className="text-xs mt-1 opacity-80">
+              {isRealisticMode && `⏰ ${timeOfDay.charAt(0).toUpperCase() + timeOfDay.slice(1)}`}
+            </div>
+          </button>
+          
+          {/* 🚀 SPACE MODE TOGGLE 🚀 */}
+          <button
+            onClick={() => {
+              const newMode = !isSpaceMode;
+              setIsSpaceMode(newMode);
+              if (newMode) setIsRealisticMode(false); // Disable realistic mode if enabling space
+              localStorage.setItem('spaceModeActive', String(newMode));
+            }}
+            className={`group px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-500 transform hover:scale-110 ${
+              isSpaceMode
+                ? 'bg-black/40 backdrop-blur-xl text-white border-2 border-purple-400/60 shadow-[0_0_40px_rgba(168,85,247,0.6)]'
+                : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-xl hover:shadow-2xl'
+            }`}
+            style={isSpaceMode ? {
+              boxShadow: '0 0 40px rgba(168, 85, 247, 0.6), inset 0 0 48px rgba(139, 92, 246, 0.2)',
+              transform: 'translateZ(20px)'
+            } : {}}
+          >
+            {isSpaceMode ? '🚀 Space Mode' : '🌍 Earth Mode'}
+            <div className="text-xs mt-1 opacity-80">
+              {isSpaceMode && '🌌 Artemis 2 Mission'}
+            </div>
+          </button>
+          
+          {/* 🎨 TEXTURE PACK INDICATOR 🎨 */}
+          {isTexturePackActive && (
+            <div className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 text-white px-6 py-3 rounded-2xl font-bold text-lg shadow-xl border-2 border-white/40 animate-pulse">
+              <div className="flex items-center justify-between gap-3">
+                <span>🎨 Custom Theme</span>
+                <button
+                  onClick={deactivateTexturePack}
+                  className="bg-white/20 hover:bg-white/40 px-3 py-1 rounded-lg text-sm transition-all"
+                >
+                  ❌
+                </button>
+              </div>
+              <div className="text-xs mt-1 opacity-90">Your drawings active!</div>
+            </div>
+          )}
+        </div>
+
+        <div 
+          className={`max-w-5xl w-full rounded-3xl p-10 flex flex-col items-center gap-8 transition-all duration-500 ${
+            isSpaceMode
+              ? 'bg-black/20 backdrop-blur-2xl border-2 border-purple-400/30 shadow-[0_0_60px_rgba(168,85,247,0.5)]'
+              : isRealisticMode
+              ? 'bg-white/10 backdrop-blur-2xl border-2 border-white/20 shadow-[0_8px_32px_rgba(31,38,135,0.37)]'
+              : 'bg-white shadow-2xl'
+          }`}
+          style={isSpaceMode ? {
+            boxShadow: '0 0 60px rgba(168, 85, 247, 0.5), inset 0 0 80px rgba(139, 92, 246, 0.1)',
+            transform: 'translateZ(30px)',
+            transformStyle: 'preserve-3d'
+          } : isRealisticMode ? {
+            boxShadow: '0 8px 32px rgba(31, 38, 135, 0.37), 0 20px 60px rgba(0, 0, 0, 0.2)',
+            transform: 'translateZ(30px) rotateX(2deg)',
+            transformStyle: 'preserve-3d'
+          } : {}}
+        >
+          <h1 className={`text-3xl font-bold mb-2 transition-all duration-500 ${
+            isSpaceMode
+              ? 'text-white drop-shadow-[0_0_20px_rgba(168,85,247,0.8)]'
+              : isRealisticMode 
+              ? 'text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]' 
+              : 'text-blue-700'
+          }`}>Welcome to Learnverse!</h1>
+          
+          {/* 🎨 TEXTURE PACK PREVIEW 🎨 */}
+          {isTexturePackActive && (
+            <div className="w-full bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 border-4 border-purple-300">
+              <h2 className="text-2xl font-bold text-purple-700 mb-4 text-center">
+                🎨 Your Custom Drawings! 🎨
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {textures.coin && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Coin</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.coin} alt="Custom Coin" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+                {textures.button && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Button</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.button} alt="Custom Button" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+                {textures.achievement && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Achievement</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.achievement} alt="Custom Achievement" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+                {textures.streak && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Streak</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.streak} alt="Custom Streak" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+                {textures.card && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Card</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.card} alt="Custom Card" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+                {textures.header && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Header</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.header} alt="Custom Header" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+                {textures.menu && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Menu</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.menu} alt="Custom Menu" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           
           {/* Create Account Button */}
           <div className="w-full flex justify-center">
             <Link href="/kid/welcome">
-              <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 animate-pulse">
+              <button className={`py-3 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 ${
+                isSpaceMode
+                  ? 'bg-purple-600/40 backdrop-blur-xl text-white border-2 border-purple-400/60 shadow-[0_0_30px_rgba(168,85,247,0.5)]'
+                  : isRealisticMode
+                  ? 'bg-white/20 backdrop-blur-xl text-white border-2 border-white/40'
+                  : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white animate-pulse'
+              }`}>
                 Create New Account ✨
               </button>
             </Link>
           </div>
 
           {/* Feature Grid */}
-          <FeatureGrid />
+          <FeatureGrid isRealisticMode={isRealisticMode} isSpaceMode={isSpaceMode} />
         </div>
+
+        {/* 🕺 GROOVY MODE OVERLAY */}
+        {isGroovyMode && (
+          <div className="fixed inset-0 pointer-events-none z-50">
+            {/* Disco balls */}
+            <div className="absolute top-10 left-10 text-6xl animate-spin" style={{animationDuration: '3s'}}>🪩</div>
+            <div className="absolute top-10 right-10 text-6xl animate-spin" style={{animationDuration: '4s'}}>🪩</div>
+            <div className="absolute bottom-10 left-1/4 text-6xl animate-spin" style={{animationDuration: '5s'}}>🪩</div>
+            
+            {/* Sunglasses floating */}
+            <div className="absolute top-1/4 left-1/2 text-4xl animate-bounce">🕶️</div>
+            <div className="absolute top-1/2 right-1/4 text-4xl animate-bounce" style={{animationDelay: '0.5s'}}>🕶️</div>
+            
+            {/* Groovy text */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-yellow-500 to-cyan-500 animate-pulse">
+              ✨ GROOVY MODE ACTIVE ✨
+            </div>
+            
+            {/* Exit button */}
+            <button 
+              onClick={() => {
+                setIsGroovyMode(false);
+                localStorage.removeItem('groovyModeActive');
+              }}
+              className="absolute top-4 right-4 pointer-events-auto bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg transition"
+            >
+              ❌ Exit Groovy Mode
+            </button>
+          </div>
+        )}
+
+        {/* 🌀 SECRET ANIMATION SEQUENCE */}
+        {showAnimation && (
+          <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center overflow-hidden">
+            {/* Step 1: WEEEEEEE */}
+            {animationStep === 1 && (
+              <div className="text-9xl font-bold text-yellow-400 animate-spin">
+                WEEEEEEEEEEEEEEEE
+              </div>
+            )}
+            
+            {/* Step 2: Portal */}
+            {animationStep === 2 && (
+              <div className="relative">
+                <div className="w-96 h-96 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-500 animate-spin" style={{animationDuration: '2s'}}></div>
+                <div className="absolute inset-0 flex items-center justify-center text-6xl animate-ping">🌀</div>
+              </div>
+            )}
+            
+            {/* Step 3: Super Cool Portal Transition */}
+            {animationStep === 3 && (
+              <div className="text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 animate-spin">
+                SUPER COOL PORTAL TRANSITION
+              </div>
+            )}
+            
+            {/* Step 4: Walking dude */}
+            {animationStep === 4 && (
+              <div className="relative w-full h-full flex items-center justify-center">
+                <div className="text-9xl absolute animate-walk">🚶</div>
+                <div className="text-6xl absolute top-20 animate-fall">🧱</div>
+              </div>
+            )}
+            
+            {/* Step 5: THE GROOVY LEARNVERSE */}
+            {animationStep === 5 && (
+              <div className="text-center">
+                <div className="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 mb-8 animate-pulse">
+                  THE GROOVY LEARNVERSE
+                </div>
+                <div className="flex gap-8 justify-center text-7xl">
+                  <span className="animate-bounce">🕺</span>
+                  <span className="animate-bounce" style={{animationDelay: '0.2s'}}>🪩</span>
+                  <span className="animate-bounce" style={{animationDelay: '0.4s'}}>🕶️</span>
+                </div>
+              </div>
+            )}
+            
+            <style jsx>{`
+              @keyframes walk {
+                0% { left: -10%; }
+                100% { left: 50%; }
+              }
+              @keyframes fall {
+                0% { top: -10%; left: 45%; }
+                100% { top: 40%; left: 45%; }
+              }
+              .animate-walk {
+                animation: walk 2s linear;
+              }
+              .animate-fall {
+                animation: fall 1.5s ease-in;
+              }
+            `}</style>
+          </div>
+        )}
       </div>
     </>
   );

@@ -1,121 +1,114 @@
 #!/usr/bin/env python3
 """
-Learnverse AI Tutor - Llama 2 7B with 4-bit Quantization
-Runs on HuggingFace Spaces Free GPU (50 req/month free)
+Learnverse AI Tutor - Powered by Groq API
+FREE, FAST, and ACTUALLY WORKS! 🚀
+Uses the same AI that powers the lesson generator!
 """
 
 import gradio as gr
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+import os
+import requests
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Global model/tokenizer (loaded once at startup)
-MODEL = None
-TOKENIZER = None
-
-def load_model():
-    """Load Llama 2 7B with 4-bit quantization (3.5GB)"""
-    global MODEL, TOKENIZER
-    
-    logger.info("Loading Llama 2 7B-Chat (4-bit quantized)...")
-    
-    model_id = "meta-llama/Llama-2-7b-chat-hf"
-    
-    # 4-bit quantization config
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type='nf4',
-        bnb_4bit_use_double_quant=True,
-        bnb_4bit_compute_dtype=torch.bfloat16,
-    )
-    
-    # Load model with quantization
-    MODEL = AutoModelForCausalLM.from_pretrained(
-        model_id,
-        quantization_config=bnb_config,
-        device_map='auto',
-        trust_remote_code=True,
-        torch_dtype=torch.bfloat16,
-    )
-    
-    TOKENIZER = AutoTokenizer.from_pretrained(model_id)
-    TOKENIZER.pad_token = TOKENIZER.eos_token
-    
-    logger.info("✅ Model loaded successfully")
-    return MODEL, TOKENIZER
+# Get Groq API key from environment variable
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
 
 def tutor_response(question: str) -> str:
     """
     Answer student question with age-appropriate explanation.
-    Optimized for grades 3-5 (8-10 year olds).
+    Powered by Groq's ultra-fast Llama 3.3 70B API!
     """
     if not question.strip():
         return "Please ask me a question! 📚"
     
+    if not GROQ_API_KEY:
+        return "⚠️ API key not configured! Add GROQ_API_KEY in Space settings."
+    
     try:
-        # Build prompt for Llama 2 Chat
-        system_prompt = """You are an enthusiastic, patient AI tutor for 3rd-5th grade students.
-Your job is to explain concepts in simple, fun language using everyday examples.
-Keep responses to 2-3 sentences maximum. Use emojis and encourage curiosity!"""
-        
-        prompt = f"""[INST] <<SYS>>
-{system_prompt}
-<</SYS>>
+        # Call Groq API (same as lesson generator!)
+        response = requests.post(
+            'https://api.groq.com/openai/v1/chat/completions',
+            headers={
+                'Authorization': f'Bearer {GROQ_API_KEY}',
+                'Content-Type': 'application/json',
+            },
+            json={
+                'model': 'llama-3.3-70b-versatile',
+                'messages': [
+                    {
+                        'role': 'system',
+                        'content': """You are an enthusiastic, patient AI tutor for elementary school students (grades K-5).
 
-Student Question: {question}
-[/INST]"""
+Your teaching style:
+- Explain concepts in SIMPLE, fun language
+- Use everyday examples kids can relate to
+- Keep responses SHORT (2-4 sentences max)
+- Use emojis to make it engaging! 🎉
+- Encourage curiosity and ask follow-up questions
+- Break down complex topics into bite-sized pieces
+- Be positive and supportive!
+
+Remember: You're talking to KIDS, so keep it super simple and fun!"""
+                    },
+                    {
+                        'role': 'user',
+                        'content': question
+                    }
+                ],
+                'temperature': 0.7,
+                'max_tokens': 300,
+                'top_p': 0.9,
+            },
+            timeout=30
+        )
         
-        # Tokenize and generate
-        inputs = TOKENIZER(prompt, return_tensors='pt').to(MODEL.device)
+        if response.status_code == 200:
+            data = response.json()
+            answer = data['choices'][0]['message']['content'].strip()
+            return answer or "Great question! Keep learning! 🌟"
+        else:
+            logger.error(f"API Error: {response.status_code} - {response.text}")
+            return f"Oops! The AI is taking a quick break. Try again! 🤔"
         
-        with torch.no_grad():
-            outputs = MODEL.generate(
-                **inputs,
-                max_new_tokens=150,
-                temperature=0.7,
-                top_p=0.95,
-                top_k=50,
-                do_sample=True,
-                repetition_penalty=1.2,
-            )
-        
-        response = TOKENIZER.decode(
-            outputs[0][inputs['input_ids'].shape[1]:],
-            skip_special_tokens=True
-        ).strip()
-        
-        return response or "Great question! Keep learning! 🌟"
-        
+    except requests.exceptions.Timeout:
+        return "The AI is thinking too hard! Try asking again! 🤔"
     except Exception as e:
-        logger.error(f"Error generating response: {e}")
-        return f"Oops! I hit a snag. Try asking again! 🤔"
-
-# Load model at startup
-load_model()
+        logger.error(f"Error: {e}")
+        return f"Oops! Something went wrong. Try again! 🤔"
 
 # Gradio Interface
-with gr.Blocks(title="Learnverse AI Tutor", theme=gr.themes.Soft()) as demo:
-    gr.Markdown("# 🧑‍🏫 Learnverse AI Tutor")
-    gr.Markdown("Ask me anything about your lessons! I'm here to help you learn.")
+with gr.Blocks(title="Learnverse AI Tutor 🎓", theme=gr.themes.Soft()) as demo:
+    gr.Markdown("""
+    # 🎓 Learnverse AI Tutor
+    ### Ask me anything! I'll explain it in a fun, easy way! 🌟
+    
+    I'm powered by **Groq's ultra-fast AI** - the same technology that powers Learnverse's lesson generator!
+    """)
     
     with gr.Row():
         question = gr.Textbox(
             label="Your Question",
-            placeholder="What is 1/2 + 1/4?",
-            lines=2,
+            placeholder="Example: Why do plants need sunlight?",
+            lines=3
         )
     
     with gr.Row():
-        submit_btn = gr.Button("Ask Tutor", variant="primary")
-        clear_btn = gr.Button("Clear")
+        submit_btn = gr.Button("Ask Tutor 🤖", variant="primary", size="lg")
+        clear_btn = gr.Button("Clear 🗑️")
     
-    answer = gr.Textbox(label="Tutor Response", interactive=False, lines=4)
+    answer = gr.Textbox(label="Tutor Response 💭", interactive=False, lines=6)
     
     # Event handlers
     submit_btn.click(
+        fn=tutor_response,
+        inputs=[question],
+        outputs=[answer],
+    )
+    
+    question.submit(  # Also submit on Enter key
         fn=tutor_response,
         inputs=[question],
         outputs=[answer],
@@ -135,12 +128,23 @@ with gr.Blocks(title="Learnverse AI Tutor", theme=gr.themes.Soft()) as demo:
             ["Why is the sky blue?"],
             ["What is 5 × 7?"],
             ["How do plants make food?"],
+            ["What causes thunder and lightning?"],
+            ["How does gravity work?"],
         ],
         inputs=[question],
+        label="Try these example questions! 👇"
     )
     
     gr.Markdown("---")
-    gr.Markdown("💡 **Tip:** Ask simple questions and I'll explain in a way that's easy to understand!")
+    gr.Markdown("""
+    💡 **Tips for best results:**
+    - Ask clear, simple questions
+    - One topic at a time works best
+    - Perfect for grades K-5!
+    
+    🚀 **Powered by:** [Groq](https://groq.com) + Llama 3.3 70B  
+    🎮 **Part of:** [Learnverse](https://github.com/yourusername/Learnverse) - The ultimate learning platform for kids!
+    """)
 
 if __name__ == "__main__":
     demo.launch(server_name="0.0.0.0", server_port=7860, share=False)

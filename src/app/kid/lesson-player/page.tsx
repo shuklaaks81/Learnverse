@@ -102,6 +102,30 @@ export default function LessonPlayer() {
         localStorage.setItem(`kid_${kid.kidId}_completedGeneratedLessons`, JSON.stringify(completedLessons));
       }
       
+      // If this lesson came from the map, track it there too
+      if ((lesson as any).nodeId) {
+        const completedMapLessons = JSON.parse(localStorage.getItem(`kid_${kid.kidId}_completedMapLessons`) || '[]');
+        if (!completedMapLessons.includes((lesson as any).nodeId)) {
+          completedMapLessons.push((lesson as any).nodeId);
+          localStorage.setItem(`kid_${kid.kidId}_completedMapLessons`, JSON.stringify(completedMapLessons));
+        }
+      }
+      
+      // If this lesson came from a unit, track it there too
+      if ((lesson as any).unitLessonId) {
+        const completedUnitLessons = JSON.parse(localStorage.getItem(`kid_${kid.kidId}_completedUnitLessons`) || '[]');
+        if (!completedUnitLessons.includes((lesson as any).unitLessonId)) {
+          completedUnitLessons.push((lesson as any).unitLessonId);
+          localStorage.setItem(`kid_${kid.kidId}_completedUnitLessons`, JSON.stringify(completedUnitLessons));
+        }
+        
+        // Check if unit is complete and mark it
+        if ((lesson as any).unitId) {
+          const unitId = (lesson as any).unitId;
+          // This will be checked on the unit page to show completion
+        }
+      }
+      
       // Add coins
       const currentCoins = parseInt(localStorage.getItem(`kid_${kid.kidId}_coins`) || '0');
       localStorage.setItem(`kid_${kid.kidId}_coins`, (currentCoins + coins).toString());
@@ -237,12 +261,36 @@ export default function LessonPlayer() {
               <div className="text-3xl font-bold text-yellow-600">+{currentActivityData.data.starsEarned} Stars!</div>
             </div>
             <div className="flex gap-4 justify-center">
-              <button
-                onClick={() => router.push('/kid/lesson-generator')}
-                className="px-12 py-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl font-bold text-2xl hover:scale-110 transition-all shadow-2xl"
-              >
-                Create Another ✨
-              </button>
+              {(searchParams && searchParams.get('source') === 'map') ? (
+                <button
+                  onClick={() => router.push('/kid/lesson-map')}
+                  className="px-12 py-6 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-2xl font-bold text-2xl hover:scale-110 transition-all shadow-2xl"
+                >
+                  🗺️ Back to Map
+                </button>
+              ) : (searchParams && searchParams.get('source') === 'unit') ? (
+                <button
+                  onClick={() => {
+                    // Go back to the unit page
+                    const unitId = (lesson as any)?.unitId;
+                    if (unitId) {
+                      router.push(`/kid/unit-map/${unitId}`);
+                    } else {
+                      router.push('/kid/unit-map');
+                    }
+                  }}
+                  className="px-12 py-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl font-bold text-2xl hover:scale-110 transition-all shadow-2xl"
+                >
+                  📚 Back to Unit
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push('/kid/lesson-generator')}
+                  className="px-12 py-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl font-bold text-2xl hover:scale-110 transition-all shadow-2xl"
+                >
+                  Create Another ✨
+                </button>
+              )}
               <button
                 onClick={() => router.push('/kid')}
                 className="px-12 py-6 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-2xl font-bold text-2xl hover:scale-110 transition-all shadow-2xl"

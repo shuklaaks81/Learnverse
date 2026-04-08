@@ -5,11 +5,24 @@ import { useRouter } from 'next/navigation';
 import { useSoundEffects } from '@/utils/soundEffects';
 import { useDeviceDetection } from '@/utils/deviceDetection';
 
+const UI_OPTIONS = [
+  { label: 'Normal', value: 'original' },
+  { label: 'Premium', value: 'premium' },
+];
+
+const VERSION_OPTIONS = [
+  { label: 'Original', value: 'original' },
+  { label: 'Premium', value: 'premium' },
+  // Add more versions here if needed
+];
+
 export default function KidLogin() {
   const [familyName, setFamilyName] = useState('');
   const [kidName, setKidName] = useState('');
   const [error, setError] = useState('');
   const [isPremium, setIsPremium] = useState(false);
+  const [selectedUI, setSelectedUI] = useState('original');
+  const [selectedVersion, setSelectedVersion] = useState('original');
   const router = useRouter();
   const soundEffects = useSoundEffects();
   const deviceInfo = useDeviceDetection();
@@ -19,14 +32,16 @@ export default function KidLogin() {
     if (typeof window !== 'undefined') {
       const version = localStorage.getItem('learnverseVersion') || 'original';
       setIsPremium(version === 'premium');
-      
+      setSelectedUI(version === 'premium' ? 'premium' : 'original');
+      setSelectedVersion(version);
+
       // Check if there are multiple accounts - redirect to selector
       const kidAccounts = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
       if (kidAccounts.length > 1) {
         router.push('/kid/kid-selector');
         return;
       }
-      
+
       // Auto-redirect if already logged in
       const currentKid = localStorage.getItem('currentKid');
       if (currentKid && currentKid !== '{}') {
@@ -42,6 +57,45 @@ export default function KidLogin() {
     if (familyName.trim() === '' || kidName.trim() === '') {
       setError('Please enter both Family Name and Your Name');
       soundEffects?.playWrong();
+      return;
+    }
+
+    // 🔐 SECRET OWNER MODE DETECTION! 🔐
+    if (kidName.trim().toLowerCase() === 'owner_of_app') {
+      // UNLOCK OWNER POWERS! 
+      localStorage.setItem('ownerModeUnlocked', 'true');
+      localStorage.setItem('isSecretOwner', 'true');
+      soundEffects?.playCorrect();
+      
+      // Show special message
+      const ownerKid = {
+        kidId: 'owner-' + Date.now(),
+        kidName: '👑 OWNER',
+        familyName: familyName,
+        name: '👑 OWNER',
+        avatar: '👑',
+        coins: 999999,
+        streak: 999,
+        level: 100,
+        xp: 999999,
+        achievements: [],
+        completedLessons: []
+      };
+      
+      localStorage.setItem('currentKid', JSON.stringify(ownerKid));
+      
+      // Add to kid accounts if not exists
+      const existingKids = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
+      if (!existingKids.find((k: any) => k.kidId === ownerKid.kidId)) {
+        existingKids.push(ownerKid);
+        localStorage.setItem('kidAccounts', JSON.stringify(existingKids));
+      }
+      
+      alert('🔓 SECRET OWNER MODE UNLOCKED! 👑\n\nYou now have:\n✨ Infinite coins\n🔥 999 streak\n⚡ Level 100\n🎯 Access to owner dashboard!\n\nPress I for special features!');
+      
+      setTimeout(() => {
+        router.push('/kid'); // Go to kid dashboard with owner powers!
+      }, 500);
       return;
     }
 
@@ -88,6 +142,46 @@ export default function KidLogin() {
   const containerMaxWidth = deviceInfo.screenSize === 'large' ? 'max-w-2xl' : 'max-w-md';
 
   // PREMIUM FUTURISTIC LOGIN! 🚀✨
+  // UI/Version selectors (shared)
+  const renderSelectors = () => (
+    <div className="mb-6 flex flex-col md:flex-row gap-4 items-center justify-center">
+      <div>
+        <label className="block text-xs font-bold text-purple-300 mb-1">Choose UI Style:</label>
+        <select
+          value={selectedUI}
+          onChange={e => {
+            const val = e.target.value;
+            setSelectedUI(val);
+            localStorage.setItem('learnverseVersion', val);
+            window.location.reload();
+          }}
+          className="px-3 py-2 rounded-lg border border-purple-300 bg-white/20 text-purple-700 font-bold"
+        >
+          {UI_OPTIONS.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label className="block text-xs font-bold text-cyan-300 mb-1">Choose Version:</label>
+        <select
+          value={selectedVersion}
+          onChange={e => {
+            const val = e.target.value;
+            setSelectedVersion(val);
+            localStorage.setItem('learnverseVersion', val);
+            window.location.reload();
+          }}
+          className="px-3 py-2 rounded-lg border border-cyan-300 bg-white/20 text-cyan-700 font-bold"
+        >
+          {VERSION_OPTIONS.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+
   if (isPremium) {
     return (
       <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
@@ -141,6 +235,7 @@ export default function KidLogin() {
             <div className="absolute bottom-0 right-0 w-20 h-20 bg-gradient-radial from-green-400/50 to-transparent animate-pulse" style={{animationDelay: '1.5s'}} />
 
             <div className="relative z-10">
+              {renderSelectors()}
               <div className="text-center mb-8">
                 <h1 className="text-5xl font-bold mb-2 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-glow-text">
                   Welcome Back! 🚀
@@ -229,6 +324,7 @@ export default function KidLogin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-400 via-orange-300 to-pink-300 flex items-center justify-center p-4">
       <div className={`${containerMaxWidth} w-full bg-white rounded-3xl shadow-2xl p-8`}>
+        {renderSelectors()}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Welcome Back! 👋</h1>
           <p className="text-gray-600">Enter your Family Name and Name</p>

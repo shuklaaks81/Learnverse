@@ -1,7 +1,38 @@
 {
-  "latestVersion": "2.0.0",
-  "releaseDate": "2026-03-20",
+  "latestVersion": "2.1.0",
+  "releaseDate": "2026-04-08",
   "changelog": {
+    "🚀 SPACE MODE - Artemis 2 Tribute! 🌌": [
+      "🌟 200 twinkling stars with realistic glow effects",
+      "🪐 Floating planets (Saturn, Earth, Moon) drifting across space",
+      "🚀 Rocket ships and UFOs flying by",
+      "👨‍🚀 Astronauts floating in zero gravity",
+      "☄️ Shooting stars and meteors with light trails",
+      "🌌 Beautiful nebula effects with purple/blue/pink cosmic clouds",
+      "🎯 Special Artemis 2 rocket easter egg appears after 5 seconds!",
+      "💫 Deep space gradient background (black to indigo to purple)",
+      "🎮 Toggle on/off from main hub - works with other modes!"
+    ],
+    "⚡ ANTI-LAG PERFORMANCE SYSTEM 💨": [
+      "📊 Real-time FPS monitoring with live counter",
+      "🤖 Auto Quality Mode - adjusts settings based on your FPS",
+      "🐢 Low Quality: 50 stars, essential objects only",
+      "⚙️ Medium Quality: 100 stars, most effects enabled",
+      "⚡ High Quality: 200 stars, all effects at max",
+      "🎮 Performance widget - click to see stats and change modes",
+      "🎯 Smart object pooling - priorities for different quality levels",
+      "✨ Conditional effects - blur/shadows disabled when lagging",
+      "🚀 Optimized React components with memoization",
+      "💾 Saves your performance preference to localStorage"
+    ],
+    "🏃 LOGIN PAGE SPEED BOOST": [
+      "⚡ Removed heavy animations from login/welcome pages",
+      "🌊 Ocean effects now only load on main app pages",
+      "🎵 Audio files skip on login for instant loading",
+      "🚀 Login page is now INSTANT - no more lag!",
+      "✅ Faster account switching and selector pages",
+      "💨 Overall app feels snappier everywhere"
+    ],
     "🎉 THIS IS THE BIGGEST UPDATE OF ALL TIME!!!": [
       "🤖 AI LESSON GENERATOR - Generate unlimited interactive lessons in ~10 seconds using FREE Groq AI!",
       "🎓 REAL TEACHING - New teaching component that actually TEACHES concepts before practicing them",

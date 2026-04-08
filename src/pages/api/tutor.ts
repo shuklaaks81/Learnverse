@@ -5,6 +5,7 @@ import { tutorAgent } from '@/agents/tutor.agent';
  * API Routes:
  * POST /api/tutor - Student asks a question, tutor responds
  * GET /api/tutor/stats - Get tutor agent statistics
+ * DELETE /api/tutor - Clear conversation history for a student
  */
 
 type ResponseData = {
@@ -93,6 +94,32 @@ export default async function handler(
       console.error('[API /tutor/stats] Error:', error);
       return res.status(500).json({
         error: 'Failed to get statistics',
+      });
+    }
+  }
+
+  // Handle DELETE /api/tutor - Clear conversation history
+  if (req.method === 'DELETE') {
+    try {
+      const { studentId } = req.body;
+      
+      if (!studentId || typeof studentId !== 'string') {
+        return res.status(400).json({
+          error: 'Missing or invalid studentId parameter',
+        });
+      }
+      
+      tutorAgent.clearHistory(studentId);
+      
+      console.log(`[API /tutor] Cleared history for student: ${studentId}`);
+      
+      return res.status(200).json({
+        message: 'Conversation history cleared! 🧹 Starting fresh!',
+      });
+    } catch (error) {
+      console.error('[API /tutor] Clear history error:', error);
+      return res.status(500).json({
+        error: 'Failed to clear history',
       });
     }
   }

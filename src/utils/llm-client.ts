@@ -1,7 +1,7 @@
 /**
  * LLM Client Utility
- * Handles API calls to Hugging Face Inference API (free tier)
- * Supports Llama 2 7B for tutor agent
+ * Handles API calls to Groq API (super fast inference!)
+ * Supports Llama 3, Mixtral, and more
  */
 
 interface LLMRequest {
@@ -21,11 +21,11 @@ interface LLMResponse {
 
 export class LLMClient {
   private apiKey: string;
-  private baseUrl: string = 'https://api-inference.huggingface.co/models';
+  private baseUrl: string = 'https://api.groq.com/openai/v1/chat/completions';
   private cache: Map<string, LLMResponse>;
 
   constructor(apiKey?: string) {
-    this.apiKey = apiKey || process.env.HUGGINGFACE_API_KEY || '';
+    this.apiKey = apiKey || process.env.GROQ_API_KEY || '';
     this.cache = new Map();
   }
 
@@ -43,25 +43,31 @@ export class LLMClient {
       return { ...cached, cached: true };
     }
 
-    // Build prompt with system context
-    const fullPrompt = request.systemPrompt 
-      ? `${request.systemPrompt}\n\n${request.prompt}`
-      : request.prompt;
+    // Build messages array for chat format
+    const messages = [];
+    if (request.systemPrompt) {
+      messages.push({
+        role: 'system',
+        content: request.systemPrompt
+      });
+    }
+    messages.push({
+      role: 'user',
+      content: request.prompt
+    });
 
     try {
-      const response = await fetch(`${this.baseUrl}/${request.model}`, {
+      const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          inputs: fullPrompt,
-          parameters: {
-            temperature: request.temperature || 0.7,
-            max_new_tokens: request.maxTokens || 500,
-            return_full_text: false,
-          },
+          model: request.model,
+          messages: messages,
+          temperature: request.temperature || 0.7,
+          max_tokens: request.maxTokens || 500,
         }),
       });
 
@@ -70,10 +76,10 @@ export class LLMClient {
       }
 
       const data = await response.json();
-      const text = Array.isArray(data) ? data[0]?.generated_text : data.generated_text;
+      const text = data.choices?.[0]?.message?.content || '';
 
       const result: LLMResponse = {
-        text: text || '',
+        text: text,
         cached: false,
         model: request.model,
         timestamp: Date.now(),
@@ -117,11 +123,12 @@ export class LLMClient {
 // Pre-configured clients for common models
 export const tutorLLM = new LLMClient();
 
-// Model constants
+// Groq model constants (super fast!)
 export const MODELS = {
-  LLAMA_2_7B: 'meta-llama/Llama-2-7b-chat-hf',
-  MISTRAL_7B: 'mistralai/Mistral-7B-Instruct-v0.1',
-  CODELLAMA: 'codellama/CodeLlama-7b-hf',
+  LLAMA3_70B: 'llama3-70b-8192',      // Best for complex reasoning
+  LLAMA3_8B: 'llama3-8b-8192',        // Fast and efficient
+  MIXTRAL: 'mixtral-8x7b-32768',      // Great for creative tasks
+  GEMMA_7B: 'gemma-7b-it',            // Good general model
 } as const;
 
 // Default prompts for different agent types
