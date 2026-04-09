@@ -10,6 +10,18 @@ export default function TeacherPage() {
   const [teacherName, setTeacherName] = useState('');
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  
+  // Assignment creation states
+  const [assignmentTitle, setAssignmentTitle] = useState('');
+  const [assignmentSubject, setAssignmentSubject] = useState('Math');
+  const [assignmentTimeLimit, setAssignmentTimeLimit] = useState('30');
+  const [assignmentDueDate, setAssignmentDueDate] = useState('');
+  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  
+  const allStudents = [
+    'Alex Johnson', 'Sarah Lee', 'Mike Chen', 'Emily Davis',
+    'James Wilson', 'Sophia Martinez', 'Oliver Brown', 'Emma Garcia'
+  ];
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -40,6 +52,52 @@ export default function TeacherPage() {
     localStorage.removeItem('teacherLoggedIn');
     setIsLoggedIn(false);
     setTeacherName('');
+  };
+  
+  const toggleStudent = (student: string) => {
+    setSelectedStudents(prev => 
+      prev.includes(student) 
+        ? prev.filter(s => s !== student)
+        : [...prev, student]
+    );
+  };
+  
+  const handleSendAssignment = () => {
+    if (!assignmentTitle || selectedStudents.length === 0) {
+      alert('⚠️ Please fill in title and select at least one student!');
+      return;
+    }
+    
+    const assignment = {
+      id: Date.now(),
+      title: assignmentTitle,
+      subject: assignmentSubject,
+      timeLimit: parseInt(assignmentTimeLimit),
+      dueDate: assignmentDueDate,
+      students: selectedStudents,
+      sentBy: teacherName,
+      sentAt: new Date().toISOString()
+    };
+    
+    // Save to localStorage
+    const existingAssignments = JSON.parse(localStorage.getItem('teacherAssignments') || '[]');
+    existingAssignments.push(assignment);
+    localStorage.setItem('teacherAssignments', JSON.stringify(existingAssignments));
+    
+    // Send notification to each student
+    selectedStudents.forEach(student => {
+      const studentAssignments = JSON.parse(localStorage.getItem(`student_${student}_assignments`) || '[]');
+      studentAssignments.push(assignment);
+      localStorage.setItem(`student_${student}_assignments`, JSON.stringify(studentAssignments));
+    });
+    
+    alert(`✅ Assignment sent to ${selectedStudents.length} student(s)!\n\n"${assignmentTitle}" - ${assignmentSubject}\nTime limit: ${assignmentTimeLimit} minutes`);
+    
+    // Reset form
+    setAssignmentTitle('');
+    setAssignmentTimeLimit('30');
+    setAssignmentDueDate('');
+    setSelectedStudents([]);
   };
 
   if (!isLoggedIn) {
@@ -180,36 +238,108 @@ export default function TeacherPage() {
         </div>
 
         {/* Create Assignment */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border-2 border-purple-200 hover:shadow-2xl transition-shadow">
-          <h2 className="text-2xl font-bold text-purple-600 mb-4">📝 Create Assignment</h2>
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border-2 border-purple-200 hover:shadow-2xl transition-shadow md:col-span-2">
+          <h2 className="text-2xl font-bold text-purple-600 mb-4">📝 Create & Send Assignment</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Assignment Title</label>
+              <label className="block text-gray-700 font-semibold mb-2">📚 Assignment Title</label>
               <input
                 type="text"
+                value={assignmentTitle}
+                onChange={(e) => setAssignmentTitle(e.target.value)}
                 className="w-full px-4 py-2 rounded-xl border-2 border-purple-300 focus:border-purple-600 focus:outline-none"
                 placeholder="Math Quiz Chapter 5"
               />
             </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2">📖 Subject</label>
+                <select 
+                  value={assignmentSubject}
+                  onChange={(e) => setAssignmentSubject(e.target.value)}
+                  className="w-full px-4 py-2 rounded-xl border-2 border-purple-300 focus:border-purple-600 focus:outline-none"
+                >
+                  <option>Math</option>
+                  <option>Science</option>
+                  <option>English</option>
+                  <option>History</option>
+                  <option>Art</option>
+                  <option>Music</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2">⏱️ Time Limit (minutes)</label>
+                <input
+                  type="number"
+                  value={assignmentTimeLimit}
+                  onChange={(e) => setAssignmentTimeLimit(e.target.value)}
+                  className="w-full px-4 py-2 rounded-xl border-2 border-purple-300 focus:border-purple-600 focus:outline-none"
+                  placeholder="30"
+                  min="5"
+                  max="180"
+                />
+              </div>
+            </div>
+            
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Due Date</label>
+              <label className="block text-gray-700 font-semibold mb-2">📅 Due Date</label>
               <input
                 type="date"
+                value={assignmentDueDate}
+                onChange={(e) => setAssignmentDueDate(e.target.value)}
                 className="w-full px-4 py-2 rounded-xl border-2 border-purple-300 focus:border-purple-600 focus:outline-none"
               />
             </div>
+            
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Subject</label>
-              <select className="w-full px-4 py-2 rounded-xl border-2 border-purple-300 focus:border-purple-600 focus:outline-none">
-                <option>Math</option>
-                <option>Science</option>
-                <option>English</option>
-                <option>History</option>
-              </select>
+              <label className="block text-gray-700 font-semibold mb-2">
+                👨‍🎓 Select Students ({selectedStudents.length} selected)
+              </label>
+              <div className="bg-purple-50 rounded-xl p-4 max-h-48 overflow-y-auto border-2 border-purple-200">
+                <div className="grid grid-cols-2 gap-2">
+                  {allStudents.map(student => (
+                    <label 
+                      key={student}
+                      className={`flex items-center p-2 rounded-lg cursor-pointer transition-colors ${
+                        selectedStudents.includes(student) 
+                          ? 'bg-purple-200 border-2 border-purple-500' 
+                          : 'bg-white border-2 border-gray-200 hover:bg-purple-100'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedStudents.includes(student)}
+                        onChange={() => toggleStudent(student)}
+                        className="mr-2 w-4 h-4"
+                      />
+                      <span className="text-sm font-medium">{student}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-2 flex gap-2">
+                <button
+                  onClick={() => setSelectedStudents(allStudents)}
+                  className="flex-1 bg-purple-100 hover:bg-purple-200 text-purple-700 font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
+                >
+                  ✅ Select All
+                </button>
+                <button
+                  onClick={() => setSelectedStudents([])}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
+                >
+                  ❌ Clear All
+                </button>
+              </div>
             </div>
           </div>
-          <button className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl transition-all">
-            🚀 Create Assignment
+          <button 
+            onClick={handleSendAssignment}
+            className="w-full mt-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-105 shadow-lg"
+          >
+            📤 Send Assignment to {selectedStudents.length} Student{selectedStudents.length !== 1 ? 's' : ''}
           </button>
         </div>
 
