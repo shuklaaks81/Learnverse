@@ -45,6 +45,7 @@ interface FloatingObject {
 
 export function SpaceBackground() {
   const [showArtemis, setShowArtemis] = useState(false);
+  const [showArtemisInfo, setShowArtemisInfo] = useState(false);
   const { settings } = usePerformance();
 
   // Generate stars based on performance settings
@@ -145,7 +146,7 @@ export function SpaceBackground() {
         return (
           <div
             key={obj.id}
-            className={`absolute ${animationClass}`}
+            className={`absolute ${animationClass} ${obj.type === 'artemis' ? 'cursor-pointer hover:scale-125 transition-transform z-50' : ''}`}
             style={{
               left: `${obj.x}%`,
               top: `${obj.y}%`,
@@ -157,12 +158,13 @@ export function SpaceBackground() {
                 ? 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.5))' 
                 : 'none'
             }}
+            onClick={() => obj.type === 'artemis' && setShowArtemisInfo(true)}
           >
             {obj.emoji}
             {/* Special Artemis 2 label */}
             {obj.type === 'artemis' && showArtemis && (
-              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap text-xs font-bold text-yellow-300 bg-black/50 px-2 py-1 rounded animate-pulse">
-                ARTEMIS 2 🌙
+              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap text-xs font-bold text-yellow-300 bg-black/50 px-2 py-1 rounded animate-pulse pointer-events-none">
+                ARTEMIS 2 🌙 (Click me!)
               </div>
             )}
           </div>
@@ -185,6 +187,137 @@ export function SpaceBackground() {
       )}
 
       {/* Styles for animations */}
+      {/* ARTEMIS 2 Mission Info Modal */}
+      {showArtemisInfo && (
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowArtemisInfo(false)}
+        >
+          <div 
+            className="bg-gradient-to-br from-indigo-950 via-purple-900 to-black border-4 border-yellow-500 rounded-3xl p-8 max-w-3xl max-h-[90vh] overflow-y-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              boxShadow: '0 0 60px rgba(234, 179, 8, 0.6), inset 0 0 40px rgba(139, 92, 246, 0.2)'
+            }}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowArtemisInfo(false)}
+              className="absolute top-4 right-4 text-3xl hover:scale-125 transition-transform bg-red-600 hover:bg-red-500 w-10 h-10 rounded-full flex items-center justify-center"
+            >
+              ✕
+            </button>
+
+            {/* Header */}
+            <div className="text-center mb-6">
+              <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 mb-2 animate-pulse">
+                🚀 ARTEMIS II MISSION 🌙
+              </h1>
+              <p className="text-xl text-yellow-300 font-bold">Humanity Returns to the Moon!</p>
+            </div>
+
+            {/* Mission patch */}
+            <div className="flex justify-center mb-6">
+              <div className="text-9xl animate-bounce">🚀</div>
+            </div>
+
+            {/* Mission details */}
+            <div className="bg-black/40 rounded-2xl p-6 mb-4 border border-purple-500/30">
+              <h2 className="text-2xl font-bold text-yellow-400 mb-4">📋 Mission Overview</h2>
+              <div className="space-y-3 text-white">
+                <p className="text-lg">
+                  <span className="font-bold text-yellow-300">🗓️ Launch:</span> September 2025 (planned)
+                </p>
+                <p className="text-lg">
+                  <span className="font-bold text-yellow-300">🧑‍🚀 Crew:</span> 4 astronauts
+                </p>
+                <p className="text-lg">
+                  <span className="font-bold text-yellow-300">⏱️ Duration:</span> ~10 days
+                </p>
+                <p className="text-lg">
+                  <span className="font-bold text-yellow-300">🎯 Goal:</span> First crewed mission to the Moon in over 50 years!
+                </p>
+              </div>
+            </div>
+
+            {/* The Crew */}
+            <div className="bg-black/40 rounded-2xl p-6 mb-4 border border-purple-500/30">
+              <h2 className="text-2xl font-bold text-yellow-400 mb-4">👨‍🚀 The Crew</h2>
+              <div className="grid grid-cols-2 gap-4 text-white">
+                <div className="bg-purple-900/30 p-4 rounded-xl">
+                  <div className="text-4xl mb-2">👨‍🚀</div>
+                  <div className="font-bold">Reid Wiseman</div>
+                  <div className="text-sm text-gray-300">Commander</div>
+                </div>
+                <div className="bg-purple-900/30 p-4 rounded-xl">
+                  <div className="text-4xl mb-2">👨‍🚀</div>
+                  <div className="font-bold">Victor Glover</div>
+                  <div className="text-sm text-gray-300">Pilot</div>
+                </div>
+                <div className="bg-purple-900/30 p-4 rounded-xl">
+                  <div className="text-4xl mb-2">👩‍🚀</div>
+                  <div className="font-bold">Christina Koch</div>
+                  <div className="text-sm text-gray-300">Mission Specialist</div>
+                </div>
+                <div className="bg-purple-900/30 p-4 rounded-xl">
+                  <div className="text-4xl mb-2">👨‍🚀</div>
+                  <div className="font-bold">Jeremy Hansen</div>
+                  <div className="text-sm text-gray-300">Mission Specialist (CSA)</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Cool Facts */}
+            <div className="bg-black/40 rounded-2xl p-6 mb-4 border border-purple-500/30">
+              <h2 className="text-2xl font-bold text-yellow-400 mb-4">🤯 Cool Facts!</h2>
+              <div className="space-y-3 text-white">
+                <p className="flex items-start">
+                  <span className="text-2xl mr-3">🌙</span>
+                  <span>First crewed lunar flyby since Apollo 17 in 1972!</span>
+                </p>
+                <p className="flex items-start">
+                  <span className="text-2xl mr-3">👩‍🚀</span>
+                  <span>Christina Koch will be the first woman to fly to the Moon!</span>
+                </p>
+                <p className="flex items-start">
+                  <span className="text-2xl mr-3">🚀</span>
+                  <span>Using the new Orion spacecraft - way more advanced than Apollo!</span>
+                </p>
+                <p className="flex items-start">
+                  <span className="text-2xl mr-3">🇨🇦</span>
+                  <span>Jeremy Hansen will be the first Canadian to travel to the Moon!</span>
+                </p>
+                <p className="flex items-start">
+                  <span className="text-2xl mr-3">🎯</span>
+                  <span>This mission paves the way for Artemis 3 - the Moon LANDING!</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Timeline */}
+            <div className="bg-black/40 rounded-2xl p-6 border border-purple-500/30">
+              <h2 className="text-2xl font-bold text-yellow-400 mb-4">📅 Artemis Program Timeline</h2>
+              <div className="space-y-2 text-white">
+                <p><span className="font-bold text-green-400">✅ Artemis I (2022):</span> Uncrewed test flight - Success!</p>
+                <p><span className="font-bold text-yellow-400">🚀 Artemis II (2025):</span> Crewed lunar flyby - YOU ARE HERE!</p>
+                <p><span className="font-bold text-blue-400">🌙 Artemis III (2026):</span> First crewed Moon landing since 1972!</p>
+                <p><span className="font-bold text-purple-400">🏗️ Artemis IV+ (2028+):</span> Building a permanent Moon base!</p>
+              </div>
+            </div>
+
+            {/* Close button at bottom */}
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => setShowArtemisInfo(false)}
+                className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-400 hover:to-orange-500 text-white font-bold text-xl px-10 py-4 rounded-full transition-all transform hover:scale-110 shadow-xl"
+              >
+                🚀 Back to Space! 🌟
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style jsx>{`
         @keyframes twinkle {
           0%, 100% { opacity: 0.3; }
