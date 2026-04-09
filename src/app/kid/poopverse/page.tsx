@@ -16,6 +16,9 @@ export default function Poopverse() {
     size: number;
   }>>([]);
   const [showMessage, setShowMessage] = useState(false);
+  const [poopClicks, setPoopClicks] = useState(0);
+  const [showPopee, setShowPopee] = useState(false);
+  const [popeeAnimation, setPopeeAnimation] = useState('idle');
 
   useEffect(() => {
     // Generate 3D flying poops with depth
@@ -56,6 +59,29 @@ export default function Poopverse() {
     playFlush();
   }, []);
 
+  // Handle poop clicks to reveal Popee
+  const handlePoopClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newClicks = poopClicks + 1;
+    setPoopClicks(newClicks);
+    
+    // Play click sound
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    oscillator.frequency.value = 800 + (newClicks * 100);
+    gainNode.gain.value = 0.1;
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.1);
+    
+    if (newClicks >= 5 && !showPopee) {
+      setShowPopee(true);
+      setTimeout(() => setPopeeAnimation('dance'), 500);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-950 via-yellow-900 to-orange-950 overflow-hidden relative" style={{ perspective: '1000px' }}>
       {/* Premium gradient overlay */}
@@ -65,7 +91,8 @@ export default function Poopverse() {
       {poops.map((poop) => (
         <div
           key={poop.id}
-          className="absolute text-6xl"
+          onClick={handlePoopClick}
+          className="absolute text-6xl cursor-pointer hover:scale-125 transition-transform"
           style={{
             left: `${poop.x}%`,
             top: `${poop.y}%`,
@@ -195,6 +222,47 @@ export default function Poopverse() {
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
           </button>
         </div>
+
+        {/* 🎪 POPEE THE PERFORMER SECRET! 🎪 */}
+        {showPopee && (
+          <div className={`mt-8 transition-all duration-1000 ${popeeAnimation === 'dance' ? 'animate-bounce' : ''}`}>
+            <div className="bg-gradient-to-br from-red-600/90 to-pink-700/90 backdrop-blur-xl p-8 rounded-3xl border-2 border-red-400/50 shadow-2xl">
+              <div className="text-center space-y-4">
+                <div className="text-8xl mb-4 animate-spin" style={{ animationDuration: '2s' }}>🎪</div>
+                <h2 className="text-4xl font-black text-white drop-shadow-lg">
+                  POPEE HAS APPEARED!
+                </h2>
+                <p className="text-xl text-red-100">
+                  (Pronounced &quot;PO-PEE&quot; not &quot;POO-PEE&quot;!)
+                </p>
+                <div className="text-6xl my-6">🤡✨</div>
+                <p className="text-lg text-white">
+                  You clicked {poopClicks} poops and summoned the legendary circus performer!
+                </p>
+                <div className="bg-black/40 p-6 rounded-2xl border border-red-500/30 mt-4">
+                  <p className="text-yellow-300 font-bold text-xl mb-2">🎭 Popee says:</p>
+                  <p className="text-white italic">&quot;Welcome to the POOPVERSE circus! 
+                  Where the poops are flying and the fun never stops! 💩🎪&quot;</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setPopeeAnimation(popeeAnimation === 'dance' ? 'spin' : 'dance');
+                  }}
+                  className="mt-4 bg-gradient-to-r from-pink-500 to-red-600 text-white px-8 py-3 rounded-full font-bold hover:scale-110 transition-transform shadow-lg"
+                >
+                  🎪 Make Popee Dance!
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Poop click progress hint */}
+        {!showPopee && poopClicks > 0 && (
+          <p className="text-yellow-400/80 text-lg mt-8 animate-pulse">
+            💩 Clicked {poopClicks}/5 poops... something&apos;s happening! 🎪
+          </p>
+        )}
 
         {/* Premium secret hint */}
         <p className="text-yellow-600/60 text-sm mt-12 italic backdrop-blur-sm bg-black/20 px-6 py-3 rounded-full border border-yellow-700/20">
