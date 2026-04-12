@@ -370,6 +370,122 @@ export default function Bloxd3DPage() {
     }));
   };
 
+  // Ray cast to find block player is looking at
+  const getTargetBlock = (): { x: number; y: number; z: number } | null => {
+    const maxDistance = 5;
+    const step = 0.1;
+    
+    for (let d = 0; d < maxDistance; d += step) {
+      const targetX = player.x + Math.sin(player.rotationY) * Math.cos(player.rotationX) * d;
+      const targetY = player.y + Math.sin(-player.rotationX) * d;
+      const targetZ = player.z + Math.cos(player.rotationY) * Math.cos(player.rotationX) * d;
+      
+      const blockX = Math.floor(targetX);
+      const blockY = Math.floor(targetY);
+      const blockZ = Math.floor(targetZ);
+      
+      if (blockX >= 0 && blockX < worldSize.x &&
+          blockY >= 0 && blockY < worldSize.y &&
+          blockZ >= 0 && blockZ < worldSize.z) {
+        const block = world[blockX]?.[blockY]?.[blockZ];
+        if (block && block.type !== "air") {
+          return { x: blockX, y: blockY, z: blockZ };
+        }
+      }
+    }
+    return null;
+  };
+
+  // Break block
+  const breakBlock = () => {
+    const target = getTargetBlock();
+    if (!target) return;
+    
+    const block = world[target.x]?.[target.y]?.[target.z];
+    if (!block || block.type === "bedrock") return;
+    
+    // Add to inventory
+    const blockType = block.type.replace("_ore", "");
+    setPlayer(p => ({
+      ...p,
+      inventory: {
+        ...p.inventory,
+        [blockType]: (p.inventory[blockType] || 0) + 1,
+      },
+    }));
+    
+    // Remove block
+    setWorld(w => {
+      const newWorld = [...w];
+      newWorld[target.x][target.y][target.z] = { 
+        type: "air", 
+        x: target.x, 
+        y: target.y, 
+        z: target.z 
+      };
+      return newWorld;
+    });
+  };
+
+  // Place block
+  const placeBlock = () => {
+    const target = getTargetBlock();
+    if (!target) return;
+    
+    // Find adjacent air block to place in
+    const directions = [
+      { x: 1, y: 0, z: 0 }, { x: -1, y: 0, z: 0 },
+      { x: 0, y: 1, z: 0 }, { x: 0, y: -1, z: 0 },
+      { x: 0, y: 0, z: 1 }, { x: 0, y: 0, z: -1 },
+    ];
+    
+    for (const dir of directions) {
+      const placeX = target.x + dir.x;
+      const placeY = target.y + dir.y;
+      const placeZ = target.z + dir.z;
+      
+      if (placeX >= 0 && placeX < worldSize.x &&
+          placeY >= 0 && placeY < worldSize.y &&
+          placeZ >= 0 && placeZ < worldSize.z) {
+        const block = world[placeX]?.[placeY]?.[placeZ];
+        if (block?.type === "air") {
+          // Check if player has blocks
+          const hasStone = (player.inventory.stone || 0) > 0;
+          const hasDirt = (player.inventory.dirt || 0) > 0;
+          
+          let blockType: BlockType = "stone";
+          if (hasStone) {
+            blockType = "stone";
+            setPlayer(p => ({
+              ...p,
+              inventory: { ...p.inventory, stone: p.inventory.stone - 1 },
+            }));
+          } else if (hasDirt) {
+            blockType = "dirt";
+            setPlayer(p => ({
+              ...p,
+              inventory: { ...p.inventory, dirt: p.inventory.dirt - 1 },
+            }));
+          } else {
+            return; // No blocks to place
+          }
+          
+          setWorld(w => {
+            const newWorld = [...w];
+            newWorld[placeX][placeY][placeZ] = {
+              type: blockType,
+              x: placeX,
+              y: placeY,
+              z: placeZ,
+            };
+            return newWorld;
+          });
+          return;
+        }
+      }
+    }
+  };
+
   // Key handlers
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -446,14 +562,10 @@ export default function Bloxd3DPage() {
         height={800}
         className="w-full h-full cursor-none"
         onMouseMove={handleMouseMove}
-        onClick={() => {
-          // Break block logic here
-          console.log("Break block!");
-        }}
+        onClick={breakBlock}
         onContextMenu={(e) => {
           e.preventDefault();
-          // Place block logic here
-          console.log("Place block!");
+          placeBlock();
         }}
       />
       
