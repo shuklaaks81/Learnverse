@@ -116,23 +116,8 @@ export default function Bloxd3DPage() {
           else if (y > 12 && y < 18 && Math.random() < 0.008 && type === "air") {
             if (newWorld[x][12] && newWorld[x][12][z]?.type === "grass") {
               type = "wood";
-              // Add leaves on top
-              if (y >= 15) {
-                for (let lx = -1; lx <= 1; lx++) {
-                  for (let lz = -1; lz <= 1; lz++) {
-                    for (let ly = 0; ly <= 2; ly++) {
-                      if (x + lx >= 0 && x + lx < worldSize.x && 
-                          z + lz >= 0 && z + lz < worldSize.z &&
-                          y + ly < worldSize.y) {
-                        if (!newWorld[x + lx][y + ly]) newWorld[x + lx][y + ly] = [];
-                        if (Math.random() < 0.7) {
-                          newWorld[x + lx][y + ly][z + lz] = { type: "leaves", x: x + lx, y: y + ly, z: z + lz };
-                        }
-                      }
-                    }
-                  }
-                }
-              }
+              // Add leaves on top (simplified to avoid array issues)
+              // We'll add leaves after the main world generation
             }
           }
           
@@ -140,6 +125,34 @@ export default function Bloxd3DPage() {
         }
       }
     }
+
+    // Add leaves to trees in a second pass
+    for (let x = 0; x < worldSize.x; x++) {
+      for (let z = 0; z < worldSize.z; z++) {
+        for (let y = 15; y < 18; y++) {
+          if (newWorld[x][y][z]?.type === "wood") {
+            // Add leaves around the top of the tree
+            for (let lx = -2; lx <= 2; lx++) {
+              for (let lz = -2; lz <= 2; lz++) {
+                for (let ly = 0; ly <= 2; ly++) {
+                  const nx = x + lx;
+                  const ny = y + ly;
+                  const nz = z + lz;
+                  if (nx >= 0 && nx < worldSize.x && 
+                      nz >= 0 && nz < worldSize.z &&
+                      ny < worldSize.y &&
+                      newWorld[nx][ny][nz]?.type === "air" &&
+                      Math.random() < 0.6) {
+                    newWorld[nx][ny][nz] = { type: "leaves", x: nx, y: ny, z: nz };
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
     setWorld(newWorld);
   }, []);
 
@@ -273,16 +286,58 @@ export default function Bloxd3DPage() {
     // Sort by distance (far to near)
     visibleBlocks.sort((a, b) => b.distance - a.distance);
     
-    // Draw blocks
+    // Draw blocks with 3D faces
     visibleBlocks.forEach(({ block, screenX, screenY, size }) => {
-      const color = blockColors[block.type];
-      ctx.fillStyle = color;
-      ctx.strokeStyle = "#000";
-      ctx.lineWidth = 1;
+      const baseColor = blockColors[block.type];
+      if (baseColor === "transparent") return;
       
-      // Draw cube (simplified)
-      ctx.fillRect(screenX - size / 2, screenY - size / 2, size, size);
-      ctx.strokeRect(screenX - size / 2, screenY - size / 2, size, size);
+      // Parse RGB from hex/named color
+      const hexToRgb = (hex: string) => {
+        if (hex.startsWith('#')) {
+          const r = parseInt(hex.slice(1, 3), 16);
+          const g = parseInt(hex.slice(3, 5), 16);
+          const b = parseInt(hex.slice(5, 7), 16);
+          return { r, g, b };
+        }
+        return { r: 128, g: 128, b: 128 }; // fallback
+      };
+      
+      const rgb = hexToRgb(baseColor);
+      
+      // Draw 3D cube with visible faces
+      const x = screenX - size / 2;
+      const y = screenY - size / 2;
+      const depth = size * 0.5; // Isometric depth
+      
+      // Top face (lightest)
+      ctx.fillStyle = `rgb(${Math.min(rgb.r * 1.2, 255)}, ${Math.min(rgb.g * 1.2, 255)}, ${Math.min(rgb.b * 1.2, 255)})`;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + size, y);
+      ctx.lineTo(x + size + depth, y - depth);
+      ctx.lineTo(x + depth, y - depth);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = "rgba(0,0,0,0.3)";
+      ctx.stroke();
+      
+      // Front face (normal brightness)
+      ctx.fillStyle = baseColor;
+      ctx.fillRect(x, y, size, size);
+      ctx.strokeStyle = "rgba(0,0,0,0.3)";
+      ctx.strokeRect(x, y, size, size);
+      
+      // Right face (darker)
+      ctx.fillStyle = `rgb(${rgb.r * 0.7}, ${rgb.g * 0.7}, ${rgb.b * 0.7})`;
+      ctx.beginPath();
+      ctx.moveTo(x + size, y);
+      ctx.lineTo(x + size + depth, y - depth);
+      ctx.lineTo(x + size + depth, y + size - depth);
+      ctx.lineTo(x + size, y + size);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = "rgba(0,0,0,0.3)";
+      ctx.stroke();
     });
     
     // Crosshair
