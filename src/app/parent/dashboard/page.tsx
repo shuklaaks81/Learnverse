@@ -54,7 +54,7 @@ export default function ParentDashboard() {
   const [showTerminal, setShowTerminal] = useState(false);
   const [terminalInput, setTerminalInput] = useState('');
   const [terminalHistory, setTerminalHistory] = useState<string[]>([
-    '🖥️ Parent Terminal v1.0',
+    '🖥️ Parent Terminal v2.0 - UPGRADED! 🚀',
     'Type "help" for available commands',
     ''
   ]);
@@ -166,15 +166,24 @@ export default function ParentDashboard() {
         output.push('  logs     - View recent activity');
         output.push('  clear    - Clear terminal');
         output.push('');
+        output.push('� Learnverse System Commands:');
+        output.push('  learnverse.set <target> <property> <value>');
+        output.push('    - Modify app settings (use "all" or specific kid name)');
+        output.push('  learnverse.add type text "<text>"');
+        output.push('    - Add custom text/messages to the app');
+        output.push('  learnverse.time "<duration>"');
+        output.push('    - Set time limits or unlock unlimited access');
+        output.push('');
         output.push('🛠️ Feature Creation (Custom Commands):');
         output.push('  add button at <location> display <text> page <url> color <color>');
         output.push('  add board at <location> page <url> color <color> drawable <state>');
         output.push('  add feature <name> at <location> type <type>');
         output.push('');
         output.push('📝 Examples:');
+        output.push('  learnverse.set all coins 9999');
+        output.push('  learnverse.add type text "Welcome to Learnverse!"');
+        output.push('  learnverse.time "forever"');
         output.push('  add button at "top right" display "My Feature!" page "/kid/custom" color "blue"');
-        output.push('  add board at "corner" page "/kid/draw" color "white" drawable "always"');
-        output.push('  add feature "music player" at "bottom" type "audio"');
         break;
       
       case 'stats':
@@ -302,8 +311,188 @@ export default function ParentDashboard() {
         }
         break;
       
+      case 'learnverse.set':
+        if (args.length < 3) {
+          output.push('❌ Error: Invalid syntax');
+          output.push('Usage: learnverse.set <target> <property> <value>');
+          output.push('Example: learnverse.set all coins 9999');
+          output.push('Example: learnverse.set "Johnny" streak 100');
+          break;
+        }
+
+        const target = args[0].toLowerCase().replace(/"/g, '');
+        const property = args[1].toLowerCase();
+        const value = args.slice(2).join(' ').replace(/"/g, '');
+
+        output.push(`⚙️ Setting ${property} to "${value}" for ${target}...`);
+        
+        if (target === 'all') {
+          // Get all kid accounts
+          const allKids = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
+          let updated = 0;
+          
+          allKids.forEach((kid: any) => {
+            const kidData = JSON.parse(localStorage.getItem(`kid_${kid.kidId}`) || '{}');
+            if (property === 'coins') {
+              kidData.coins = parseInt(value) || 0;
+            } else if (property === 'streak') {
+              kidData.streak = parseInt(value) || 0;
+            } else if (property === 'progress') {
+              kidData.progress = parseInt(value) || 0;
+            } else if (property === 'achievements') {
+              kidData.achievements = parseInt(value) || 0;
+            } else {
+              kidData[property] = value;
+            }
+            localStorage.setItem(`kid_${kid.kidId}`, JSON.stringify(kidData));
+            updated++;
+          });
+          
+          output.push(`✅ Updated ${property} for ${updated} kid(s)!`);
+        } else {
+          // Find specific kid
+          const allKids = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
+          const targetKid = allKids.find((k: any) => k.kidName.toLowerCase() === target);
+          
+          if (targetKid) {
+            const kidData = JSON.parse(localStorage.getItem(`kid_${targetKid.kidId}`) || '{}');
+            if (property === 'coins') {
+              kidData.coins = parseInt(value) || 0;
+            } else if (property === 'streak') {
+              kidData.streak = parseInt(value) || 0;
+            } else if (property === 'progress') {
+              kidData.progress = parseInt(value) || 0;
+            } else if (property === 'achievements') {
+              kidData.achievements = parseInt(value) || 0;
+            } else {
+              kidData[property] = value;
+            }
+            localStorage.setItem(`kid_${targetKid.kidId}`, JSON.stringify(kidData));
+            output.push(`✅ Updated ${property} for ${targetKid.kidName}!`);
+          } else {
+            output.push(`❌ Kid "${target}" not found`);
+          }
+        }
+        break;
+      
+      case 'learnverse.add':
+        if (args.length < 3) {
+          output.push('❌ Error: Invalid syntax');
+          output.push('Usage: learnverse.add type text "<text>"');
+          output.push('Example: learnverse.add type text "Welcome to Learnverse!"');
+          break;
+        }
+
+        const addType = args[0].toLowerCase();
+        const addSubtype = args[1].toLowerCase();
+        const addContent = fullCommand.match(/"([^"]+)"/)?.[1] || args.slice(2).join(' ');
+
+        if (addType === 'type' && addSubtype === 'text') {
+          output.push(`📝 Adding custom text: "${addContent}"`);
+          
+          // Store custom text in localStorage
+          const customTexts = JSON.parse(localStorage.getItem('learnverse_custom_texts') || '[]');
+          customTexts.push({
+            text: addContent,
+            timestamp: new Date().toISOString(),
+            id: `text_${Date.now()}`
+          });
+          localStorage.setItem('learnverse_custom_texts', JSON.stringify(customTexts));
+          
+          output.push('✅ Custom text added successfully!');
+          output.push('💡 Tip: View all custom texts with "learnverse.list texts"');
+        } else {
+          output.push(`❌ Unknown add type: "${addType} ${addSubtype}"`);
+          output.push('Supported: type text');
+        }
+        break;
+      
+      case 'learnverse.time':
+        if (args.length === 0) {
+          output.push('❌ Error: Missing duration');
+          output.push('Usage: learnverse.time "<duration>"');
+          output.push('Examples: learnverse.time "forever", learnverse.time "60min", learnverse.time "2hours"');
+          break;
+        }
+
+        const duration = args.join(' ').replace(/"/g, '').toLowerCase();
+        
+        output.push(`⏰ Setting time limit: ${duration}`);
+        
+        if (duration === 'forever' || duration === 'unlimited' || duration === 'infinite') {
+          localStorage.setItem('learnverse_time_limit', 'unlimited');
+          localStorage.setItem('learnverse_unlock_time', new Date(2099, 11, 31).toISOString());
+          output.push('✅ Unlimited access granted! 🎉');
+          output.push('⏰ No time restrictions applied');
+        } else if (duration.includes('min')) {
+          const minutes = parseInt(duration) || 60;
+          const unlockTime = new Date(Date.now() + minutes * 60 * 1000);
+          localStorage.setItem('learnverse_time_limit', `${minutes}min`);
+          localStorage.setItem('learnverse_unlock_time', unlockTime.toISOString());
+          output.push(`✅ Time limit set to ${minutes} minutes`);
+          output.push(`⏰ Access until: ${unlockTime.toLocaleTimeString()}`);
+        } else if (duration.includes('hour')) {
+          const hours = parseInt(duration) || 1;
+          const unlockTime = new Date(Date.now() + hours * 60 * 60 * 1000);
+          localStorage.setItem('learnverse_time_limit', `${hours}hour`);
+          localStorage.setItem('learnverse_unlock_time', unlockTime.toISOString());
+          output.push(`✅ Time limit set to ${hours} hour(s)`);
+          output.push(`⏰ Access until: ${unlockTime.toLocaleString()}`);
+        } else {
+          localStorage.setItem('learnverse_time_limit', duration);
+          output.push(`✅ Custom time limit set: ${duration}`);
+        }
+        break;
+      
+      case 'learnverse.list':
+        if (args.length === 0) {
+          output.push('❌ Error: Missing list type');
+          output.push('Usage: learnverse.list <type>');
+          output.push('Available types: texts, features, settings');
+          break;
+        }
+
+        const listType = args[0].toLowerCase();
+        
+        if (listType === 'texts') {
+          const customTexts = JSON.parse(localStorage.getItem('learnverse_custom_texts') || '[]');
+          if (customTexts.length === 0) {
+            output.push('📝 No custom texts added yet');
+          } else {
+            output.push(`📝 Custom Texts (${customTexts.length}):`);
+            customTexts.forEach((item: any, index: number) => {
+              output.push(`  ${index + 1}. "${item.text}"`);
+              output.push(`     Added: ${new Date(item.timestamp).toLocaleString()}`);
+            });
+          }
+        } else if (listType === 'features') {
+          const customFeatures = JSON.parse(localStorage.getItem('customFeatures') || '[]');
+          if (customFeatures.length === 0) {
+            output.push('⚙️ No custom features added yet');
+          } else {
+            output.push(`⚙️ Custom Features (${customFeatures.length}):`);
+            customFeatures.forEach((item: any, index: number) => {
+              output.push(`  ${index + 1}. ${item.type} - ${item.displayText || item.name || 'Unnamed'}`);
+            });
+          }
+        } else if (listType === 'settings') {
+          const timeLimit = localStorage.getItem('learnverse_time_limit') || 'Not set';
+          const unlockTime = localStorage.getItem('learnverse_unlock_time');
+          output.push('⚙️ Learnverse Settings:');
+          output.push(`  Time Limit: ${timeLimit}`);
+          if (unlockTime) {
+            output.push(`  Access Until: ${new Date(unlockTime).toLocaleString()}`);
+          }
+          output.push(`  Glitch Mode: ${localStorage.getItem('glitchMode') === 'true' ? 'Active 💥' : 'Inactive'}`);
+          output.push(`  Custom Texts: ${JSON.parse(localStorage.getItem('learnverse_custom_texts') || '[]').length}`);
+          output.push(`  Custom Features: ${JSON.parse(localStorage.getItem('customFeatures') || '[]').length}`);
+        } else {
+          output.push(`❌ Unknown list type: "${listType}"`);
+        }
+        break;
+      
       case 'clear':
-        setTerminalHistory(['🖥️ Parent Terminal v1.0', 'Type "help" for available commands', '']);
+        setTerminalHistory(['🖥️ Parent Terminal v2.0 - UPGRADED! 🚀', 'Type "help" for available commands', '']);
         setTerminalInput('');
         return;
       

@@ -12,7 +12,7 @@ interface FunFeature {
   cost: number;
   route: string;
   unlocked: boolean;
-  category: 'physics' | 'art' | 'chaos' | 'secret';
+  category: 'physics' | 'art' | 'chaos' | 'secret' | 'tools';
 }
 
 export default function FunLabPage() {
@@ -69,6 +69,16 @@ export default function FunLabPage() {
       route: '/kid/fun-lab/sound-maker',
       unlocked: false,
       category: 'art'
+    },
+    {
+      id: 'bloxd-fixer',
+      name: 'BLOXD Code Fixer',
+      description: 'Scan and fix your bloxd.io code automatically! 🔧',
+      icon: '💻',
+      cost: 0,
+      route: '/kid/fun-lab/bloxd-fixer',
+      unlocked: true,
+      category: 'tools'
     },
     {
       id: 'secret-portal',

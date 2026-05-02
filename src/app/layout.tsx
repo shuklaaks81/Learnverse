@@ -11,6 +11,7 @@ import ConditionalOceanBg from "./ConditionalOceanBg";
 import MigrationWrapper from "./MigrationWrapper";
 import { PerformanceManager } from "@/components/PerformanceManager";
 import { SafeModeManager } from "@/components/SafeModeManager";
+import GlitchModeProvider from "./GlitchModeProvider";
 
 import VersionLayoutClient from "./VersionLayoutClient";
 
@@ -60,24 +61,26 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <MigrationWrapper>
-          <LoadingWrapper>
-            <SecretEventProvider>
-              <PerformanceManager>
-                <SafeModeManager>
-                  {/* Ocean background - only shows in non-premium mode */}
-                  <ConditionalOceanBg />
-                  {/* OceanSounds must be rendered in a client component */}
-                  <ClientOceanSoundsWrapper />
-                  <PWAInstallPrompt />
-                  {/* <HolidayBlocker /> */}
-                  <VersionLayoutClient>{children}</VersionLayoutClient>
-                  <Analytics />
-                </SafeModeManager>
-              </PerformanceManager>
-            </SecretEventProvider>
-          </LoadingWrapper>
-        </MigrationWrapper>
+        <GlitchModeProvider>
+          <MigrationWrapper>
+            <LoadingWrapper>
+              <SecretEventProvider>
+                <PerformanceManager>
+                  <SafeModeManager>
+                    {/* Ocean background - only shows in non-premium mode */}
+                    <ConditionalOceanBg />
+                    {/* OceanSounds must be rendered in a client component */}
+                    <ClientOceanSoundsWrapper />
+                    <PWAInstallPrompt />
+                    {/* <HolidayBlocker /> */}
+                    <VersionLayoutClient>{children}</VersionLayoutClient>
+                    <Analytics />
+                  </SafeModeManager>
+                </PerformanceManager>
+              </SecretEventProvider>
+            </LoadingWrapper>
+          </MigrationWrapper>
+        </GlitchModeProvider>
       </body>
     </html>
   );

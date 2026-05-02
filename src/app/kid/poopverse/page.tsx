@@ -102,7 +102,7 @@ export default function Poopverse() {
             opacity: 0.7 + (poop.z / 400),
           }}
         >
-          💩
+          hehe
         </div>
       ))}
 
@@ -112,10 +112,10 @@ export default function Poopverse() {
         {/* Premium Title with 3D effect */}
         <div className="relative mb-8">
           <h1 className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500 animate-bounce drop-shadow-2xl" style={{
-            textShadow: '0 10px 30px rgba(139, 69, 19, 0.8), 0 20px 50px rgba(139, 69, 19, 0.5)',
+            textShadow: '0 10px 30px rgba(0, 255, 0, 0.8), 0 20px 50px rgba(139, 69, 19, 0.5)',
             transform: 'translateZ(50px)'
           }}>
-            💩 POOPVERSE 💩
+            hehe POOPVERSE hehe
           </h1>
           {/* Premium shine effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" 
@@ -123,7 +123,7 @@ export default function Poopverse() {
         </div>
 
         <p className="text-4xl text-amber-200 mb-12 text-center px-8 font-bold animate-pulse backdrop-blur-sm bg-black/20 py-4 px-8 rounded-2xl border border-yellow-600/30">
-          You found the secret dimension of POOP!
+          the owner is teaking the app he heeeeeeeeee :D
         </p>
 
         {/* Premium Info Card */}
@@ -131,15 +131,15 @@ export default function Poopverse() {
           boxShadow: '0 25px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)'
         }}>
           <p className="text-2xl text-yellow-100 text-center mb-4 font-semibold">
-            🚽 Welcome to the most CRAPPY dimension ever! 🚽
+            hmmmmmmmmmmmmmmmmm i think the app broke
           </p>
           <p className="text-xl text-yellow-200 text-center mb-6">
-            Here, everything is made of poop. The ground, the sky, even the air smells funny!
+             what if the wolrd blew up?
           </p>
           <div className="text-center space-y-3 bg-black/30 p-6 rounded-2xl border border-yellow-700/40">
-            <p className="text-lg text-yellow-300">🌀 Secret URL discovered!</p>
-            <p className="text-lg text-yellow-300">💩 Now you&apos;re stuck in... POOP WORLD!</p>
-            <p className="text-lg text-yellow-300">🎉 Congrats on being a 💩 detective!</p>
+            <p className="text-lg text-yellow-300">🌀 PORTAL TIME WEEEEEEEEEE</p>
+            <p className="text-lg text-yellow-300">💩 Now you&apos;ok lets go lets go gp back to app</p>
+            <p className="text-lg text-yellow-300">did you know that the owner of the app is 10?</p>
           </div>
         </div>
 
@@ -148,21 +148,21 @@ export default function Poopverse() {
           <div className="text-9xl animate-bounce transform hover:scale-125 transition-transform cursor-pointer" 
                style={{ 
                  animationDelay: '0s',
-                 filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.5))',
+                 filter: 'drop-shadow(0 15px 25px rgba(0, 132, 255, 0.5))',
                  transform: 'translateZ(30px)'
-               }}>💩</div>
+               }}>huh</div>
           <div className="text-9xl animate-bounce transform hover:scale-125 transition-transform cursor-pointer" 
                style={{ 
                  animationDelay: '0.2s',
                  filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.5))',
                  transform: 'translateZ(30px)'
-               }}>💩</div>
+               }}>he heee</div>
           <div className="text-9xl animate-bounce transform hover:scale-125 transition-transform cursor-pointer" 
                style={{ 
                  animationDelay: '0.4s',
                  filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.5))',
                  transform: 'translateZ(30px)'
-               }}>💩</div>
+               }}>the app broke!</div>
         </div>
 
         {/* Premium Stats Dashboard */}
@@ -170,22 +170,22 @@ export default function Poopverse() {
           <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-amber-400 mb-6 text-center">💩 PREMIUM POOP STATS 💩</h3>
           <div className="grid grid-cols-2 gap-6 text-yellow-100">
             <div className="text-center bg-black/40 p-6 rounded-2xl border border-yellow-600/20 transform hover:scale-105 transition-transform">
-              <div className="text-5xl mb-3">🚽</div>
+              <div className="text-5xl mb-3">dude lets go to space</div>
               <div className="text-sm font-semibold">Toilets Flushed</div>
               <div className="text-2xl font-bold text-yellow-300">∞</div>
             </div>
             <div className="text-center bg-black/40 p-6 rounded-2xl border border-yellow-600/20 transform hover:scale-105 transition-transform">
-              <div className="text-5xl mb-3">💩</div>
+              <div className="text-5xl mb-3">bro who would think that a 10 year old went in the code and broke it?</div>
               <div className="text-sm font-semibold">Poops Flying</div>
               <div className="text-2xl font-bold text-yellow-300">{poops.length}</div>
             </div>
             <div className="text-center bg-black/40 p-6 rounded-2xl border border-yellow-600/20 transform hover:scale-105 transition-transform">
-              <div className="text-5xl mb-3">🌪️</div>
+              <div className="text-5xl mb-3">its fun day i broke this to the broken limits!</div>
               <div className="text-sm font-semibold">Swirl Speed</div>
               <div className="text-2xl font-bold text-yellow-300">MAX</div>
             </div>
             <div className="text-center bg-black/40 p-6 rounded-2xl border border-yellow-600/20 transform hover:scale-105 transition-transform">
-              <div className="text-5xl mb-3">😂</div>
+              <div className="text-5xl mb-3">thanks github copilot i dont blame you if you dont know what that is</div>
               <div className="text-sm font-semibold">Funniness</div>
               <div className="text-2xl font-bold text-yellow-300">100%</div>
             </div>
@@ -207,9 +207,9 @@ export default function Poopverse() {
           </button>
           <button
             onClick={() => {
-              const poop = window.confirm('Are you sure you want to EMBRACE the poop? 💩');
+              const poop = window.confirm('hold on.... the following page maty have been crazyfied if thats a word');
               if (poop) {
-                alert('POOOOOOOOOP! 💩💩💩💩💩');
+                alert('exuse me, mr dude have you heard of bloxd.io you should go to it! 💩💩💩💩💩');
               }
             }}
             className="relative bg-gradient-to-br from-amber-700 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-white font-bold text-xl px-10 py-5 rounded-2xl transition-all transform hover:scale-110 hover:-translate-y-1 shadow-2xl border-2 border-amber-500/50 overflow-hidden group"
@@ -218,7 +218,7 @@ export default function Poopverse() {
               transform: 'translateZ(20px)'
             }}
           >
-            <span className="relative z-10">💩 Embrace the Poop</span>
+            <span className="relative z-10">💩 yooooooooooooo bro wsp wsp</span>
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
           </button>
         </div>
@@ -241,8 +241,8 @@ export default function Poopverse() {
                 </p>
                 <div className="bg-black/40 p-6 rounded-2xl border border-red-500/30 mt-4">
                   <p className="text-yellow-300 font-bold text-xl mb-2">🎭 Popee says:</p>
-                  <p className="text-white italic">&quot;Welcome to the POOPVERSE circus! 
-                  Where the poops are flying and the fun never stops! 💩🎪&quot;</p>
+                  <p className="text-white italic">&quot;some thing broke totaly yeahhhhhhhhhhhhhhhhhhhhh totaly not intended
+                  I BLEIVE I CAN FLYYYYYYYYYYYYYYYY I BELIVE I CAN TOUCH THE SKYYYYYYYYYYYYY DUM DO BA BO BAP 💩🎪&quot;</p>
                 </div>
                 <button
                   onClick={() => {
@@ -260,13 +260,13 @@ export default function Poopverse() {
         {/* Poop click progress hint */}
         {!showPopee && poopClicks > 0 && (
           <p className="text-yellow-400/80 text-lg mt-8 animate-pulse">
-            💩 Clicked {poopClicks}/5 poops... something&apos;s happening! 🎪
+            💩 Clicked {poopClicks}/5 poops... something&apos;HAVE YOU EVER WENT IN THE CODE AND CHANGED CODE? me too i have!
           </p>
         )}
 
         {/* Premium secret hint */}
         <p className="text-yellow-600/60 text-sm mt-12 italic backdrop-blur-sm bg-black/20 px-6 py-3 rounded-full border border-yellow-700/20">
-          Psst... there might be other secret dimensions hidden in Learnverse... 🤫
+          Psst... there might be other secret dimensions hidden in the curplurse or poopverse or was it learkverse what was the name again?... 🤫
         </p>
       </div>
 
