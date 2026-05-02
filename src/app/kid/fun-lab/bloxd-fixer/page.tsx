@@ -17,6 +17,7 @@ export default function BloxdCodeFixer() {
   const [issues, setIssues] = useState<CodeIssue[]>([]);
   const [scanning, setScanning] = useState(false);
   const [scanned, setScanned] = useState(false);
+  const [mode, setMode] = useState<'world' | 'block'>('world');
 
   // BLOXD.io code scanner and fixer
   const scanAndFixCode = () => {
@@ -28,7 +29,57 @@ export default function BloxdCodeFixer() {
       let fixed = code;
       const lines = code.split('\n');
 
-      // Check for common BLOXD.io issues
+      // World Code Mode - Check for callbacks
+      if (mode === 'world') {
+        const hasOnPlayerJoin = code.includes('onPlayerJoin');
+        const hasOnPlayerLeave = code.includes('onPlayerLeave');
+        const hasOnBlockBreak = code.includes('onBlockBreak');
+        const hasOnBlockPlace = code.includes('onBlockPlace');
+        
+        if (!hasOnPlayerJoin && !hasOnPlayerLeave && !hasOnBlockBreak && !hasOnBlockPlace) {
+          foundIssues.push({
+            line: 0,
+            type: 'warning',
+            message: '⚠️ World code should have callbacks like onPlayerJoin(), onBlockBreak(), etc.',
+            fix: 'Add event callbacks'
+          });
+        }
+
+        // Check for world object usage
+        if (!code.includes('world.')) {
+          foundIssues.push({
+            line: 0,
+            type: 'info',
+            message: '💡 World code usually uses the "world" object (world.spawnEntity, world.getBlock, etc.)',
+            fix: 'Recommendation'
+          });
+        }
+      }
+
+      // Code Block Mode - Different checks
+      if (mode === 'block') {
+        // Check for block-specific patterns
+        if (code.includes('onPlayerJoin') || code.includes('onBlockBreak')) {
+          foundIssues.push({
+            line: 0,
+            type: 'warning',
+            message: '⚠️ Code blocks should not have world callbacks! Use block.* methods instead.',
+            fix: 'Remove callbacks'
+          });
+        }
+
+        // Check for block object usage
+        if (!code.includes('block.')) {
+          foundIssues.push({
+            line: 0,
+            type: 'info',
+            message: '💡 Code blocks should use "block" object (block.id, block.data, etc.)',
+            fix: 'Recommendation'
+          });
+        }
+      }
+
+      // Check for common BLOXD.io issues (both modes)
       lines.forEach((line, index) => {
         const lineNum = index + 1;
 
@@ -181,25 +232,67 @@ export default function BloxdCodeFixer() {
           <h1 className="text-5xl font-black text-white mb-3 drop-shadow-lg">
             🔧 BLOXD Code Fixer
           </h1>
-          <p className="text-xl text-white/90">
+          <p className="text-xl text-white/90 mb-4">
             Paste your bloxd.io code and I'll scan it for errors and fix them!
           </p>
+
+          {/* Mode Selector */}
+          <div className="flex gap-4 mt-6">
+            <button
+              onClick={() => setMode('world')}
+              className={`flex-1 py-4 px-6 rounded-2xl font-bold text-lg transition-all transform ${
+                mode === 'world'
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white scale-105 shadow-2xl'
+                  : 'bg-white/20 text-white/70 hover:bg-white/30'
+              }`}
+            >
+              🌍 World Code
+              <div className="text-sm font-normal mt-1">
+                {mode === 'world' ? 'Uses callbacks!' : 'onPlayerJoin, etc.'}
+              </div>
+            </button>
+            <button
+              onClick={() => setMode('block')}
+              className={`flex-1 py-4 px-6 rounded-2xl font-bold text-lg transition-all transform ${
+                mode === 'block'
+                  ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white scale-105 shadow-2xl'
+                  : 'bg-white/20 text-white/70 hover:bg-white/30'
+              }`}
+            >
+              🧱 Code Block
+              <div className="text-sm font-normal mt-1">
+                {mode === 'block' ? 'Uses block.*!' : 'block.id, etc.'}
+              </div>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Input Section */}
           <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border-2 border-white/20">
-            <h2 className="text-3xl font-bold text-white mb-4">📝 Your Code</h2>
+            <h2 className="text-3xl font-bold text-white mb-4">
+              📝 Your {mode === 'world' ? 'World' : 'Block'} Code
+            </h2>
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="Paste your BLOXD.io code here...
+              placeholder={mode === 'world' 
+                ? `Paste your World Code here...
 
 Example:
-function onPlayerJoin() {
+function onPlayerJoin(player) {
   player.positon.x = 10
+  world.spawnEntity('zombie')
   cosole.log('Player joined')
-}"
+}`
+                : `Paste your Code Block here...
+
+Example:
+if (block.id === 1) {
+  block.data = 5
+  player.giveItem('diamond')
+}`
+              }
               className="w-full h-96 bg-gray-900 text-green-400 font-mono p-4 rounded-xl resize-none focus:outline-none focus:ring-4 focus:ring-blue-400"
               spellCheck={false}
             />
@@ -285,14 +378,29 @@ function onPlayerJoin() {
             {/* Tips */}
             {!scanned && (
               <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border-2 border-white/20">
-                <h2 className="text-3xl font-bold text-white mb-4">💡 Tips</h2>
+                <h2 className="text-3xl font-bold text-white mb-4">
+                  💡 {mode === 'world' ? 'World Code' : 'Code Block'} Tips
+                </h2>
                 <div className="space-y-3 text-white/90">
-                  <p>✅ Checks for typos (functoin, retrun, cosole)</p>
-                  <p>✅ Finds missing semicolons</p>
-                  <p>✅ Detects bracket mismatches</p>
-                  <p>✅ BLOXD.io API corrections</p>
-                  <p>✅ Performance warnings</p>
-                  <p>✅ Variable naming issues</p>
+                  {mode === 'world' ? (
+                    <>
+                      <p>✅ World code needs callbacks (onPlayerJoin, onBlockBreak)</p>
+                      <p>✅ Use world.* methods (world.spawnEntity, world.getBlock)</p>
+                      <p>✅ Callbacks get parameters (player, block, etc.)</p>
+                      <p>✅ Checks for typos and missing semicolons</p>
+                      <p>✅ BLOXD.io API corrections</p>
+                      <p>✅ Performance warnings</p>
+                    </>
+                  ) : (
+                    <>
+                      <p>✅ Code blocks use block.* properties (block.id, block.data)</p>
+                      <p>✅ Don't use world callbacks in code blocks!</p>
+                      <p>✅ Use player.* for player actions</p>
+                      <p>✅ Checks for typos and missing semicolons</p>
+                      <p>✅ BLOXD.io API corrections</p>
+                      <p>✅ Variable naming issues</p>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -301,20 +409,26 @@ function onPlayerJoin() {
 
         {/* Example Code Snippets */}
         <div className="mt-6 bg-white/10 backdrop-blur-lg rounded-3xl p-6 border-2 border-white/20">
-          <h2 className="text-3xl font-bold text-white mb-4">📚 Common BLOXD.io Code Patterns</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">
+            📚 {mode === 'world' ? 'World Code' : 'Code Block'} Examples
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-gray-900/50 p-4 rounded-xl">
               <h3 className="text-white font-bold mb-2">❌ Common Mistake:</h3>
-              <code className="text-red-400 text-sm">
-                player.positon.x = 10<br/>
-                cosole.log("hi")
+              <code className="text-red-400 text-sm whitespace-pre-wrap">
+                {mode === 'world' 
+                  ? `// Missing callback!\nplayer.positon.x = 10\ncosole.log("hi")`
+                  : `// Wrong for code blocks!\nfunction onPlayerJoin()\nblock.id = undefined`
+                }
               </code>
             </div>
             <div className="bg-gray-900/50 p-4 rounded-xl">
               <h3 className="text-white font-bold mb-2">✅ Fixed Version:</h3>
-              <code className="text-green-400 text-sm">
-                player.position.x = 10;<br/>
-                console.log("hi");
+              <code className="text-green-400 text-sm whitespace-pre-wrap">
+                {mode === 'world'
+                  ? `function onPlayerJoin(player) {\n  player.position.x = 10;\n  console.log("hi");\n}`
+                  : `if (block.id === 1) {\n  block.data = 5;\n  player.giveItem('diamond');\n}`
+                }
               </code>
             </div>
           </div>
