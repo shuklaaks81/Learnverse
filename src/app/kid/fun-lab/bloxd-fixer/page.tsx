@@ -685,56 +685,88 @@ function onPlayerJoin(player) {
             {/* Template 3: Mob Spawning */}
             <div className="mb-6 bg-gray-900/80 p-5 rounded-2xl border-2 border-green-500/50">
               <h3 className="text-2xl font-bold text-green-300 mb-3 flex items-center gap-2">
-                👹 Template 3: Nether Mob Spawning
+                👹 Template 3: Nether Mob Spawning (REAL API!)
               </h3>
               <p className="text-white/80 mb-3 text-sm">
-                🧟 Spawns mobs in the Nether! Uses BLOXD mob replacements!
+                🔥 Uses api.attemptSpawnMob() and api.setMobSetting() - the REAL BLOXD API!
               </p>
               <div className="bg-black/50 p-4 rounded-xl overflow-x-auto">
                 <pre className="text-green-400 text-xs font-mono">
-{`// Nether mob spawner - replaces with BLOXD mobs
+{`// Nether mob spawner - REAL BLOXD API!
 const NETHER_Y = -10;  // Nether level
-let mobSpawnTimer = 0;
 
 function onPlayerJoin(player) {
-  // Start mob spawning
+  // Spawn initial Nether mobs
   spawnNetherMobs();
 }
 
 function spawnNetherMobs() {
-  // Random positions in Nether
+  // Random position in Nether
   const x = Math.floor(Math.random() * 40) - 20;
   const z = Math.floor(Math.random() * 40) - 20;
   const y = NETHER_Y + 5;
-  
   const mobType = Math.random();
   
   if (mobType < 0.4) {
-    // Zombie Pigmen -> Use BLOXD zombie
-    world.spawnEntity('zombie', x, y, z);
+    // Zombie Pigmen - Pig with fire attacks!
+    const m = api.attemptSpawnMob("Pig", x, y, z, {
+      name: "Zombie Pigman",
+      variation: "default"
+    });
+    api.setMobSetting(m, "maxHealth", 400);
+    api.setHealth(m, 400);
+    api.setMobSetting(m, "attackItemName", "Fireball");
+    api.setMobSetting(m, "attackDamage", 15);
+    api.setMobSetting(m, "attackInterval", 1000);
+    api.setMobSetting(m, "attackRadius", 20);
+    api.setMobSetting(m, "chaseRadius", 30);
+    
   } else if (mobType < 0.7) {
-    // Blazes -> Use BLOXD fire enemy or skeleton
-    world.spawnEntity('skeleton', x, y, z);
-  } else if (mobType < 0.9) {
-    // Ghasts -> Use BLOXD slime (big and floaty!)
-    world.spawnEntity('slime', x, y + 3, z);
+    // Blaze - Chicken that shoots fireballs!
+    const m = api.attemptSpawnMob("Chicken", x, y + 2, z, {
+      name: "Blaze",
+      variation: "default"
+    });
+    api.setMobSetting(m, "maxHealth", 300);
+    api.setHealth(m, 300);
+    api.setMobSetting(m, "attackItemName", "Fireball");
+    api.setMobSetting(m, "attackDamage", 20);
+    api.setMobSetting(m, "attackInterval", 800);
+    api.setMobSetting(m, "attackRadius", 30);
+    api.setMobSetting(m, "chaseRadius", 40);
+    
   } else {
-    // Magma Cubes -> Use BLOXD small slime
-    world.spawnEntity('small_slime', x, y, z);
+    // Magma Cube - Cow that explodes!
+    const m = api.attemptSpawnMob("Cow", x, y, z, {
+      name: "Magma Cube",
+      variation: "default"
+    });
+    api.setMobSetting(m, "maxHealth", 500);
+    api.setHealth(m, 500);
+    api.setMobSetting(m, "attackItemName", "Stick");
+    api.setMobSetting(m, "attackDamage", 25);
+    api.setMobSetting(m, "attackInterval", 500);
+    api.setMobSetting(m, "attackRadius", 15);
+    api.setMobSetting(m, "onDeathAura", 100); // Explodes on death!
   }
   
-  // Spawn more mobs every 10 seconds
-  setTimeout(spawnNetherMobs, 10000);
+  // Spawn more mobs every 15 seconds
+  setTimeout(spawnNetherMobs, 15000);
 }
 
-// Alternative: Spawn mobs when player enters Nether
+// Bonus: Spawn mobs near player in Nether
 function onPlayerMove(player) {
   if (player.position.y < 0) {  // Player in Nether!
-    // Random chance to spawn nearby mob
-    if (Math.random() > 0.99) {
+    if (Math.random() > 0.98) {
       const nearX = player.position.x + (Math.random() * 20 - 10);
       const nearZ = player.position.z + (Math.random() * 20 - 10);
-      world.spawnEntity('zombie', nearX, NETHER_Y + 5, nearZ);
+      const m = api.attemptSpawnMob("Pig", nearX, NETHER_Y + 5, nearZ, {
+        name: "Zombie Pigman"
+      });
+      api.setMobSetting(m, "maxHealth", 400);
+      api.setHealth(m, 400);
+      api.setMobSetting(m, "attackItemName", "Fireball");
+      api.setMobSetting(m, "attackDamage", 15);
     }
   }
 }`}
@@ -742,49 +774,81 @@ function onPlayerMove(player) {
               </div>
               <button
                 onClick={() => {
-                  const code3 = `// Nether mob spawner - replaces with BLOXD mobs
+                  const code3 = `// Nether mob spawner - REAL BLOXD API!
 const NETHER_Y = -10;  // Nether level
-let mobSpawnTimer = 0;
 
 function onPlayerJoin(player) {
-  // Start mob spawning
+  // Spawn initial Nether mobs
   spawnNetherMobs();
 }
 
 function spawnNetherMobs() {
-  // Random positions in Nether
+  // Random position in Nether
   const x = Math.floor(Math.random() * 40) - 20;
   const z = Math.floor(Math.random() * 40) - 20;
   const y = NETHER_Y + 5;
-  
   const mobType = Math.random();
   
   if (mobType < 0.4) {
-    // Zombie Pigmen -> Use BLOXD zombie
-    world.spawnEntity('zombie', x, y, z);
+    // Zombie Pigmen - Pig with fire attacks!
+    const m = api.attemptSpawnMob("Pig", x, y, z, {
+      name: "Zombie Pigman",
+      variation: "default"
+    });
+    api.setMobSetting(m, "maxHealth", 400);
+    api.setHealth(m, 400);
+    api.setMobSetting(m, "attackItemName", "Fireball");
+    api.setMobSetting(m, "attackDamage", 15);
+    api.setMobSetting(m, "attackInterval", 1000);
+    api.setMobSetting(m, "attackRadius", 20);
+    api.setMobSetting(m, "chaseRadius", 30);
+    
   } else if (mobType < 0.7) {
-    // Blazes -> Use BLOXD fire enemy or skeleton
-    world.spawnEntity('skeleton', x, y, z);
-  } else if (mobType < 0.9) {
-    // Ghasts -> Use BLOXD slime (big and floaty!)
-    world.spawnEntity('slime', x, y + 3, z);
+    // Blaze - Chicken that shoots fireballs!
+    const m = api.attemptSpawnMob("Chicken", x, y + 2, z, {
+      name: "Blaze",
+      variation: "default"
+    });
+    api.setMobSetting(m, "maxHealth", 300);
+    api.setHealth(m, 300);
+    api.setMobSetting(m, "attackItemName", "Fireball");
+    api.setMobSetting(m, "attackDamage", 20);
+    api.setMobSetting(m, "attackInterval", 800);
+    api.setMobSetting(m, "attackRadius", 30);
+    api.setMobSetting(m, "chaseRadius", 40);
+    
   } else {
-    // Magma Cubes -> Use BLOXD small slime
-    world.spawnEntity('small_slime', x, y, z);
+    // Magma Cube - Cow that explodes!
+    const m = api.attemptSpawnMob("Cow", x, y, z, {
+      name: "Magma Cube",
+      variation: "default"
+    });
+    api.setMobSetting(m, "maxHealth", 500);
+    api.setHealth(m, 500);
+    api.setMobSetting(m, "attackItemName", "Stick");
+    api.setMobSetting(m, "attackDamage", 25);
+    api.setMobSetting(m, "attackInterval", 500);
+    api.setMobSetting(m, "attackRadius", 15);
+    api.setMobSetting(m, "onDeathAura", 100); // Explodes on death!
   }
   
-  // Spawn more mobs every 10 seconds
-  setTimeout(spawnNetherMobs, 10000);
+  // Spawn more mobs every 15 seconds
+  setTimeout(spawnNetherMobs, 15000);
 }
 
-// Alternative: Spawn mobs when player enters Nether
+// Bonus: Spawn mobs near player in Nether
 function onPlayerMove(player) {
   if (player.position.y < 0) {  // Player in Nether!
-    // Random chance to spawn nearby mob
-    if (Math.random() > 0.99) {
+    if (Math.random() > 0.98) {
       const nearX = player.position.x + (Math.random() * 20 - 10);
       const nearZ = player.position.z + (Math.random() * 20 - 10);
-      world.spawnEntity('zombie', nearX, NETHER_Y + 5, nearZ);
+      const m = api.attemptSpawnMob("Pig", nearX, NETHER_Y + 5, nearZ, {
+        name: "Zombie Pigman"
+      });
+      api.setMobSetting(m, "maxHealth", 400);
+      api.setHealth(m, 400);
+      api.setMobSetting(m, "attackItemName", "Fireball");
+      api.setMobSetting(m, "attackDamage", 15);
     }
   }
 }`;
@@ -804,7 +868,8 @@ function onPlayerMove(player) {
                 <p>⚡ <strong>Generate in chunks</strong> - Don't try to generate everything at once!</p>
                 <p>⏱️ <strong>Use setTimeout</strong> - Add delays between chunks to avoid lag</p>
                 <p>🧱 <strong>Block replacements:</strong> red_wool = netherrack, brown_wool = soul sand, lava = lava!</p>
-                <p>👹 <strong>Mob replacements:</strong> zombie = zombie pigmen, skeleton = blazes, slime = ghasts!</p>
+                <p>👹 <strong>Mob API:</strong> Use api.attemptSpawnMob() and api.setMobSetting() for custom mobs!</p>
+                <p>🐷 <strong>Mob types:</strong> Pig = Pigmen, Chicken = Blazes, Cow = Magma Cubes!</p>
                 <p>🏗️ <strong>Test small first</strong> - Start with CHUNK_SIZE = 4, then increase!</p>
                 <p>📍 <strong>Bedrock is Y=0</strong> - Generate Nether at Y=-5 to Y=-35</p>
                 <p>🔥 <strong>Combine templates</strong> - Use all 3 together for full Nether experience!</p>
