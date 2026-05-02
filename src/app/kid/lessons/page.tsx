@@ -21,12 +21,27 @@ export default function LessonsPage() {
   const isLegendary = useLegendaryMode();
   const [styles, setStyles] = useState(getLegendaryStyles());
   const [isPremium, setIsPremium] = useState(false);
+  const [diagnosticsCompleted, setDiagnosticsCompleted] = useState({
+    math: false,
+    writing: false,
+    science: false,
+  });
   
   // Ensure styles are updated on client after mount (SSR-safe)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const version = localStorage.getItem('learnverseVersion') || 'original';
       setIsPremium(version === 'premium');
+      
+      // Check diagnostic completion
+      const currentKid = localStorage.getItem('currentKid');
+      if (currentKid) {
+        const kid = JSON.parse(currentKid);
+        const diagnostics = localStorage.getItem(`kid_${kid.kidId}_diagnostics`);
+        if (diagnostics) {
+          setDiagnosticsCompleted(JSON.parse(diagnostics));
+        }
+      }
     }
     setStyles(getLegendaryStyles());
   }, []);
@@ -143,6 +158,104 @@ export default function LessonsPage() {
               </div>
             </div>
           </div>
+
+          {/* Diagnostic Tests - Show if not all completed */}
+          {(!diagnosticsCompleted.math || !diagnosticsCompleted.writing || !diagnosticsCompleted.science) && (
+            <div className="futuristic-glass p-8 mb-8 animate-card-appear border-4 border-yellow-400/50 shadow-[0_0_40px_rgba(255,215,0,0.4)]" style={{animationDelay: '0.05s'}}>
+              <h2 className="text-3xl font-bold text-yellow-400 mb-3 drop-shadow-[0_0_15px_rgba(255,215,0,0.8)] flex items-center gap-3">
+                <span className="text-4xl">🎯</span> Take Your Diagnostic Tests!
+              </h2>
+              <p className="text-cyan-300 text-lg mb-6">
+                Complete these tests to unlock personalized lessons just for YOU! 🚀
+              </p>
+              
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Math Test */}
+                <Link href="/kid/diagnostic/math">
+                  <div className={`relative group cursor-pointer ${diagnosticsCompleted.math ? 'opacity-60' : ''}`}>
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-400/30 to-purple-500/30 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300" />
+                    <div className={`relative futuristic-glass p-6 rounded-2xl border-2 ${
+                      diagnosticsCompleted.math 
+                        ? 'border-green-400 shadow-[0_0_30px_rgba(0,255,0,0.5)]' 
+                        : 'border-blue-400/50 group-hover:border-blue-400 group-hover:shadow-[0_0_40px_rgba(0,150,255,0.6)]'
+                    } transition-all duration-300`}>
+                      {diagnosticsCompleted.math && (
+                        <div className="absolute -top-3 -right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-[0_0_15px_rgba(0,255,0,0.6)] animate-pulse">
+                          ✓ Done
+                        </div>
+                      )}
+                      <div className="text-6xl mb-4 group-hover:scale-110 transition-transform drop-shadow-[0_0_10px_rgba(0,150,255,0.8)]">
+                        🔢
+                      </div>
+                      <h3 className="text-2xl font-bold text-blue-300 mb-2">Math Test</h3>
+                      <p className="text-white/80 text-sm mb-4">
+                        Test your arithmetic, fractions, and problem-solving skills!
+                      </p>
+                      <div className="bg-blue-500/20 rounded-lg p-2 text-center">
+                        <span className="text-blue-300 font-bold">⏱️ ~10 minutes</span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+
+                {/* Writing Test */}
+                <Link href="/kid/diagnostic/writing">
+                  <div className={`relative group cursor-pointer ${diagnosticsCompleted.writing ? 'opacity-60' : ''}`}>
+                    <div className="absolute inset-0 bg-gradient-to-br from-pink-400/30 to-purple-500/30 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300" />
+                    <div className={`relative futuristic-glass p-6 rounded-2xl border-2 ${
+                      diagnosticsCompleted.writing 
+                        ? 'border-green-400 shadow-[0_0_30px_rgba(0,255,0,0.5)]' 
+                        : 'border-pink-400/50 group-hover:border-pink-400 group-hover:shadow-[0_0_40px_rgba(255,20,147,0.6)]'
+                    } transition-all duration-300`}>
+                      {diagnosticsCompleted.writing && (
+                        <div className="absolute -top-3 -right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-[0_0_15px_rgba(0,255,0,0.6)] animate-pulse">
+                          ✓ Done
+                        </div>
+                      )}
+                      <div className="text-6xl mb-4 group-hover:scale-110 transition-transform drop-shadow-[0_0_10px_rgba(255,20,147,0.8)]">
+                        ✍️
+                      </div>
+                      <h3 className="text-2xl font-bold text-pink-300 mb-2">Writing Test</h3>
+                      <p className="text-white/80 text-sm mb-4">
+                        Check your reading, grammar, and writing abilities!
+                      </p>
+                      <div className="bg-pink-500/20 rounded-lg p-2 text-center">
+                        <span className="text-pink-300 font-bold">⏱️ ~10 minutes</span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+
+                {/* Science Test */}
+                <Link href="/kid/diagnostic/science">
+                  <div className={`relative group cursor-pointer ${diagnosticsCompleted.science ? 'opacity-60' : ''}`}>
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-400/30 to-cyan-500/30 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300" />
+                    <div className={`relative futuristic-glass p-6 rounded-2xl border-2 ${
+                      diagnosticsCompleted.science 
+                        ? 'border-green-400 shadow-[0_0_30px_rgba(0,255,0,0.5)]' 
+                        : 'border-green-400/50 group-hover:border-green-400 group-hover:shadow-[0_0_40px_rgba(0,255,0,0.6)]'
+                    } transition-all duration-300`}>
+                      {diagnosticsCompleted.science && (
+                        <div className="absolute -top-3 -right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-[0_0_15px_rgba(0,255,0,0.6)] animate-pulse">
+                          ✓ Done
+                        </div>
+                      )}
+                      <div className="text-6xl mb-4 group-hover:scale-110 transition-transform drop-shadow-[0_0_10px_rgba(0,255,0,0.8)]">
+                        🔬
+                      </div>
+                      <h3 className="text-2xl font-bold text-green-300 mb-2">Science Test</h3>
+                      <p className="text-white/80 text-sm mb-4">
+                        Explore your knowledge of biology, physics, and chemistry!
+                      </p>
+                      <div className="bg-green-500/20 rounded-lg p-2 text-center">
+                        <span className="text-green-300 font-bold">⏱️ ~10 minutes</span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            </div>
+          )}
 
           {/* Subject Filter */}
           <div className="futuristic-glass p-6 mb-8 animate-card-appear" style={{animationDelay: '0.1s'}}>
@@ -349,6 +462,83 @@ export default function LessonsPage() {
             </div>
           </div>
         </div>
+
+        {/* Diagnostic Tests - Show if not all completed */}
+        {(!diagnosticsCompleted.math || !diagnosticsCompleted.writing || !diagnosticsCompleted.science) && (
+          <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl shadow-xl p-6 mb-6 border-4 border-yellow-400">
+            <h2 className="text-2xl font-bold text-orange-600 mb-2 flex items-center gap-2">
+              <span className="text-3xl">🎯</span> Take Your Diagnostic Tests!
+            </h2>
+            <p className="text-gray-700 mb-4">
+              Complete these tests to unlock personalized lessons just for YOU! 🚀
+            </p>
+            
+            <div className="grid md:grid-cols-3 gap-4">
+              {/* Math Test */}
+              <Link href="/kid/diagnostic/math">
+                <div className={`bg-white rounded-xl p-5 shadow-lg hover:shadow-2xl transition-all hover:scale-105 cursor-pointer border-2 ${
+                  diagnosticsCompleted.math ? 'border-green-500' : 'border-blue-400'
+                }`}>
+                  {diagnosticsCompleted.math && (
+                    <div className="absolute -top-2 -right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                      ✓ Done
+                    </div>
+                  )}
+                  <div className="text-5xl mb-3">🔢</div>
+                  <h3 className="text-xl font-bold text-blue-600 mb-2">Math Test</h3>
+                  <p className="text-gray-600 text-sm mb-3">
+                    Test your arithmetic, fractions, and problem-solving!
+                  </p>
+                  <div className="bg-blue-100 rounded-lg p-2 text-center">
+                    <span className="text-blue-700 font-semibold text-sm">⏱️ ~10 minutes</span>
+                  </div>
+                </div>
+              </Link>
+
+              {/* Writing Test */}
+              <Link href="/kid/diagnostic/writing">
+                <div className={`bg-white rounded-xl p-5 shadow-lg hover:shadow-2xl transition-all hover:scale-105 cursor-pointer border-2 ${
+                  diagnosticsCompleted.writing ? 'border-green-500' : 'border-pink-400'
+                }`}>
+                  {diagnosticsCompleted.writing && (
+                    <div className="absolute -top-2 -right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                      ✓ Done
+                    </div>
+                  )}
+                  <div className="text-5xl mb-3">✍️</div>
+                  <h3 className="text-xl font-bold text-pink-600 mb-2">Writing Test</h3>
+                  <p className="text-gray-600 text-sm mb-3">
+                    Check your reading, grammar, and writing!
+                  </p>
+                  <div className="bg-pink-100 rounded-lg p-2 text-center">
+                    <span className="text-pink-700 font-semibold text-sm">⏱️ ~10 minutes</span>
+                  </div>
+                </div>
+              </Link>
+
+              {/* Science Test */}
+              <Link href="/kid/diagnostic/science">
+                <div className={`bg-white rounded-xl p-5 shadow-lg hover:shadow-2xl transition-all hover:scale-105 cursor-pointer border-2 ${
+                  diagnosticsCompleted.science ? 'border-green-500' : 'border-green-400'
+                }`}>
+                  {diagnosticsCompleted.science && (
+                    <div className="absolute -top-2 -right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                      ✓ Done
+                    </div>
+                  )}
+                  <div className="text-5xl mb-3">🔬</div>
+                  <h3 className="text-xl font-bold text-green-600 mb-2">Science Test</h3>
+                  <p className="text-gray-600 text-sm mb-3">
+                    Explore biology, physics, and chemistry!
+                  </p>
+                  <div className="bg-green-100 rounded-lg p-2 text-center">
+                    <span className="text-green-700 font-semibold text-sm">⏱️ ~10 minutes</span>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* Subject Filter */}
         <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
