@@ -102,6 +102,86 @@ export default function WritingDiagnosticPage() {
       correct: 1,
       topic: "vocabulary"
     },
+    {
+      id: 11,
+      question: "Which word is spelled correctly?",
+      options: ["seperate", "separate", "seperete", "separete"],
+      correct: 1,
+      topic: "spelling"
+    },
+    {
+      id: 12,
+      question: "What is the past tense of 'run'?",
+      options: ["runned", "ran", "running", "runs"],
+      correct: 1,
+      topic: "grammar"
+    },
+    {
+      id: 13,
+      question: "Which is an adjective?",
+      options: ["jump", "beautiful", "slowly", "under"],
+      correct: 1,
+      topic: "parts_of_speech"
+    },
+    {
+      id: 14,
+      question: "What does 'enormous' mean?",
+      options: ["tiny", "very large", "colorful", "fast"],
+      correct: 1,
+      topic: "vocabulary"
+    },
+    {
+      id: 15,
+      question: "Which sentence needs a comma?",
+      options: [
+        "I like pizza",
+        "She ran fast",
+        "I like pizza and she likes burgers",
+        "Yes I want to go"
+      ],
+      correct: 3,
+      topic: "punctuation"
+    },
+    {
+      id: 16,
+      question: "What is a compound word?",
+      options: ["running", "football", "quickly", "jumped"],
+      correct: 1,
+      topic: "vocabulary"
+    },
+    {
+      id: 17,
+      question: "Read: 'The quick brown fox jumps.' What is the adjective?",
+      options: ["quick", "fox", "jumps", "the"],
+      correct: 0,
+      topic: "reading_comprehension"
+    },
+    {
+      id: 18,
+      question: "Which needs a capital letter?",
+      options: ["dog", "monday", "happy", "blue"],
+      correct: 1,
+      topic: "capitalization"
+    },
+    {
+      id: 19,
+      question: "What is a synonym for 'big'?",
+      options: ["small", "large", "tiny", "little"],
+      correct: 1,
+      topic: "vocabulary"
+    },
+    {
+      id: 20,
+      question: "Which is a complete sentence?",
+      options: [
+        "Running fast",
+        "The blue car",
+        "She ate lunch",
+        "In the park"
+      ],
+      correct: 2,
+      topic: "grammar"
+    },
   ];
 
   const handleAnswer = (selectedIndex: number) => {
@@ -111,22 +191,22 @@ export default function WritingDiagnosticPage() {
     const isCorrect = selectedIndex === questions[currentQuestion].correct;
     if (isCorrect) {
       setScore(score + 1);
-      sounds?.playCorrect();
     } else {
-      sounds?.playWrong();
       const topic = questions[currentQuestion].topic;
       if (!weakTopics.includes(topic)) {
         setWeakTopics([...weakTopics, topic]);
       }
     }
 
+    sounds?.playClick();
+
     if (currentQuestion < questions.length - 1) {
-      setTimeout(() => setCurrentQuestion(currentQuestion + 1), 1000);
+      setTimeout(() => setCurrentQuestion(currentQuestion + 1), 300);
     } else {
       setTimeout(() => {
         setShowResult(true);
         saveDiagnosticResults();
-      }, 1000);
+      }, 300);
     }
   };
 
@@ -161,47 +241,39 @@ export default function WritingDiagnosticPage() {
   };
 
   if (showResult) {
-    const percentage = Math.round((score / questions.length) * 100);
-    const grade = percentage >= 90 ? "A" : percentage >= 80 ? "B" : percentage >= 70 ? "C" : percentage >= 60 ? "D" : "F";
-    
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 p-8 flex items-center justify-center">
         <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-2xl w-full">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-4">🎉 Writing Test Complete!</h1>
-            <div className="text-7xl mb-6">{percentage >= 70 ? "✨" : "📖"}</div>
+            <div className="text-7xl mb-6">✨</div>
             
             <div className="mb-8">
-              <div className="text-6xl font-bold text-pink-600 mb-2">{score}/{questions.length}</div>
-              <div className="text-3xl font-bold text-gray-700">Grade: {grade}</div>
-              <div className="text-xl text-gray-600">{percentage}%</div>
+              <p className="text-2xl font-bold text-gray-700 mb-4">
+                Fantastic work completing the test!
+              </p>
+              <p className="text-lg text-gray-600">
+                You answered {questions.length} questions and we learned a lot about your writing skills!
+              </p>
             </div>
             
             {weakTopics.length > 0 && (
-              <div className="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-6 mb-6">
-                <h2 className="text-2xl font-bold text-yellow-700 mb-3">📝 Areas to Work On:</h2>
+              <div className="bg-pink-50 border-2 border-pink-400 rounded-xl p-6 mb-6">
+                <h2 className="text-2xl font-bold text-pink-700 mb-3">📚 We'll Focus On:</h2>
                 <div className="flex flex-wrap gap-3 justify-center">
                   {weakTopics.map(topic => (
-                    <span key={topic} className="bg-yellow-200 text-yellow-800 px-4 py-2 rounded-full font-semibold">
+                    <span key={topic} className="bg-pink-200 text-pink-800 px-4 py-2 rounded-full font-semibold">
                       {topic.replace('_', ' ')}
                     </span>
                   ))}
                 </div>
                 <p className="text-gray-600 mt-4">
-                  We'll generate personalized lessons to help you improve! 🚀
+                  We'll create personalized lessons to help you learn even more! 🚀
                 </p>
               </div>
             )}
             
-            {percentage >= 90 && (
-              <p className="text-green-600 font-bold text-xl mb-4">🏆 Excellent! You're a writing wizard!</p>
-            )}
-            {percentage >= 70 && percentage < 90 && (
-              <p className="text-blue-600 font-bold text-xl mb-4">👏 Well done! Keep reading and writing!</p>
-            )}
-            {percentage < 70 && (
-              <p className="text-orange-600 font-bold text-xl mb-4">💪 Good effort! Practice makes perfect!</p>
-            )}
+            <p className="text-purple-600 font-bold text-xl mb-4">🎯 Your personalized writing lessons are ready!</p>
             
             <div className="flex gap-4 justify-center">
               <button
@@ -256,32 +328,13 @@ export default function WritingDiagnosticPage() {
                 className={`p-6 rounded-2xl font-bold text-xl transition-all transform hover:scale-105 text-left ${
                   answers[currentQuestion] === undefined
                     ? "bg-gradient-to-r from-pink-400 to-purple-400 text-white hover:from-pink-500 hover:to-purple-500 shadow-lg"
-                    : answers[currentQuestion] === index
-                    ? index === question.correct
-                      ? "bg-green-500 text-white scale-105"
-                      : "bg-red-500 text-white"
-                    : index === question.correct
-                    ? "bg-green-500 text-white"
-                    : "bg-gray-300 text-gray-600"
+                    : "bg-gray-400 text-white cursor-not-allowed"
                 }`}
               >
                 {option}
               </button>
             ))}
           </div>
-
-          {answers[currentQuestion] !== undefined && (
-            <div className={`mt-6 p-4 rounded-xl text-center font-bold text-lg ${
-              answers[currentQuestion] === question.correct
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
-            }`}>
-              {answers[currentQuestion] === question.correct
-                ? "🎉 Correct! Fantastic!"
-                : "❌ Not quite! The correct answer is: " + question.options[question.correct]
-              }
-            </div>
-          )}
         </div>
 
         <div className="mt-6 text-center">

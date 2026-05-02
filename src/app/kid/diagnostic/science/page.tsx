@@ -107,6 +107,81 @@ export default function ScienceDiagnosticPage() {
       correct: 2,
       topic: "astronomy"
     },
+    {
+      id: 11,
+      question: "What is the center of an atom called?",
+      options: ["Electron", "Nucleus", "Proton", "Neutron"],
+      correct: 1,
+      topic: "chemistry"
+    },
+    {
+      id: 12,
+      question: "What type of animal is a frog?",
+      options: ["Mammal", "Reptile", "Amphibian", "Fish"],
+      correct: 2,
+      topic: "biology"
+    },
+    {
+      id: 13,
+      question: "What do we call a baby kangaroo?",
+      options: ["Calf", "Joey", "Pup", "Kit"],
+      correct: 1,
+      topic: "biology"
+    },
+    {
+      id: 14,
+      question: "What is the closest star to Earth?",
+      options: ["Polaris", "Sirius", "The Sun", "Alpha Centauri"],
+      correct: 2,
+      topic: "astronomy"
+    },
+    {
+      id: 15,
+      question: "What gas do humans breathe in?",
+      options: ["Carbon Dioxide", "Oxygen", "Nitrogen", "Helium"],
+      correct: 1,
+      topic: "biology"
+    },
+    {
+      id: 16,
+      question: "What is the boiling point of water?",
+      options: ["0°C", "50°C", "100°C", "200°C"],
+      correct: 2,
+      topic: "chemistry"
+    },
+    {
+      id: 17,
+      question: "What causes thunder?",
+      options: [
+        "Clouds bumping together",
+        "Lightning heating the air rapidly",
+        "Wind blowing fast",
+        "Rain falling hard"
+      ],
+      correct: 1,
+      topic: "physics"
+    },
+    {
+      id: 18,
+      question: "How many legs does a spider have?",
+      options: ["6", "8", "10", "12"],
+      correct: 1,
+      topic: "biology"
+    },
+    {
+      id: 19,
+      question: "What is the largest planet in our solar system?",
+      options: ["Earth", "Saturn", "Jupiter", "Neptune"],
+      correct: 2,
+      topic: "astronomy"
+    },
+    {
+      id: 20,
+      question: "What do we call a scientist who studies rocks?",
+      options: ["Biologist", "Geologist", "Meteorologist", "Astronomer"],
+      correct: 1,
+      topic: "earth_science"
+    },
   ];
 
   const handleAnswer = (selectedIndex: number) => {
@@ -116,22 +191,22 @@ export default function ScienceDiagnosticPage() {
     const isCorrect = selectedIndex === questions[currentQuestion].correct;
     if (isCorrect) {
       setScore(score + 1);
-      sounds?.playCorrect();
     } else {
-      sounds?.playWrong();
       const topic = questions[currentQuestion].topic;
       if (!weakTopics.includes(topic)) {
         setWeakTopics([...weakTopics, topic]);
       }
     }
 
+    sounds?.playClick();
+
     if (currentQuestion < questions.length - 1) {
-      setTimeout(() => setCurrentQuestion(currentQuestion + 1), 1000);
+      setTimeout(() => setCurrentQuestion(currentQuestion + 1), 300);
     } else {
       setTimeout(() => {
         setShowResult(true);
         saveDiagnosticResults();
-      }, 1000);
+      }, 300);
     }
   };
 
@@ -166,47 +241,39 @@ export default function ScienceDiagnosticPage() {
   };
 
   if (showResult) {
-    const percentage = Math.round((score / questions.length) * 100);
-    const grade = percentage >= 90 ? "A" : percentage >= 80 ? "B" : percentage >= 70 ? "C" : percentage >= 60 ? "D" : "F";
-    
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-500 via-teal-500 to-blue-500 p-8 flex items-center justify-center">
         <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-2xl w-full">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-4">🎉 Science Test Complete!</h1>
-            <div className="text-7xl mb-6">{percentage >= 70 ? "🔬" : "🧪"}</div>
+            <div className="text-7xl mb-6">🔬</div>
             
             <div className="mb-8">
-              <div className="text-6xl font-bold text-green-600 mb-2">{score}/{questions.length}</div>
-              <div className="text-3xl font-bold text-gray-700">Grade: {grade}</div>
-              <div className="text-xl text-gray-600">{percentage}%</div>
+              <p className="text-2xl font-bold text-gray-700 mb-4">
+                Excellent work completing the test!
+              </p>
+              <p className="text-lg text-gray-600">
+                You answered {questions.length} questions and we learned a lot about your science knowledge!
+              </p>
             </div>
             
             {weakTopics.length > 0 && (
-              <div className="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-6 mb-6">
-                <h2 className="text-2xl font-bold text-yellow-700 mb-3">📝 Areas to Work On:</h2>
+              <div className="bg-green-50 border-2 border-green-400 rounded-xl p-6 mb-6">
+                <h2 className="text-2xl font-bold text-green-700 mb-3">📚 We'll Focus On:</h2>
                 <div className="flex flex-wrap gap-3 justify-center">
                   {weakTopics.map(topic => (
-                    <span key={topic} className="bg-yellow-200 text-yellow-800 px-4 py-2 rounded-full font-semibold">
+                    <span key={topic} className="bg-green-200 text-green-800 px-4 py-2 rounded-full font-semibold">
                       {topic.replace('_', ' ')}
                     </span>
                   ))}
                 </div>
                 <p className="text-gray-600 mt-4">
-                  We'll generate personalized lessons to help you improve! 🚀
+                  We'll create personalized lessons to help you learn even more! 🚀
                 </p>
               </div>
             )}
             
-            {percentage >= 90 && (
-              <p className="text-green-600 font-bold text-xl mb-4">🏆 Outstanding! You're a science superstar!</p>
-            )}
-            {percentage >= 70 && percentage < 90 && (
-              <p className="text-blue-600 font-bold text-xl mb-4">👏 Great work! Keep exploring science!</p>
-            )}
-            {percentage < 70 && (
-              <p className="text-orange-600 font-bold text-xl mb-4">💪 Nice try! Let's dive deeper into science!</p>
-            )}
+            <p className="text-teal-600 font-bold text-xl mb-4">🎯 Your personalized science lessons are ready!</p>
             
             <div className="flex gap-4 justify-center">
               <button
@@ -261,32 +328,13 @@ export default function ScienceDiagnosticPage() {
                 className={`p-6 rounded-2xl font-bold text-xl transition-all transform hover:scale-105 text-left ${
                   answers[currentQuestion] === undefined
                     ? "bg-gradient-to-r from-green-400 to-teal-400 text-white hover:from-green-500 hover:to-teal-500 shadow-lg"
-                    : answers[currentQuestion] === index
-                    ? index === question.correct
-                      ? "bg-green-500 text-white scale-105"
-                      : "bg-red-500 text-white"
-                    : index === question.correct
-                    ? "bg-green-500 text-white"
-                    : "bg-gray-300 text-gray-600"
+                    : "bg-gray-400 text-white cursor-not-allowed"
                 }`}
               >
                 {option}
               </button>
             ))}
           </div>
-
-          {answers[currentQuestion] !== undefined && (
-            <div className={`mt-6 p-4 rounded-xl text-center font-bold text-lg ${
-              answers[currentQuestion] === question.correct
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
-            }`}>
-              {answers[currentQuestion] === question.correct
-                ? "🎉 Correct! You're a scientist!"
-                : "❌ Not quite! The correct answer is: " + question.options[question.correct]
-              }
-            </div>
-          )}
         </div>
 
         <div className="mt-6 text-center">

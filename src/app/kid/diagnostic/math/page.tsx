@@ -92,6 +92,76 @@ export default function MathDiagnosticPage() {
       correct: 2,
       topic: "word_problems"
     },
+    {
+      id: 11,
+      question: "What is 123 + 456?",
+      options: ["579", "589", "569", "599"],
+      correct: 0,
+      topic: "addition"
+    },
+    {
+      id: 12,
+      question: "What is 100 - 37?",
+      options: ["63", "73", "53", "67"],
+      correct: 0,
+      topic: "subtraction"
+    },
+    {
+      id: 13,
+      question: "What is 12 × 9?",
+      options: ["98", "108", "118", "88"],
+      correct: 1,
+      topic: "multiplication"
+    },
+    {
+      id: 14,
+      question: "What is 144 ÷ 12?",
+      options: ["10", "11", "12", "14"],
+      correct: 2,
+      topic: "division"
+    },
+    {
+      id: 15,
+      question: "What is 2/3 + 1/3?",
+      options: ["3/6", "3/3", "1", "Both B and C"],
+      correct: 3,
+      topic: "fractions"
+    },
+    {
+      id: 16,
+      question: "What is 50% of 200?",
+      options: ["50", "75", "100", "150"],
+      correct: 2,
+      topic: "percentages"
+    },
+    {
+      id: 17,
+      question: "A circle has a radius of 5. What is its diameter?",
+      options: ["5", "10", "15", "25"],
+      correct: 1,
+      topic: "geometry"
+    },
+    {
+      id: 18,
+      question: "What is 5³?",
+      options: ["15", "25", "75", "125"],
+      correct: 3,
+      topic: "exponents"
+    },
+    {
+      id: 19,
+      question: "What comes next? 5, 10, 15, 20, __",
+      options: ["22", "25", "30", "35"],
+      correct: 1,
+      topic: "patterns"
+    },
+    {
+      id: 20,
+      question: "Tom has $50. He spends $12 on lunch and $8 on a book. How much does he have left?",
+      options: ["$20", "$25", "$30", "$35"],
+      correct: 2,
+      topic: "word_problems"
+    },
   ];
 
   const handleAnswer = (selectedIndex: number) => {
@@ -101,9 +171,7 @@ export default function MathDiagnosticPage() {
     const isCorrect = selectedIndex === questions[currentQuestion].correct;
     if (isCorrect) {
       setScore(score + 1);
-      sounds?.playCorrect();
     } else {
-      sounds?.playWrong();
       // Track weak topic
       const topic = questions[currentQuestion].topic;
       if (!weakTopics.includes(topic)) {
@@ -111,14 +179,16 @@ export default function MathDiagnosticPage() {
       }
     }
 
+    sounds?.playClick();
+
     // Move to next question or show results
     if (currentQuestion < questions.length - 1) {
-      setTimeout(() => setCurrentQuestion(currentQuestion + 1), 1000);
+      setTimeout(() => setCurrentQuestion(currentQuestion + 1), 300);
     } else {
       setTimeout(() => {
         setShowResult(true);
         saveDiagnosticResults();
-      }, 1000);
+      }, 300);
     }
   };
 
@@ -155,47 +225,39 @@ export default function MathDiagnosticPage() {
   };
 
   if (showResult) {
-    const percentage = Math.round((score / questions.length) * 100);
-    const grade = percentage >= 90 ? "A" : percentage >= 80 ? "B" : percentage >= 70 ? "C" : percentage >= 60 ? "D" : "F";
-    
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-8 flex items-center justify-center">
         <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-2xl w-full">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-4">🎉 Math Test Complete!</h1>
-            <div className="text-7xl mb-6">{percentage >= 70 ? "🌟" : "📚"}</div>
+            <div className="text-7xl mb-6">🌟</div>
             
             <div className="mb-8">
-              <div className="text-6xl font-bold text-blue-600 mb-2">{score}/{questions.length}</div>
-              <div className="text-3xl font-bold text-gray-700">Grade: {grade}</div>
-              <div className="text-xl text-gray-600">{percentage}%</div>
+              <p className="text-2xl font-bold text-gray-700 mb-4">
+                Great job completing the test!
+              </p>
+              <p className="text-lg text-gray-600">
+                You answered {questions.length} questions and we learned a lot about your math skills!
+              </p>
             </div>
             
             {weakTopics.length > 0 && (
-              <div className="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-6 mb-6">
-                <h2 className="text-2xl font-bold text-yellow-700 mb-3">📝 Areas to Work On:</h2>
+              <div className="bg-blue-50 border-2 border-blue-400 rounded-xl p-6 mb-6">
+                <h2 className="text-2xl font-bold text-blue-700 mb-3">📚 We'll Focus On:</h2>
                 <div className="flex flex-wrap gap-3 justify-center">
                   {weakTopics.map(topic => (
-                    <span key={topic} className="bg-yellow-200 text-yellow-800 px-4 py-2 rounded-full font-semibold">
+                    <span key={topic} className="bg-blue-200 text-blue-800 px-4 py-2 rounded-full font-semibold">
                       {topic.replace('_', ' ')}
                     </span>
                   ))}
                 </div>
                 <p className="text-gray-600 mt-4">
-                  We'll generate personalized lessons to help you improve! 🚀
+                  We'll create personalized lessons to help you learn even more! 🚀
                 </p>
               </div>
             )}
             
-            {percentage >= 90 && (
-              <p className="text-green-600 font-bold text-xl mb-4">🏆 Amazing work! You're a math superstar!</p>
-            )}
-            {percentage >= 70 && percentage < 90 && (
-              <p className="text-blue-600 font-bold text-xl mb-4">👏 Great job! Keep practicing to reach mastery!</p>
-            )}
-            {percentage < 70 && (
-              <p className="text-orange-600 font-bold text-xl mb-4">💪 Good start! Let's work on those weak areas!</p>
-            )}
+            <p className="text-purple-600 font-bold text-xl mb-4">🎯 Your personalized math lessons are ready!</p>
             
             <div className="flex gap-4 justify-center">
               <button
@@ -253,33 +315,13 @@ export default function MathDiagnosticPage() {
                 className={`p-6 rounded-2xl font-bold text-xl transition-all transform hover:scale-105 ${
                   answers[currentQuestion] === undefined
                     ? "bg-gradient-to-r from-blue-400 to-purple-400 text-white hover:from-blue-500 hover:to-purple-500 shadow-lg"
-                    : answers[currentQuestion] === index
-                    ? index === question.correct
-                      ? "bg-green-500 text-white scale-105"
-                      : "bg-red-500 text-white"
-                    : index === question.correct
-                    ? "bg-green-500 text-white"
-                    : "bg-gray-300 text-gray-600"
+                    : "bg-gray-400 text-white cursor-not-allowed"
                 }`}
               >
                 {option}
               </button>
             ))}
           </div>
-
-          {/* Feedback */}
-          {answers[currentQuestion] !== undefined && (
-            <div className={`mt-6 p-4 rounded-xl text-center font-bold text-lg ${
-              answers[currentQuestion] === question.correct
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
-            }`}>
-              {answers[currentQuestion] === question.correct
-                ? "🎉 Correct! Great job!"
-                : "❌ Oops! The correct answer is: " + question.options[question.correct]
-              }
-            </div>
-          )}
         </div>
 
         {/* Exit Button */}

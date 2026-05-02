@@ -192,7 +192,7 @@ export default function LessonsPage() {
                         Test your arithmetic, fractions, and problem-solving skills!
                       </p>
                       <div className="bg-blue-500/20 rounded-lg p-2 text-center">
-                        <span className="text-blue-300 font-bold">⏱️ ~10 minutes</span>
+                        <span className="text-blue-300 font-bold">⏱️ ~15 minutes</span>
                       </div>
                     </div>
                   </div>
@@ -220,7 +220,7 @@ export default function LessonsPage() {
                         Check your reading, grammar, and writing abilities!
                       </p>
                       <div className="bg-pink-500/20 rounded-lg p-2 text-center">
-                        <span className="text-pink-300 font-bold">⏱️ ~10 minutes</span>
+                        <span className="text-pink-300 font-bold">⏱️ ~15 minutes</span>
                       </div>
                     </div>
                   </div>
@@ -248,7 +248,7 @@ export default function LessonsPage() {
                         Explore your knowledge of biology, physics, and chemistry!
                       </p>
                       <div className="bg-green-500/20 rounded-lg p-2 text-center">
-                        <span className="text-green-300 font-bold">⏱️ ~10 minutes</span>
+                        <span className="text-green-300 font-bold">⏱️ ~15 minutes</span>
                       </div>
                     </div>
                   </div>
@@ -490,7 +490,7 @@ export default function LessonsPage() {
                     Test your arithmetic, fractions, and problem-solving!
                   </p>
                   <div className="bg-blue-100 rounded-lg p-2 text-center">
-                    <span className="text-blue-700 font-semibold text-sm">⏱️ ~10 minutes</span>
+                    <span className="text-blue-700 font-semibold text-sm">⏱️ ~15 minutes</span>
                   </div>
                 </div>
               </Link>
@@ -511,7 +511,7 @@ export default function LessonsPage() {
                     Check your reading, grammar, and writing!
                   </p>
                   <div className="bg-pink-100 rounded-lg p-2 text-center">
-                    <span className="text-pink-700 font-semibold text-sm">⏱️ ~10 minutes</span>
+                    <span className="text-pink-700 font-semibold text-sm">⏱️ ~15 minutes</span>
                   </div>
                 </div>
               </Link>
@@ -532,7 +532,7 @@ export default function LessonsPage() {
                     Explore biology, physics, and chemistry!
                   </p>
                   <div className="bg-green-100 rounded-lg p-2 text-center">
-                    <span className="text-green-700 font-semibold text-sm">⏱️ ~10 minutes</span>
+                    <span className="text-green-700 font-semibold text-sm">⏱️ ~15 minutes</span>
                   </div>
                 </div>
               </Link>
