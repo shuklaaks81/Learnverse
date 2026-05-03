@@ -599,52 +599,68 @@ if (block.id === 1) {
             {/* Template 1: Chunk by Chunk Generation */}
             <div className="mb-6 bg-gray-900/80 p-5 rounded-2xl border-2 border-red-500/50">
               <h3 className="text-2xl font-bold text-orange-300 mb-3 flex items-center gap-2">
-                🧱 Template 1: Massive Nether Generation (To World Border!)
+                🧱 Template 1: Nether Generation (WORKING VERSION!)
               </h3>
               <p className="text-white/80 mb-3 text-sm">
-                ⚡ Generates 9x9x9 cubes to the WORLD BORDER (100,000 blocks)! 🔥
+                ⚡ Generates 9x9x9 cubes below you! You'll SEE it generate! 🔥
               </p>
               <div className="bg-black/50 p-4 rounded-xl overflow-x-auto">
                 <pre className="text-green-400 text-xs font-mono">
-{`// MASSIVE Nether generation to world border!
-let currentChunkX = -100000;  // Start at world border
-let currentChunkZ = -100000;
-let currentChunkY = -5;       // Start Y position
-const CUBE_SIZE = 9;          // Generate 9x9x9 cubes!
-const BEDROCK_Y = 0;          // Bedrock level
-const NETHER_START = -5;      // Start Nether below bedrock
-const NETHER_HEIGHT = 30;     // Nether is 30 blocks tall
-const WORLD_BORDER = 100000;  // World border limit
+{`// Nether generation that WORKS and you can SEE!
+let currentPlayer = null;    // Store player reference
+let startX = 0;              // Will be set to player position
+let startZ = 0;
+let currentX = 0;
+let currentZ = 0;
+let currentY = -10;          // Start Y position (below bedrock)
+const CUBE_SIZE = 9;         // Generate 9x9x9 cubes!
+const NETHER_HEIGHT = 30;    // Nether is 30 blocks tall
+const AREA_SIZE = 100;       // Generate 100 blocks around spawn (change to 100000 for world border!)
 let totalCubes = 0;
 
 function onPlayerJoin(player) {
-  // Start MASSIVE generation!
-  player.sendMessage("🔥 Starting Nether generation to world border!");
-  generateNextCube();
+  currentPlayer = player;    // Save player!
+  
+  // Get player position
+  let pos = player.getPosition();
+  startX = Math.floor(pos.x) - 50;  // Start 50 blocks away
+  startZ = Math.floor(pos.z) - 50;
+  currentX = startX;
+  currentZ = startZ;
+  
+  console.log("🔥 Starting Nether generation at X:" + startX + " Z:" + startZ);
+  player.sendMessage("🔥 Starting Nether generation! Look around you!");
+  
+  // Generate first cube immediately so you see something!
+  setTimeout(() => generateNextCube(), 100);
 }
 
 function generateNextCube() {
-  // Generate one 9x9x9 cube at a time
-  for (let x = currentChunkX; x < currentChunkX + CUBE_SIZE; x++) {
-    for (let z = currentChunkZ; z < currentChunkZ + CUBE_SIZE; z++) {
-      for (let y = currentChunkY; y < currentChunkY + CUBE_SIZE; y++) {
+  console.log("Generating cube at X:" + currentX + " Y:" + currentY + " Z:" + currentZ);
+  
+  // Generate one 9x9x9 cube
+  for (let x = currentX; x < currentX + CUBE_SIZE; x++) {
+    for (let z = currentZ; z < currentZ + CUBE_SIZE; z++) {
+      for (let y = currentY; y < currentY + CUBE_SIZE; y++) {
         
-        // Only generate in Nether range
-        if (y >= NETHER_START && y < NETHER_START + NETHER_HEIGHT) {
-          // Netherrack base (red wool)
-          if (Math.random() > 0.1) {
-            world.setBlock(x, y, z, 'red_wool');
-          }
-          
-          // Soul sand patches (brown wool)
-          if (y === NETHER_START && Math.random() > 0.85) {
-            world.setBlock(x, y, z, 'brown_wool');
-          }
-          
-          // Lava lakes
-          if (y < NETHER_START + 12 && Math.random() > 0.96) {
-            world.setBlock(x, y, z, 'lava');
-          }
+        // Netherrack base (red wool) - dense!
+        if (Math.random() > 0.05) {
+          world.setBlock(x, y, z, 'red_wool');
+        }
+        
+        // Soul sand patches (brown wool)
+        if (y === currentY && Math.random() > 0.85) {
+          world.setBlock(x, y, z, 'brown_wool');
+        }
+        
+        // Lava lakes - rare
+        if (Math.random() > 0.97) {
+          world.setBlock(x, y, z, 'lava');
+        }
+        
+        // Glowstone (yellow wool) - very rare
+        if (Math.random() > 0.98) {
+          world.setBlock(x, y, z, 'yellow_wool');
         }
       }
     }
@@ -652,77 +668,99 @@ function generateNextCube() {
   
   totalCubes++;
   
-  // Move to next cube
-  currentChunkY += CUBE_SIZE;
+  // Move to next cube horizontally first
+  currentX += CUBE_SIZE;
   
-  // If we finished this column, move to next X position
-  if (currentChunkY >= NETHER_START + NETHER_HEIGHT) {
-    currentChunkY = NETHER_START;
-    currentChunkX += CUBE_SIZE;
+  // If we finished this row, move to next Z
+  if (currentX >= startX + AREA_SIZE) {
+    currentX = startX;
+    currentZ += CUBE_SIZE;
     
-    // If we finished this X row, move to next Z
-    if (currentChunkX >= WORLD_BORDER) {
-      currentChunkX = -WORLD_BORDER;
-      currentChunkZ += CUBE_SIZE;
-      
-      // Progress update every row
-      player.sendMessage(\`🔥 Row complete! Generated \${totalCubes} cubes so far...\`);
+    // Progress update every row
+    if (currentPlayer) {
+      currentPlayer.sendMessage("🔥 Row complete! Generated " + totalCubes + " cubes!");
     }
+    console.log("🔥 Row complete! Total cubes: " + totalCubes);
   }
   
-  // Check if we're done
-  if (currentChunkZ >= WORLD_BORDER) {
-    player.sendMessage("✅ NETHER GEN COMPLETE! 🔥🔥🔥");
-    player.sendMessage(\`Total cubes generated: \${totalCubes}\`);
+  // If we finished all rows, move up
+  if (currentZ >= startZ + AREA_SIZE) {
+    currentZ = startZ;
+    currentY += CUBE_SIZE;
+  }
+  
+  // Check if we're done (generated all height layers)
+  if (currentY >= -10 + NETHER_HEIGHT) {
+    if (currentPlayer) {
+      currentPlayer.sendMessage("✅ NETHER GEN COMPLETE! 🔥🔥🔥");
+      currentPlayer.sendMessage("Total cubes: " + totalCubes);
+    }
+    console.log("✅ GENERATION COMPLETE! Total: " + totalCubes + " cubes");
     return; // Stop generating
   }
   
-  // Continue generating after short delay
-  setTimeout(generateNextCube, 500);  // 0.5 second delay
+  // Continue generating after short delay (prevents lag!)
+  setTimeout(() => generateNextCube(), 200);  // 0.2 second delay
 }`}
                 </pre>
               </div>
               <button
                 onClick={() => {
-                  const code1 = `// MASSIVE Nether generation to world border!
-let currentChunkX = -100000;  // Start at world border
-let currentChunkZ = -100000;
-let currentChunkY = -5;       // Start Y position
-const CUBE_SIZE = 9;          // Generate 9x9x9 cubes!
-const BEDROCK_Y = 0;          // Bedrock level
-const NETHER_START = -5;      // Start Nether below bedrock
-const NETHER_HEIGHT = 30;     // Nether is 30 blocks tall
-const WORLD_BORDER = 100000;  // World border limit
+                  const code1 = `// Nether generation that WORKS and you can SEE!
+let currentPlayer = null;    // Store player reference
+let startX = 0;              // Will be set to player position
+let startZ = 0;
+let currentX = 0;
+let currentZ = 0;
+let currentY = -10;          // Start Y position (below bedrock)
+const CUBE_SIZE = 9;         // Generate 9x9x9 cubes!
+const NETHER_HEIGHT = 30;    // Nether is 30 blocks tall
+const AREA_SIZE = 100;       // Generate 100 blocks around spawn (change to 100000 for world border!)
 let totalCubes = 0;
 
 function onPlayerJoin(player) {
-  // Start MASSIVE generation!
-  player.sendMessage("🔥 Starting Nether generation to world border!");
-  generateNextCube();
+  currentPlayer = player;    // Save player!
+  
+  // Get player position
+  let pos = player.getPosition();
+  startX = Math.floor(pos.x) - 50;  // Start 50 blocks away
+  startZ = Math.floor(pos.z) - 50;
+  currentX = startX;
+  currentZ = startZ;
+  
+  console.log("🔥 Starting Nether generation at X:" + startX + " Z:" + startZ);
+  player.sendMessage("🔥 Starting Nether generation! Look around you!");
+  
+  // Generate first cube immediately so you see something!
+  setTimeout(() => generateNextCube(), 100);
 }
 
 function generateNextCube() {
-  // Generate one 9x9x9 cube at a time
-  for (let x = currentChunkX; x < currentChunkX + CUBE_SIZE; x++) {
-    for (let z = currentChunkZ; z < currentChunkZ + CUBE_SIZE; z++) {
-      for (let y = currentChunkY; y < currentChunkY + CUBE_SIZE; y++) {
+  console.log("Generating cube at X:" + currentX + " Y:" + currentY + " Z:" + currentZ);
+  
+  // Generate one 9x9x9 cube
+  for (let x = currentX; x < currentX + CUBE_SIZE; x++) {
+    for (let z = currentZ; z < currentZ + CUBE_SIZE; z++) {
+      for (let y = currentY; y < currentY + CUBE_SIZE; y++) {
         
-        // Only generate in Nether range
-        if (y >= NETHER_START && y < NETHER_START + NETHER_HEIGHT) {
-          // Netherrack base (red wool)
-          if (Math.random() > 0.1) {
-            world.setBlock(x, y, z, 'red_wool');
-          }
-          
-          // Soul sand patches (brown wool)
-          if (y === NETHER_START && Math.random() > 0.85) {
-            world.setBlock(x, y, z, 'brown_wool');
-          }
-          
-          // Lava lakes
-          if (y < NETHER_START + 12 && Math.random() > 0.96) {
-            world.setBlock(x, y, z, 'lava');
-          }
+        // Netherrack base (red wool) - dense!
+        if (Math.random() > 0.05) {
+          world.setBlock(x, y, z, 'red_wool');
+        }
+        
+        // Soul sand patches (brown wool)
+        if (y === currentY && Math.random() > 0.85) {
+          world.setBlock(x, y, z, 'brown_wool');
+        }
+        
+        // Lava lakes - rare
+        if (Math.random() > 0.97) {
+          world.setBlock(x, y, z, 'lava');
+        }
+        
+        // Glowstone (yellow wool) - very rare
+        if (Math.random() > 0.98) {
+          world.setBlock(x, y, z, 'yellow_wool');
         }
       }
     }
@@ -730,33 +768,39 @@ function generateNextCube() {
   
   totalCubes++;
   
-  // Move to next cube
-  currentChunkY += CUBE_SIZE;
+  // Move to next cube horizontally first
+  currentX += CUBE_SIZE;
   
-  // If we finished this column, move to next X position
-  if (currentChunkY >= NETHER_START + NETHER_HEIGHT) {
-    currentChunkY = NETHER_START;
-    currentChunkX += CUBE_SIZE;
+  // If we finished this row, move to next Z
+  if (currentX >= startX + AREA_SIZE) {
+    currentX = startX;
+    currentZ += CUBE_SIZE;
     
-    // If we finished this X row, move to next Z
-    if (currentChunkX >= WORLD_BORDER) {
-      currentChunkX = -WORLD_BORDER;
-      currentChunkZ += CUBE_SIZE;
-      
-      // Progress update every row
-      player.sendMessage(\`🔥 Row complete! Generated \${totalCubes} cubes so far...\`);
+    // Progress update every row
+    if (currentPlayer) {
+      currentPlayer.sendMessage("🔥 Row complete! Generated " + totalCubes + " cubes!");
     }
+    console.log("🔥 Row complete! Total cubes: " + totalCubes);
   }
   
-  // Check if we're done
-  if (currentChunkZ >= WORLD_BORDER) {
-    player.sendMessage("✅ NETHER GEN COMPLETE! 🔥🔥🔥");
-    player.sendMessage(\`Total cubes generated: \${totalCubes}\`);
+  // If we finished all rows, move up
+  if (currentZ >= startZ + AREA_SIZE) {
+    currentZ = startZ;
+    currentY += CUBE_SIZE;
+  }
+  
+  // Check if we're done (generated all height layers)
+  if (currentY >= -10 + NETHER_HEIGHT) {
+    if (currentPlayer) {
+      currentPlayer.sendMessage("✅ NETHER GEN COMPLETE! 🔥🔥🔥");
+      currentPlayer.sendMessage("Total cubes: " + totalCubes);
+    }
+    console.log("✅ GENERATION COMPLETE! Total: " + totalCubes + " cubes");
     return; // Stop generating
   }
   
-  // Continue generating after short delay
-  setTimeout(generateNextCube, 500);  // 0.5 second delay
+  // Continue generating after short delay (prevents lag!)
+  setTimeout(() => generateNextCube(), 200);  // 0.2 second delay
 }`;
                   navigator.clipboard.writeText(code1);
                   alert('📋 Template 1 copied to clipboard!');
