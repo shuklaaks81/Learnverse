@@ -19,7 +19,7 @@ export default function BloxdCodeFixer() {
   const [scanned, setScanned] = useState(false);
   const [mode, setMode] = useState<'world' | 'block'>('world');
 
-  // BLOXD.io code scanner and fixer
+  // BLOXD.io code scanner and fixer - ADVANCED VERSION!
   const scanAndFixCode = () => {
     setScanning(true);
     setScanned(false);
@@ -28,6 +28,11 @@ export default function BloxdCodeFixer() {
       const foundIssues: CodeIssue[] = [];
       let fixed = code;
       const lines = code.split('\n');
+      
+      // Track defined variables and functions for existence checking!
+      const definedVars = new Set<string>();
+      const definedFunctions = new Set<string>();
+      const usedVars = new Set<string>();
 
       // World Code Mode - Check for callbacks
       if (mode === 'world') {
@@ -46,11 +51,11 @@ export default function BloxdCodeFixer() {
         }
 
         // Check for world object usage
-        if (!code.includes('world.')) {
+        if (!code.includes('world.') && !code.includes('api.')) {
           foundIssues.push({
             line: 0,
             type: 'info',
-            message: '💡 World code usually uses the "world" object (world.spawnEntity, world.getBlock, etc.)',
+            message: '💡 World code usually uses "world" or "api" object (world.setBlock, api.attemptSpawnMob, etc.)',
             fix: 'Recommendation'
           });
         }
@@ -82,6 +87,41 @@ export default function BloxdCodeFixer() {
       // Check for common BLOXD.io issues (both modes)
       lines.forEach((line, index) => {
         const lineNum = index + 1;
+        const trimmed = line.trim();
+
+        // ADVANCED SYNTAX ERROR CHECKS!
+        
+        // Missing closing parentheses
+        const openParen = (line.match(/\(/g) || []).length;
+        const closeParen = (line.match(/\)/g) || []).length;
+        if (openParen !== closeParen && trimmed && !trimmed.startsWith('//')) {
+          foundIssues.push({
+            line: lineNum,
+            type: 'error',
+            message: `❌ SYNTAX ERROR: Mismatched parentheses! (${openParen} open, ${closeParen} close)`,
+            fix: 'Check your () brackets'
+          });
+        }
+
+        // Missing closing quotes
+        const singleQuotes = (line.match(/'/g) || []).length;
+        const doubleQuotes = (line.match(/"/g) || []).length;
+        if (singleQuotes % 2 !== 0 && !trimmed.startsWith('//')) {
+          foundIssues.push({
+            line: lineNum,
+            type: 'error',
+            message: "❌ SYNTAX ERROR: Unclosed single quote '",
+            fix: 'Add closing quote'
+          });
+        }
+        if (doubleQuotes % 2 !== 0 && !trimmed.startsWith('//')) {
+          foundIssues.push({
+            line: lineNum,
+            type: 'error',
+            message: '❌ SYNTAX ERROR: Unclosed double quote "',
+            fix: 'Add closing quote'
+          });
+        }
 
         // Missing semicolons
         if (line.trim() && !line.trim().endsWith(';') && !line.trim().endsWith('{') && !line.trim().endsWith('}') && !line.trim().startsWith('//') && !line.trim().startsWith('if') && !line.trim().startsWith('for') && !line.trim().startsWith('while') && !line.trim().startsWith('function')) {
@@ -109,31 +149,126 @@ export default function BloxdCodeFixer() {
           foundIssues.push({
             line: lineNum,
             type: 'error',
-            message: 'Typo: "retrun" should be "return"',
+            message: '❌ TYPO: "retrun" should be "return"',
             fix: 'Fixed typo'
           });
-          fixed = fixed.replace('retrun', 'return');
+          fixed = fixed.replace(/retrun/g, 'return');
+        }
+        if (line.includes('reutrn')) {
+          foundIssues.push({
+            line: lineNum,
+            type: 'error',
+            message: '❌ TYPO: "reutrn" should be "return"',
+            fix: 'Fixed typo'
+          });
+          fixed = fixed.replace(/reutrn/g, 'return');
+        }
+        if (line.includes('funtion')) {
+          foundIssues.push({
+            line: lineNum,
+            type: 'error',
+            message: '❌ TYPO: "funtion" should be "function"',
+            fix: 'Fixed typo'
+          });
+          fixed = fixed.replace(/funtion/g, 'function');
+        }
+        if (line.includes('funciton')) {
+          foundIssues.push({
+            line: lineNum,
+            type: 'error',
+            message: '❌ TYPO: "funciton" should be "function"',
+            fix: 'Fixed typo'
+          });
+          fixed = fixed.replace(/funciton/g, 'function');
         }
 
         if (line.includes('cosole')) {
           foundIssues.push({
             line: lineNum,
             type: 'error',
-            message: 'Typo: "cosole" should be "console"',
+            message: '❌ TYPO: "cosole" should be "console"',
             fix: 'Fixed typo'
           });
-          fixed = fixed.replace('cosole', 'console');
+          fixed = fixed.replace(/cosole/g, 'console');
         }
-
-        // BLOXD.io specific checks
-        if (line.includes('player.positon')) {
+        if (line.includes('consol.')) {
           foundIssues.push({
             line: lineNum,
             type: 'error',
-            message: 'Typo: "positon" should be "position"',
+            message: '❌ TYPO: "consol" should be "console"',
             fix: 'Fixed typo'
           });
-          fixed = fixed.replace('player.positon', 'player.position');
+          fixed = fixed.replace(/consol\./g, 'console.');
+        }
+        if (line.match(/\bture\b/)) {
+          foundIssues.push({
+            line: lineNum,
+            type: 'error',
+            message: '❌ TYPO: "ture" should be "true"',
+            fix: 'Fixed typo'
+          });
+          fixed = fixed.replace(/\bture\b/g, 'true');
+        }
+        if (line.match(/\bflase\b/)) {
+          foundIssues.push({
+            line: lineNum,
+            type: 'error',
+            message: '❌ TYPO: "flase" should be "false"',
+            fix: 'Fixed typo'
+          });
+          fixed = fixed.replace(/\bflase\b/g, 'false');
+        }
+        if (line.includes('postion')) {
+          foundIssues.push({
+            line: lineNum,
+            type: 'error',
+            message: '❌ TYPO: "postion" should be "position"',
+            fix: 'Fixed typo'
+          });
+          fixed = fixed.replace(/postion/g, 'position');
+        }
+
+        // Track function definitions for existence checking
+        const funcMatch = line.match(/function\s+([a-zA-Z_]\w*)/);
+        if (funcMatch) {
+          definedFunctions.add(funcMatch[1]);
+        }
+        
+        // Track variable declarations
+        const varMatch = line.match(/(?:let|const|var)\s+([a-zA-Z_]\w*)/);
+        if (varMatch) {
+          definedVars.add(varMatch[1]);
+        }
+        
+        // Track variable usage
+        const usageMatches = line.matchAll(/\b([a-zA-Z_]\w*)\b/g);
+        for (const match of usageMatches) {
+          const varName = match[1];
+          if (!['if', 'for', 'while', 'function', 'let', 'const', 'var', 'return', 'true', 'false', 'null', 'undefined', 'this', 'else'].includes(varName)) {
+            usedVars.add(varName);
+          }
+        }
+
+        // BLOXD.io specific checks
+        if (line.includes('player.positon') || line.includes('.positon')) {
+          foundIssues.push({
+            line: lineNum,
+            type: 'error',
+            message: '❌ TYPO: "positon" should be "position"',
+            fix: 'Fixed typo'
+          });
+          fixed = fixed.replace(/positon/g, 'position');
+        }
+        
+        // Check for wrong API function names
+        if (line.match(/api\.spawnMob/i) && !line.includes('attemptSpawnMob')) {
+          foundIssues.push({
+            line: lineNum,
+            type: 'error',
+            message: '❌ Wrong function! Use "api.attemptSpawnMob" not "api.spawnMob"',
+            fix: 'Fixed function name'
+          });
+          fixed = fixed.replace(/api\.spawnMob/gi, 'api.attemptSpawnMob');
         }
 
         if (line.includes('world.spawnEnemy') && !line.includes('()')) {
@@ -150,8 +285,8 @@ export default function BloxdCodeFixer() {
           foundIssues.push({
             line: lineNum,
             type: 'error',
-            message: 'Variable names cannot start with numbers',
-            fix: 'Variables should start with letters'
+            message: '❌ Variable names cannot start with numbers!',
+            fix: 'Start variable names with letters'
           });
         }
 
@@ -162,27 +297,27 @@ export default function BloxdCodeFixer() {
           foundIssues.push({
             line: lineNum,
             type: 'warning',
-            message: 'Possible bracket mismatch',
-            fix: 'Check your brackets'
+            message: `⚠️ Possible bracket mismatch (${openBrackets} open, ${closeBrackets} close)`,
+            fix: 'Check your {} brackets'
           });
         }
 
         // Missing var/let/const
-        if (line.match(/^\s*[a-zA-Z_]\w*\s*=/) && !line.includes('let') && !line.includes('const') && !line.includes('var')) {
+        if (line.match(/^\s*[a-zA-Z_]\w*\s*=/) && !line.includes('let') && !line.includes('const') && !line.includes('var') && !line.includes('.')) {
           foundIssues.push({
             line: lineNum,
             type: 'warning',
-            message: 'Variable declared without let/const/var',
+            message: '⚠️ Variable declared without let/const/var',
             fix: 'Should use let, const, or var'
           });
         }
 
         // BLOXD API tips
-        if (line.includes('player.health') && !line.includes('player.health =')) {
+        if (line.includes('player.health') && !line.includes('player.health =') && !line.includes('setHealth')) {
           foundIssues.push({
             line: lineNum,
             type: 'info',
-            message: '💡 Tip: Use player.setHealth() for better results',
+            message: '💡 Tip: Use player.setHealth() or api.setHealth() for better results',
             fix: 'Recommendation'
           });
         }
@@ -193,6 +328,23 @@ export default function BloxdCodeFixer() {
             type: 'warning',
             message: '⚠️ Be careful with timers - they can cause lag!',
             fix: 'Performance warning'
+          });
+        }
+      });
+
+      // Check for undefined variables/functions being used!
+      usedVars.forEach(varName => {
+        // Skip built-in objects and BLOXD API
+        if (['Math', 'console', 'player', 'world', 'block', 'api', 'setTimeout', 'setInterval', 'String', 'Number', 'Array', 'Object'].includes(varName)) {
+          return;
+        }
+        
+        if (!definedVars.has(varName) && !definedFunctions.has(varName)) {
+          foundIssues.push({
+            line: 0,
+            type: 'warning',
+            message: `⚠️ "${varName}" is used but never defined! Did you forget to declare it?`,
+            fix: 'Check if variable exists'
           });
         }
       });
@@ -447,114 +599,164 @@ if (block.id === 1) {
             {/* Template 1: Chunk by Chunk Generation */}
             <div className="mb-6 bg-gray-900/80 p-5 rounded-2xl border-2 border-red-500/50">
               <h3 className="text-2xl font-bold text-orange-300 mb-3 flex items-center gap-2">
-                🧱 Template 1: Chunk-by-Chunk Nether Generation
+                🧱 Template 1: Massive Nether Generation (To World Border!)
               </h3>
               <p className="text-white/80 mb-3 text-sm">
-                ⚡ Generates bit by bit to avoid hitting world code limits!
+                ⚡ Generates 9x9x9 cubes to the WORLD BORDER (100,000 blocks)! 🔥
               </p>
               <div className="bg-black/50 p-4 rounded-xl overflow-x-auto">
                 <pre className="text-green-400 text-xs font-mono">
-{`// Chunk-by-chunk Nether generation below bedrock
-let currentChunkX = -10;  // Start position
-let currentChunkZ = -10;
-const CHUNK_SIZE = 8;     // Generate 8x8 blocks at a time
-const BEDROCK_Y = 0;      // Bedrock level
-const NETHER_START = -5;  // Start Nether 5 blocks below bedrock
-const NETHER_HEIGHT = 30; // Nether is 30 blocks tall
+{`// MASSIVE Nether generation to world border!
+let currentChunkX = -100000;  // Start at world border
+let currentChunkZ = -100000;
+let currentChunkY = -5;       // Start Y position
+const CUBE_SIZE = 9;          // Generate 9x9x9 cubes!
+const BEDROCK_Y = 0;          // Bedrock level
+const NETHER_START = -5;      // Start Nether below bedrock
+const NETHER_HEIGHT = 30;     // Nether is 30 blocks tall
+const WORLD_BORDER = 100000;  // World border limit
+let totalCubes = 0;
 
 function onPlayerJoin(player) {
-  // Start generation when player joins
-  generateNextChunk();
+  // Start MASSIVE generation!
+  player.sendMessage("🔥 Starting Nether generation to world border!");
+  generateNextCube();
 }
 
-function generateNextChunk() {
-  // Generate one chunk at a time
-  for (let x = currentChunkX; x < currentChunkX + CHUNK_SIZE; x++) {
-    for (let z = currentChunkZ; z < currentChunkZ + CHUNK_SIZE; z++) {
-      for (let y = NETHER_START; y < NETHER_START + NETHER_HEIGHT; y++) {
+function generateNextCube() {
+  // Generate one 9x9x9 cube at a time
+  for (let x = currentChunkX; x < currentChunkX + CUBE_SIZE; x++) {
+    for (let z = currentChunkZ; z < currentChunkZ + CUBE_SIZE; z++) {
+      for (let y = currentChunkY; y < currentChunkY + CUBE_SIZE; y++) {
         
-        // Netherrack base (replace with red wool or brick)
-        if (Math.random() > 0.1) {
-          world.setBlock(x, y, z, 'red_wool'); // Use red_wool as netherrack
-        }
-        
-        // Soul sand patches (brown wool)
-        if (y === NETHER_START && Math.random() > 0.8) {
-          world.setBlock(x, y, z, 'brown_wool');
-        }
-        
-        // Lava lakes
-        if (y < NETHER_START + 10 && Math.random() > 0.95) {
-          world.setBlock(x, y, z, 'lava');
+        // Only generate in Nether range
+        if (y >= NETHER_START && y < NETHER_START + NETHER_HEIGHT) {
+          // Netherrack base (red wool)
+          if (Math.random() > 0.1) {
+            world.setBlock(x, y, z, 'red_wool');
+          }
+          
+          // Soul sand patches (brown wool)
+          if (y === NETHER_START && Math.random() > 0.85) {
+            world.setBlock(x, y, z, 'brown_wool');
+          }
+          
+          // Lava lakes
+          if (y < NETHER_START + 12 && Math.random() > 0.96) {
+            world.setBlock(x, y, z, 'lava');
+          }
         }
       }
     }
   }
   
-  // Move to next chunk
-  currentChunkX += CHUNK_SIZE;
-  if (currentChunkX > 10) {  // Generated enough X chunks
-    currentChunkX = -10;
-    currentChunkZ += CHUNK_SIZE;
+  totalCubes++;
+  
+  // Move to next cube
+  currentChunkY += CUBE_SIZE;
+  
+  // If we finished this column, move to next X position
+  if (currentChunkY >= NETHER_START + NETHER_HEIGHT) {
+    currentChunkY = NETHER_START;
+    currentChunkX += CUBE_SIZE;
+    
+    // If we finished this X row, move to next Z
+    if (currentChunkX >= WORLD_BORDER) {
+      currentChunkX = -WORLD_BORDER;
+      currentChunkZ += CUBE_SIZE;
+      
+      // Progress update every row
+      player.sendMessage(\`🔥 Row complete! Generated \${totalCubes} cubes so far...\`);
+    }
   }
   
-  // Generate next chunk after delay (avoid lag)
-  if (currentChunkZ <= 10) {
-    setTimeout(generateNextChunk, 1000);  // Wait 1 second
+  // Check if we're done
+  if (currentChunkZ >= WORLD_BORDER) {
+    player.sendMessage("✅ NETHER GEN COMPLETE! 🔥🔥🔥");
+    player.sendMessage(\`Total cubes generated: \${totalCubes}\`);
+    return; // Stop generating
   }
+  
+  // Continue generating after short delay
+  setTimeout(generateNextCube, 500);  // 0.5 second delay
 }`}
                 </pre>
               </div>
               <button
                 onClick={() => {
-                  const code1 = `// Chunk-by-chunk Nether generation below bedrock
-let currentChunkX = -10;  // Start position
-let currentChunkZ = -10;
-const CHUNK_SIZE = 8;     // Generate 8x8 blocks at a time
-const BEDROCK_Y = 0;      // Bedrock level
-const NETHER_START = -5;  // Start Nether 5 blocks below bedrock
-const NETHER_HEIGHT = 30; // Nether is 30 blocks tall
+                  const code1 = `// MASSIVE Nether generation to world border!
+let currentChunkX = -100000;  // Start at world border
+let currentChunkZ = -100000;
+let currentChunkY = -5;       // Start Y position
+const CUBE_SIZE = 9;          // Generate 9x9x9 cubes!
+const BEDROCK_Y = 0;          // Bedrock level
+const NETHER_START = -5;      // Start Nether below bedrock
+const NETHER_HEIGHT = 30;     // Nether is 30 blocks tall
+const WORLD_BORDER = 100000;  // World border limit
+let totalCubes = 0;
 
 function onPlayerJoin(player) {
-  // Start generation when player joins
-  generateNextChunk();
+  // Start MASSIVE generation!
+  player.sendMessage("🔥 Starting Nether generation to world border!");
+  generateNextCube();
 }
 
-function generateNextChunk() {
-  // Generate one chunk at a time
-  for (let x = currentChunkX; x < currentChunkX + CHUNK_SIZE; x++) {
-    for (let z = currentChunkZ; z < currentChunkZ + CHUNK_SIZE; z++) {
-      for (let y = NETHER_START; y < NETHER_START + NETHER_HEIGHT; y++) {
+function generateNextCube() {
+  // Generate one 9x9x9 cube at a time
+  for (let x = currentChunkX; x < currentChunkX + CUBE_SIZE; x++) {
+    for (let z = currentChunkZ; z < currentChunkZ + CUBE_SIZE; z++) {
+      for (let y = currentChunkY; y < currentChunkY + CUBE_SIZE; y++) {
         
-        // Netherrack base (replace with red wool or brick)
-        if (Math.random() > 0.1) {
-          world.setBlock(x, y, z, 'red_wool'); // Use red_wool as netherrack
-        }
-        
-        // Soul sand patches (brown wool)
-        if (y === NETHER_START && Math.random() > 0.8) {
-          world.setBlock(x, y, z, 'brown_wool');
-        }
-        
-        // Lava lakes
-        if (y < NETHER_START + 10 && Math.random() > 0.95) {
-          world.setBlock(x, y, z, 'lava');
+        // Only generate in Nether range
+        if (y >= NETHER_START && y < NETHER_START + NETHER_HEIGHT) {
+          // Netherrack base (red wool)
+          if (Math.random() > 0.1) {
+            world.setBlock(x, y, z, 'red_wool');
+          }
+          
+          // Soul sand patches (brown wool)
+          if (y === NETHER_START && Math.random() > 0.85) {
+            world.setBlock(x, y, z, 'brown_wool');
+          }
+          
+          // Lava lakes
+          if (y < NETHER_START + 12 && Math.random() > 0.96) {
+            world.setBlock(x, y, z, 'lava');
+          }
         }
       }
     }
   }
   
-  // Move to next chunk
-  currentChunkX += CHUNK_SIZE;
-  if (currentChunkX > 10) {  // Generated enough X chunks
-    currentChunkX = -10;
-    currentChunkZ += CHUNK_SIZE;
+  totalCubes++;
+  
+  // Move to next cube
+  currentChunkY += CUBE_SIZE;
+  
+  // If we finished this column, move to next X position
+  if (currentChunkY >= NETHER_START + NETHER_HEIGHT) {
+    currentChunkY = NETHER_START;
+    currentChunkX += CUBE_SIZE;
+    
+    // If we finished this X row, move to next Z
+    if (currentChunkX >= WORLD_BORDER) {
+      currentChunkX = -WORLD_BORDER;
+      currentChunkZ += CUBE_SIZE;
+      
+      // Progress update every row
+      player.sendMessage(\`🔥 Row complete! Generated \${totalCubes} cubes so far...\`);
+    }
   }
   
-  // Generate next chunk after delay (avoid lag)
-  if (currentChunkZ <= 10) {
-    setTimeout(generateNextChunk, 1000);  // Wait 1 second
+  // Check if we're done
+  if (currentChunkZ >= WORLD_BORDER) {
+    player.sendMessage("✅ NETHER GEN COMPLETE! 🔥🔥🔥");
+    player.sendMessage(\`Total cubes generated: \${totalCubes}\`);
+    return; // Stop generating
   }
+  
+  // Continue generating after short delay
+  setTimeout(generateNextCube, 500);  // 0.5 second delay
 }`;
                   navigator.clipboard.writeText(code1);
                   alert('📋 Template 1 copied to clipboard!');
@@ -708,8 +910,8 @@ function spawnNetherMobs() {
   const mobType = Math.random();
   
   if (mobType < 0.4) {
-    // Zombie Pigmen - Pig with fire attacks!
-    const m = api.attemptSpawnMob("Pig", x, y, z, {
+    // Zombie Pigmen - Just use Zombie!
+    const m = api.attemptSpawnMob("Zombie", x, y, z, {
       name: "Zombie Pigman",
       variation: "default"
     });
@@ -722,8 +924,8 @@ function spawnNetherMobs() {
     api.setMobSetting(m, "chaseRadius", 30);
     
   } else if (mobType < 0.7) {
-    // Blaze - Chicken that shoots fireballs!
-    const m = api.attemptSpawnMob("Chicken", x, y + 2, z, {
+    // Blaze - Use Magma Golem!
+    const m = api.attemptSpawnMob("Magma Golem", x, y + 2, z, {
       name: "Blaze",
       variation: "default"
     });
@@ -736,7 +938,7 @@ function spawnNetherMobs() {
     api.setMobSetting(m, "chaseRadius", 40);
     
   } else {
-    // Magma Cube - Cow that explodes!
+    // Magma Cube - Cow with slow attacks!
     const m = api.attemptSpawnMob("Cow", x, y, z, {
       name: "Magma Cube",
       variation: "default"
@@ -745,7 +947,7 @@ function spawnNetherMobs() {
     api.setHealth(m, 500);
     api.setMobSetting(m, "attackItemName", "Stick");
     api.setMobSetting(m, "attackDamage", 25);
-    api.setMobSetting(m, "attackInterval", 500);
+    api.setMobSetting(m, "attackInterval", 999999); // Basically never attacks!
     api.setMobSetting(m, "attackRadius", 15);
     api.setMobSetting(m, "onDeathAura", 100); // Explodes on death!
   }
@@ -760,7 +962,7 @@ function onPlayerMove(player) {
     if (Math.random() > 0.98) {
       const nearX = player.position.x + (Math.random() * 20 - 10);
       const nearZ = player.position.z + (Math.random() * 20 - 10);
-      const m = api.attemptSpawnMob("Pig", nearX, NETHER_Y + 5, nearZ, {
+      const m = api.attemptSpawnMob("Zombie", nearX, NETHER_Y + 5, nearZ, {
         name: "Zombie Pigman"
       });
       api.setMobSetting(m, "maxHealth", 400);
@@ -790,8 +992,8 @@ function spawnNetherMobs() {
   const mobType = Math.random();
   
   if (mobType < 0.4) {
-    // Zombie Pigmen - Pig with fire attacks!
-    const m = api.attemptSpawnMob("Pig", x, y, z, {
+    // Zombie Pigmen - Just use Zombie!
+    const m = api.attemptSpawnMob("Zombie", x, y, z, {
       name: "Zombie Pigman",
       variation: "default"
     });
@@ -804,8 +1006,8 @@ function spawnNetherMobs() {
     api.setMobSetting(m, "chaseRadius", 30);
     
   } else if (mobType < 0.7) {
-    // Blaze - Chicken that shoots fireballs!
-    const m = api.attemptSpawnMob("Chicken", x, y + 2, z, {
+    // Blaze - Use Magma Golem!
+    const m = api.attemptSpawnMob("Magma Golem", x, y + 2, z, {
       name: "Blaze",
       variation: "default"
     });
@@ -818,7 +1020,7 @@ function spawnNetherMobs() {
     api.setMobSetting(m, "chaseRadius", 40);
     
   } else {
-    // Magma Cube - Cow that explodes!
+    // Magma Cube - Cow with slow attacks!
     const m = api.attemptSpawnMob("Cow", x, y, z, {
       name: "Magma Cube",
       variation: "default"
@@ -827,7 +1029,7 @@ function spawnNetherMobs() {
     api.setHealth(m, 500);
     api.setMobSetting(m, "attackItemName", "Stick");
     api.setMobSetting(m, "attackDamage", 25);
-    api.setMobSetting(m, "attackInterval", 500);
+    api.setMobSetting(m, "attackInterval", 999999); // Basically never attacks!
     api.setMobSetting(m, "attackRadius", 15);
     api.setMobSetting(m, "onDeathAura", 100); // Explodes on death!
   }
@@ -842,7 +1044,7 @@ function onPlayerMove(player) {
     if (Math.random() > 0.98) {
       const nearX = player.position.x + (Math.random() * 20 - 10);
       const nearZ = player.position.z + (Math.random() * 20 - 10);
-      const m = api.attemptSpawnMob("Pig", nearX, NETHER_Y + 5, nearZ, {
+      const m = api.attemptSpawnMob("Zombie", nearX, NETHER_Y + 5, nearZ, {
         name: "Zombie Pigman"
       });
       api.setMobSetting(m, "maxHealth", 400);
@@ -865,13 +1067,17 @@ function onPlayerMove(player) {
             <div className="bg-yellow-900/30 p-4 rounded-xl border-2 border-yellow-500/50">
               <h3 className="text-xl font-bold text-yellow-300 mb-3">💡 Pro Tips for Nether Generation:</h3>
               <div className="space-y-2 text-white/90 text-sm">
-                <p>⚡ <strong>Generate in chunks</strong> - Don't try to generate everything at once!</p>
-                <p>⏱️ <strong>Use setTimeout</strong> - Add delays between chunks to avoid lag</p>
+                <p>⚡ <strong>Generate 9x9x9 cubes</strong> - Perfect size to avoid lag!</p>
+                <p>🌍 <strong>World border = 100,000 blocks</strong> - Template 1 generates ALL OF IT!</p>
+                <p>⏱️ <strong>Use setTimeout</strong> - 0.5 second delay between cubes prevents lag</p>
+                <p>📊 <strong>Progress messages</strong> - Shows "Row complete!" and cube count!</p>
+                <p>✅ <strong>"NETHER GEN COMPLETE!"</strong> - Message when finished!</p>
                 <p>🧱 <strong>Block replacements:</strong> red_wool = netherrack, brown_wool = soul sand, lava = lava!</p>
                 <p>👹 <strong>Mob API:</strong> Use api.attemptSpawnMob() and api.setMobSetting() for custom mobs!</p>
-                <p>🐷 <strong>Mob types:</strong> Pig = Pigmen, Chicken = Blazes, Cow = Magma Cubes!</p>
-                <p>🏗️ <strong>Test small first</strong> - Start with CHUNK_SIZE = 4, then increase!</p>
-                <p>📍 <strong>Bedrock is Y=0</strong> - Generate Nether at Y=-5 to Y=-35</p>
+                <p>🧟 <strong>Mob types:</strong> Zombie = Pigmen, Magma Golem = Blazes, Cow = Magma Cubes!</p>
+                <p>⏰ <strong>Magma Cubes:</strong> Set attackInterval to 999999 so they only attack when you get close!</p>
+                <p>🧪 <strong>Test small first</strong> - Lower WORLD_BORDER to 1000 for testing!</p>
+                <p>📍 <strong>Bedrock is Y=0</strong> - Nether generates from Y=-5 to Y=-35 (30 blocks tall)!</p>
                 <p>🔥 <strong>Combine templates</strong> - Use all 3 together for full Nether experience!</p>
               </div>
             </div>
