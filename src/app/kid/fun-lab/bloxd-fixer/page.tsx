@@ -1124,7 +1124,7 @@ let overworldPortalPos = null; // Track overworld portal
 
 function onPlayerJoin(player) {
   player.sendMessage("🌀 Build a 4x5 obsidian frame and light it with lava!");
-  player.sendMessage("💡 Use purple_wool for obsidian blocks!");
+  player.sendMessage("💡 Obsidian blocks work in BLOXD!");
 }
 
 // Detect when player places lava to light portal
@@ -1155,14 +1155,14 @@ function checkForPortalFrame(x, y, z) {
 }
 
 function isPortalFrameAt(x, y, z) {
-  // Check if there's a 4x5 frame of purple_wool (obsidian)
+  // Check if there's a 4x5 frame of obsidian
   let frameCount = 0;
   
   // Check 4 wide, 5 tall frame
   for (let px = x; px < x + 4; px++) {
     for (let py = y; py < y + 5; py++) {
       const block = world.getBlock(px, py, z);
-      if (block === 'purple_wool') {
+      if (block === 'obsidian') {
         frameCount++;
       }
     }
@@ -1241,12 +1241,12 @@ function createNetherPortal(x, z) {
   
   // Build 4x5 obsidian frame
   for (let px = netherX; px < netherX + 4; px++) {
-    world.setBlock(px, netherY, netherZ, 'purple_wool');      // Bottom
-    world.setBlock(px, netherY + 4, netherZ, 'purple_wool'); // Top
+    world.setBlock(px, netherY, netherZ, 'obsidian');      // Bottom
+    world.setBlock(px, netherY + 4, netherZ, 'obsidian'); // Top
   }
   for (let py = netherY; py <= netherY + 4; py++) {
-    world.setBlock(netherX, py, netherZ, 'purple_wool');     // Left
-    world.setBlock(netherX + 3, py, netherZ, 'purple_wool'); // Right
+    world.setBlock(netherX, py, netherZ, 'obsidian');     // Left
+    world.setBlock(netherX + 3, py, netherZ, 'obsidian'); // Right
   }
   
   // Fill with portal blocks
@@ -1270,7 +1270,7 @@ let overworldPortalPos = null; // Track overworld portal
 
 function onPlayerJoin(player) {
   player.sendMessage("🌀 Build a 4x5 obsidian frame and light it with lava!");
-  player.sendMessage("💡 Use purple_wool for obsidian blocks!");
+  player.sendMessage("💡 Obsidian blocks work in BLOXD!");
 }
 
 // Detect when player places lava to light portal
@@ -1301,14 +1301,14 @@ function checkForPortalFrame(x, y, z) {
 }
 
 function isPortalFrameAt(x, y, z) {
-  // Check if there's a 4x5 frame of purple_wool (obsidian)
+  // Check if there's a 4x5 frame of obsidian
   let frameCount = 0;
   
   // Check 4 wide, 5 tall frame
   for (let px = x; px < x + 4; px++) {
     for (let py = y; py < y + 5; py++) {
       const block = world.getBlock(px, py, z);
-      if (block === 'purple_wool') {
+      if (block === 'obsidian') {
         frameCount++;
       }
     }
@@ -1387,12 +1387,12 @@ function createNetherPortal(x, z) {
   
   // Build 4x5 obsidian frame
   for (let px = netherX; px < netherX + 4; px++) {
-    world.setBlock(px, netherY, netherZ, 'purple_wool');      // Bottom
-    world.setBlock(px, netherY + 4, netherZ, 'purple_wool'); // Top
+    world.setBlock(px, netherY, netherZ, 'obsidian');      // Bottom
+    world.setBlock(px, netherY + 4, netherZ, 'obsidian'); // Top
   }
   for (let py = netherY; py <= netherY + 4; py++) {
-    world.setBlock(netherX, py, netherZ, 'purple_wool');     // Left
-    world.setBlock(netherX + 3, py, netherZ, 'purple_wool'); // Right
+    world.setBlock(netherX, py, netherZ, 'obsidian');     // Left
+    world.setBlock(netherX + 3, py, netherZ, 'obsidian'); // Right
   }
   
   // Fill with portal blocks
@@ -1427,8 +1427,8 @@ function createNetherPortal(x, z) {
                 <p>👹 <strong>Mob API:</strong> Use api.attemptSpawnMob() and api.setMobSetting() for custom mobs!</p>
                 <p>🧟 <strong>Mob types:</strong> Zombie = Pigmen, Magma Golem = Blazes, Cow = Magma Cubes!</p>
                 <p>⏰ <strong>Magma Cubes:</strong> Set attackInterval to 999999 so they only attack when you get close!</p>
-                <p>🌀 <strong>Portal blocks:</strong> purple_wool = obsidian, light_blue_wool = portal blocks!</p>
-                <p>🔥 <strong>Light portal:</strong> Build 4x5 purple_wool frame, place lava inside to activate!</p>
+                <p>🌀 <strong>Portal blocks:</strong> obsidian = frame, light_blue_wool = portal blocks!</p>
+                <p>🔥 <strong>Light portal:</strong> Build 4x5 obsidian frame, place lava inside to activate!</p>
                 <p>🚪 <strong>Teleportation:</strong> onPlayerMove() detects when you walk into portal blocks!</p>
                 <p>📍 <strong>Portal linking:</strong> Overworld Y&gt;0 teleports to Nether Y&lt;0!</p>
                 <p>🧪 <strong>Test small first</strong> - Lower WORLD_BORDER to 1000 for testing!</p>
