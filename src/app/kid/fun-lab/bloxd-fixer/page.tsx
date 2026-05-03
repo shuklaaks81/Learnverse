@@ -1107,6 +1107,313 @@ function onPlayerMove(player) {
               </button>
             </div>
 
+            {/* Template 4: Nether Portal System */}
+            <div className="mb-6 bg-gray-900/80 p-5 rounded-2xl border-2 border-blue-500/50">
+              <h3 className="text-2xl font-bold text-blue-300 mb-3 flex items-center gap-2">
+                🌀 Template 4: Nether Portal System! (TELEPORT!)
+              </h3>
+              <p className="text-white/80 mb-3 text-sm">
+                🔥 Build obsidian frame, light with lava, portal fills with blue blocks, TELEPORTS you to the Nether! 🌀
+              </p>
+              <div className="bg-black/50 p-4 rounded-xl overflow-x-auto">
+                <pre className="text-green-400 text-xs font-mono">
+{`// NETHER PORTAL SYSTEM - Build and teleport!
+const NETHER_Y = -10;        // Where Nether generates
+let netherPortalPos = null;  // Track portal location
+let overworldPortalPos = null; // Track overworld portal
+
+function onPlayerJoin(player) {
+  player.sendMessage("🌀 Build a 4x5 obsidian frame and light it with lava!");
+  player.sendMessage("💡 Use purple_wool for obsidian blocks!");
+}
+
+// Detect when player places lava to light portal
+function onBlockPlace(player, blockType, x, y, z) {
+  if (blockType === 'lava') {
+    console.log("Lava placed at X:" + x + " Y:" + y + " Z:" + z);
+    
+    // Check if this is near an obsidian portal frame
+    if (checkForPortalFrame(x, y, z)) {
+      player.sendMessage("🔥 LIGHTING PORTAL!");
+      lightPortal(x, y, z, player);
+    }
+  }
+}
+
+// Check if there's a 4x5 obsidian frame nearby
+function checkForPortalFrame(x, y, z) {
+  // Check for vertical portal frame (4 wide, 5 tall)
+  // Bottom left corner check
+  for (let dx = -2; dx <= 2; dx++) {
+    for (let dy = -2; dy <= 2; dy++) {
+      if (isPortalFrameAt(x + dx, y + dy, z)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function isPortalFrameAt(x, y, z) {
+  // Check if there's a 4x5 frame of purple_wool (obsidian)
+  let frameCount = 0;
+  
+  // Check 4 wide, 5 tall frame
+  for (let px = x; px < x + 4; px++) {
+    for (let py = y; py < y + 5; py++) {
+      const block = world.getBlock(px, py, z);
+      if (block === 'purple_wool') {
+        frameCount++;
+      }
+    }
+  }
+  
+  // Need at least 14 blocks for a frame (4+4+3+3 = 14)
+  return frameCount >= 14;
+}
+
+function lightPortal(x, y, z, player) {
+  // Find the portal frame bounds
+  let portalX = x - 1;
+  let portalY = y - 1;
+  let portalZ = z;
+  
+  // Fill portal interior with light blue wool (portal blocks!)
+  for (let px = portalX; px < portalX + 4; px++) {
+    for (let py = portalY; py < portalY + 5; py++) {
+      const block = world.getBlock(px, py, portalZ);
+      
+      // Only fill air spaces inside frame
+      if (block === 'air' || block === 'lava') {
+        world.setBlock(px, py, portalZ, 'light_blue_wool'); // BLUE PORTAL!
+      }
+    }
+  }
+  
+  // Save portal locations
+  if (y > 0) {
+    // Overworld portal
+    overworldPortalPos = { x: portalX + 2, y: portalY + 2, z: portalZ };
+    player.sendMessage("✅ OVERWORLD PORTAL ACTIVATED! 🌀");
+    player.sendMessage("💡 Step into the blue blocks to teleport to the Nether!");
+  } else {
+    // Nether portal
+    netherPortalPos = { x: portalX + 2, y: portalY + 2, z: portalZ };
+    player.sendMessage("✅ NETHER PORTAL ACTIVATED! 🌀");
+    player.sendMessage("💡 Step in to return to the Overworld!");
+  }
+  
+  // Play sound effect (whoosh!)
+  player.sendMessage("🔊 WHOOOOSH! Portal activated!");
+}
+
+// Teleport player when they walk into portal
+function onPlayerMove(player) {
+  const pos = player.getPosition();
+  const px = Math.floor(pos.x);
+  const py = Math.floor(pos.y);
+  const pz = Math.floor(pos.z);
+  
+  const block = world.getBlock(px, py, pz);
+  
+  // Check if player is in a portal block
+  if (block === 'light_blue_wool') {
+    
+    if (py > 0 && netherPortalPos) {
+      // In overworld portal - teleport to Nether!
+      player.sendMessage("🌀 TELEPORTING TO THE NETHER! 🔥🔥🔥");
+      player.teleport(netherPortalPos.x, netherPortalPos.y, netherPortalPos.z);
+      
+    } else if (py < 0 && overworldPortalPos) {
+      // In Nether portal - teleport to overworld!
+      player.sendMessage("🌀 TELEPORTING TO OVERWORLD! 🌍");
+      player.teleport(overworldPortalPos.x, overworldPortalPos.y, overworldPortalPos.z);
+    }
+  }
+}
+
+// Auto-create Nether-side portal when first portal is lit
+function createNetherPortal(x, z) {
+  // Build portal frame in Nether
+  const netherX = Math.floor(x / 8);  // Nether coordinate scaling
+  const netherZ = Math.floor(z / 8);
+  const netherY = NETHER_Y + 5;
+  
+  // Build 4x5 obsidian frame
+  for (let px = netherX; px < netherX + 4; px++) {
+    world.setBlock(px, netherY, netherZ, 'purple_wool');      // Bottom
+    world.setBlock(px, netherY + 4, netherZ, 'purple_wool'); // Top
+  }
+  for (let py = netherY; py <= netherY + 4; py++) {
+    world.setBlock(netherX, py, netherZ, 'purple_wool');     // Left
+    world.setBlock(netherX + 3, py, netherZ, 'purple_wool'); // Right
+  }
+  
+  // Fill with portal blocks
+  for (let px = netherX + 1; px < netherX + 3; px++) {
+    for (let py = netherY + 1; py < netherY + 4; py++) {
+      world.setBlock(px, py, netherZ, 'light_blue_wool');
+    }
+  }
+  
+  netherPortalPos = { x: netherX + 2, y: netherY + 2, z: netherZ };
+  console.log("🌀 Auto-created Nether portal at X:" + netherX + " Y:" + netherY + " Z:" + netherZ);
+}`}
+                </pre>
+              </div>
+              <button
+                onClick={() => {
+                  const code4 = `// NETHER PORTAL SYSTEM - Build and teleport!
+const NETHER_Y = -10;        // Where Nether generates
+let netherPortalPos = null;  // Track portal location
+let overworldPortalPos = null; // Track overworld portal
+
+function onPlayerJoin(player) {
+  player.sendMessage("🌀 Build a 4x5 obsidian frame and light it with lava!");
+  player.sendMessage("💡 Use purple_wool for obsidian blocks!");
+}
+
+// Detect when player places lava to light portal
+function onBlockPlace(player, blockType, x, y, z) {
+  if (blockType === 'lava') {
+    console.log("Lava placed at X:" + x + " Y:" + y + " Z:" + z);
+    
+    // Check if this is near an obsidian portal frame
+    if (checkForPortalFrame(x, y, z)) {
+      player.sendMessage("🔥 LIGHTING PORTAL!");
+      lightPortal(x, y, z, player);
+    }
+  }
+}
+
+// Check if there's a 4x5 obsidian frame nearby
+function checkForPortalFrame(x, y, z) {
+  // Check for vertical portal frame (4 wide, 5 tall)
+  // Bottom left corner check
+  for (let dx = -2; dx <= 2; dx++) {
+    for (let dy = -2; dy <= 2; dy++) {
+      if (isPortalFrameAt(x + dx, y + dy, z)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function isPortalFrameAt(x, y, z) {
+  // Check if there's a 4x5 frame of purple_wool (obsidian)
+  let frameCount = 0;
+  
+  // Check 4 wide, 5 tall frame
+  for (let px = x; px < x + 4; px++) {
+    for (let py = y; py < y + 5; py++) {
+      const block = world.getBlock(px, py, z);
+      if (block === 'purple_wool') {
+        frameCount++;
+      }
+    }
+  }
+  
+  // Need at least 14 blocks for a frame (4+4+3+3 = 14)
+  return frameCount >= 14;
+}
+
+function lightPortal(x, y, z, player) {
+  // Find the portal frame bounds
+  let portalX = x - 1;
+  let portalY = y - 1;
+  let portalZ = z;
+  
+  // Fill portal interior with light blue wool (portal blocks!)
+  for (let px = portalX; px < portalX + 4; px++) {
+    for (let py = portalY; py < portalY + 5; py++) {
+      const block = world.getBlock(px, py, portalZ);
+      
+      // Only fill air spaces inside frame
+      if (block === 'air' || block === 'lava') {
+        world.setBlock(px, py, portalZ, 'light_blue_wool'); // BLUE PORTAL!
+      }
+    }
+  }
+  
+  // Save portal locations
+  if (y > 0) {
+    // Overworld portal
+    overworldPortalPos = { x: portalX + 2, y: portalY + 2, z: portalZ };
+    player.sendMessage("✅ OVERWORLD PORTAL ACTIVATED! 🌀");
+    player.sendMessage("💡 Step into the blue blocks to teleport to the Nether!");
+  } else {
+    // Nether portal
+    netherPortalPos = { x: portalX + 2, y: portalY + 2, z: portalZ };
+    player.sendMessage("✅ NETHER PORTAL ACTIVATED! 🌀");
+    player.sendMessage("💡 Step in to return to the Overworld!");
+  }
+  
+  // Play sound effect (whoosh!)
+  player.sendMessage("🔊 WHOOOOSH! Portal activated!");
+}
+
+// Teleport player when they walk into portal
+function onPlayerMove(player) {
+  const pos = player.getPosition();
+  const px = Math.floor(pos.x);
+  const py = Math.floor(pos.y);
+  const pz = Math.floor(pos.z);
+  
+  const block = world.getBlock(px, py, pz);
+  
+  // Check if player is in a portal block
+  if (block === 'light_blue_wool') {
+    
+    if (py > 0 && netherPortalPos) {
+      // In overworld portal - teleport to Nether!
+      player.sendMessage("🌀 TELEPORTING TO THE NETHER! 🔥🔥🔥");
+      player.teleport(netherPortalPos.x, netherPortalPos.y, netherPortalPos.z);
+      
+    } else if (py < 0 && overworldPortalPos) {
+      // In Nether portal - teleport to overworld!
+      player.sendMessage("🌀 TELEPORTING TO OVERWORLD! 🌍");
+      player.teleport(overworldPortalPos.x, overworldPortalPos.y, overworldPortalPos.z);
+    }
+  }
+}
+
+// Auto-create Nether-side portal when first portal is lit
+function createNetherPortal(x, z) {
+  // Build portal frame in Nether
+  const netherX = Math.floor(x / 8);  // Nether coordinate scaling
+  const netherZ = Math.floor(z / 8);
+  const netherY = NETHER_Y + 5;
+  
+  // Build 4x5 obsidian frame
+  for (let px = netherX; px < netherX + 4; px++) {
+    world.setBlock(px, netherY, netherZ, 'purple_wool');      // Bottom
+    world.setBlock(px, netherY + 4, netherZ, 'purple_wool'); // Top
+  }
+  for (let py = netherY; py <= netherY + 4; py++) {
+    world.setBlock(netherX, py, netherZ, 'purple_wool');     // Left
+    world.setBlock(netherX + 3, py, netherZ, 'purple_wool'); // Right
+  }
+  
+  // Fill with portal blocks
+  for (let px = netherX + 1; px < netherX + 3; px++) {
+    for (let py = netherY + 1; py < netherY + 4; py++) {
+      world.setBlock(px, py, netherZ, 'light_blue_wool');
+    }
+  }
+  
+  netherPortalPos = { x: netherX + 2, y: netherY + 2, z: netherZ };
+  console.log("🌀 Auto-created Nether portal at X:" + netherX + " Y:" + netherY + " Z:" + netherZ);
+}`;
+                  navigator.clipboard.writeText(code4);
+                  alert('📋 Template 4 copied to clipboard!');
+                }}
+                className="mt-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl font-bold hover:scale-105 transition-transform"
+              >
+                📋 Copy Template 4
+              </button>
+            </div>
+
             {/* Pro Tips */}
             <div className="bg-yellow-900/30 p-4 rounded-xl border-2 border-yellow-500/50">
               <h3 className="text-xl font-bold text-yellow-300 mb-3">💡 Pro Tips for Nether Generation:</h3>
@@ -1114,15 +1421,19 @@ function onPlayerMove(player) {
                 <p>⚡ <strong>Generate 9x9x9 cubes</strong> - Perfect size to avoid lag!</p>
                 <p>🌍 <strong>World border = 100,000 blocks</strong> - Template 1 generates ALL OF IT!</p>
                 <p>⏱️ <strong>Use setTimeout</strong> - 0.5 second delay between cubes prevents lag</p>
-                <p>📊 <strong>Progress messages</strong> - Shows "Row complete!" and cube count!</p>
-                <p>✅ <strong>"NETHER GEN COMPLETE!"</strong> - Message when finished!</p>
+                <p>📊 <strong>Progress messages</strong> - Shows &quot;Row complete!&quot; and cube count!</p>
+                <p>✅ <strong>&quot;NETHER GEN COMPLETE!&quot;</strong> - Message when finished!</p>
                 <p>🧱 <strong>Block replacements:</strong> red_wool = netherrack, brown_wool = soul sand, lava = lava!</p>
                 <p>👹 <strong>Mob API:</strong> Use api.attemptSpawnMob() and api.setMobSetting() for custom mobs!</p>
                 <p>🧟 <strong>Mob types:</strong> Zombie = Pigmen, Magma Golem = Blazes, Cow = Magma Cubes!</p>
                 <p>⏰ <strong>Magma Cubes:</strong> Set attackInterval to 999999 so they only attack when you get close!</p>
+                <p>🌀 <strong>Portal blocks:</strong> purple_wool = obsidian, light_blue_wool = portal blocks!</p>
+                <p>🔥 <strong>Light portal:</strong> Build 4x5 purple_wool frame, place lava inside to activate!</p>
+                <p>🚪 <strong>Teleportation:</strong> onPlayerMove() detects when you walk into portal blocks!</p>
+                <p>📍 <strong>Portal linking:</strong> Overworld Y&gt;0 teleports to Nether Y&lt;0!</p>
                 <p>🧪 <strong>Test small first</strong> - Lower WORLD_BORDER to 1000 for testing!</p>
-                <p>📍 <strong>Bedrock is Y=0</strong> - Nether generates from Y=-5 to Y=-35 (30 blocks tall)!</p>
-                <p>🔥 <strong>Combine templates</strong> - Use all 3 together for full Nether experience!</p>
+                <p>📍 <strong>Bedrock is Y=0</strong> - Nether generates from Y=-10 to Y=-40 (30 blocks tall)!</p>
+                <p>🔥 <strong>Combine templates</strong> - Use all 4 together for FULL Nether experience with portals!</p>
               </div>
             </div>
           </div>
