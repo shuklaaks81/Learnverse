@@ -6,6 +6,7 @@ import { SecretEventProvider } from "./SecretEventProvider";
 import LoadingWrapper from "./LoadingWrapper";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import HolidayBlocker from "@/components/HolidayBlocker";
+import BobTheBanana from "@/components/BobTheBanana";
 import { Analytics } from '@vercel/analytics/react';
 
 import VersionLayoutClient from "./VersionLayoutClient";
@@ -58,6 +59,11 @@ export default function RootLayout({
       <body>
         <LoadingWrapper>
           <SecretEventProvider>
+            {/* Bob The Banana Header */}
+            <header className="fixed top-4 left-4 z-50">
+              <BobTheBanana />
+            </header>
+
             <div className="ocean-bg">
               {/* Ripples */}
               <div className="ripple" style={{top: '20%', left: '30%', width: 120, height: 120, animationDelay: '0s'}}></div>
