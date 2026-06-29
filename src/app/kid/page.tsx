@@ -1,246 +1,811 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
+import { ProfileHeader } from "./components/ProfileHeader";
+import { FeatureGrid } from "./components/FeatureGrid";
+import { OnboardingTour } from "@/components/OnboardingTour";
+import { useTexturePack } from "@/hooks/useTexturePack";
+import { SpaceBackground } from "@/components/SpaceBackground";
+import { PerformanceIndicator } from "@/components/PerformanceIndicator";
 
+/**
+ * Kid Hub Page
+ * 
+ * Main dashboard for student accounts displaying:
+ * - Profile header with stats (coins, streak, achievements)
+ * - Feature grid with access to all learning activities
+ * - Account management (sign out, switch account)
+ * - Welcome messaging
+ * - Onboarding tour with secrets contract
+ * 
+ * Premium Mode: Futuristic cyber interface with holographic effects
+ * 
+ * PERFORMANCE OPTIMIZED: useCallback to prevent unnecessary re-renders
+ */
 export default function KidPage() {
   const [kidName, setKidName] = useState("Alex");
-  const [progress, setProgress] = useState(65); // percentage
+  const [progress, setProgress] = useState(65);
   const [coins, setCoins] = useState(250);
   const [streak, setStreak] = useState(7);
   const [showBuildButton, setShowBuildButton] = useState(false);
+  const [hasMultipleAccounts, setHasMultipleAccounts] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+  const [isOwnerMode, setIsOwnerMode] = useState(false);
+  
+  // 🕺 SECRET GROOVY MODE STATES 🕺
+  const [secretClicks, setSecretClicks] = useState({ progress: 0, background: 0 });
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [animationStep, setAnimationStep] = useState(0);
+  const [isGroovyMode, setIsGroovyMode] = useState(false);
+  
+  // ✨ HYPER REALISTIC MODE STATES ✨
+  const [isRealisticMode, setIsRealisticMode] = useState(false);
+  const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
+  
+  // 🚀 SPACE MODE STATES 🚀
+  const [isSpaceMode, setIsSpaceMode] = useState(false);
+  
+  // 🎨 CUSTOM TEXTURE PACK 🎨
+  const { isActive: isTexturePackActive, textures, deactivate: deactivateTexturePack } = useTexturePack();
+
+  const premiumParticles = useMemo(
+    () =>
+      [...Array(30)].map((_, index) => ({
+        id: `particle-${index}`,
+        size: Math.random() * 4 + 2,
+        color: ['#0ff', '#f0f', '#ff0'][Math.floor(Math.random() * 3)],
+        top: Math.random() * 100,
+        left: Math.random() * 100,
+        blur: Math.random() * 20 + 10,
+        delay: Math.random() * 5,
+        duration: Math.random() * 15 + 10,
+      })),
+    []
+  );
 
   useEffect(() => {
-    // Check if Build Your App feature is enabled
-    const featureEnabled = localStorage.getItem('feature_buildApp');
-    setShowBuildButton(featureEnabled === 'true');
-  return (
-    <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100 p-8">
-      {/* Build Your App Button - Top Right Corner */}
-      {showBuildButton && (
-        <Link href="/kid/build" className="fixed top-4 right-4 z-50">
-          <button className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-6 py-3 rounded-2xl font-bold text-lg shadow-2xl hover:scale-110 transition-transform animate-pulse border-4 border-yellow-300">
-            🏗️ Build Your App!!!
-          </button>
-        </Link>
-      )}
-
-      {/* Custom Features from Terminal */}
-      {customFeatures.map((feature, index) => {
-        const getPositionClass = (location: string) => {
-          const loc = location.toLowerCase();
-          if (loc.includes('top') && loc.includes('left')) return 'top-4 left-4';
-          if (loc.includes('top') && loc.includes('right')) return 'top-20 right-4';
-          if (loc.includes('bottom') && loc.includes('left')) return 'bottom-4 left-4';
-          if (loc.includes('bottom') && loc.includes('right')) return 'bottom-4 right-4';
-          if (loc.includes('corner')) return 'top-36 right-4';
-          return 'top-52 right-4';
-        };
-
-        const getColorClass = (color: string) => {
-          const colorMap: { [key: string]: string } = {
-            'blue': 'from-blue-500 to-blue-600',
-            'red': 'from-red-500 to-red-600',
-            'green': 'from-green-500 to-green-600',
-            'purple': 'from-purple-500 to-purple-600',
-            'pink': 'from-pink-500 to-pink-600',
-            'yellow': 'from-yellow-500 to-yellow-600',
-            'orange': 'from-orange-500 to-orange-600',
-            'white': 'from-gray-100 to-gray-200 text-gray-800',
-          };
-          return colorMap[color.toLowerCase()] || 'from-blue-500 to-blue-600';
-        };
-
-        if (feature.type === 'button') {
-          return (
-            <Link key={feature.id} href={feature.pageUrl} className={`fixed ${getPositionClass(feature.location)} z-40`}>
-              <button className={`bg-gradient-to-r ${getColorClass(feature.color)} text-white px-6 py-3 rounded-2xl font-bold shadow-2xl hover:scale-110 transition-transform border-4 border-white/50`}>
-                {feature.displayText}
-              </button>
-            </Link>
-          );
+    if (typeof window !== 'undefined') {
+      try {
+        // 👑 CHECK FOR SECRET OWNER MODE! 👑
+        const ownerUnlocked = localStorage.getItem('isSecretOwner') === 'true';
+        setIsOwnerMode(ownerUnlocked);
+        
+        // Load current kid data
+        const kidDataStr = localStorage.getItem('currentKid');
+        if (kidDataStr) {
+          const kidData = JSON.parse(kidDataStr);
+          setKidName(kidData.kidName || 'Alex');
+          setCoins(parseInt(localStorage.getItem(`kid_${kidData.kidId}_coins`) || '250'));
+          setStreak(kidData.streak || 0);
+          // Calculate progress based on completed lessons
+          const completedLessons = JSON.parse(localStorage.getItem(`kid_${kidData.kidId}_completedLessons`) || '[]');
+          setProgress(Math.min(completedLessons.length * 5, 100)); // 5% per lesson, max 100%
         }
+        
+        const version = localStorage.getItem('learnverseVersion') || 'original';
+        setIsPremium(version === 'premium');
+        
+        const featureEnabled = localStorage.getItem('feature_buildApp');
+        setShowBuildButton(featureEnabled === 'true');
+        
+        const kidAccounts = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
+        setHasMultipleAccounts(kidAccounts.length > 1);
 
-        if (feature.type === 'board') {
-          return (
-            <Link key={feature.id} href={feature.pageUrl} className={`fixed ${getPositionClass(feature.location)} z-40`}>
-              <button className={`bg-gradient-to-r ${getColorClass(feature.color)} px-6 py-3 rounded-2xl font-bold shadow-2xl hover:scale-110 transition-transform border-4 border-black`}>
-                🎨 Drawing Board
-              </button>
-            </Link>
-          );
+        // Check if user has seen the tour
+        const tourCompleted = localStorage.getItem('tourCompleted');
+        if (!tourCompleted) {
+          // Small delay so page loads first
+          setTimeout(() => setShowTour(true), 500);
         }
+      } catch (error) {
+        console.error('Error loading kid data:', error);
+        // Keep default values if loading fails - page won't go blank!
+      }
+    }
+  }, []);
 
-        if (feature.type === 'custom') {
-          return (
-            <div key={feature.id} className={`fixed ${getPositionClass(feature.location)} z-40 bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-lg border-2 border-purple-400`}>
-              <p className="font-bold text-sm">⭐ {feature.name}</p>
-              <p className="text-xs text-gray-600">{feature.featureType}</p>
+  // 🎯 OPTIMIZED HANDLERS with useCallback
+  const handleTourComplete = useCallback(() => {
+    setShowTour(false);
+    localStorage.setItem('tourCompleted', 'true');
+  }, []);
+
+  const triggerGroovySequence = useCallback(() => {
+    setShowAnimation(true);
+    setAnimationStep(1);
+    
+    // Animation timeline
+    setTimeout(() => setAnimationStep(2), 2000);  // Portal
+    setTimeout(() => setAnimationStep(3), 4000);  // Walking dude
+    setTimeout(() => setAnimationStep(4), 6000);  // Brick fall
+    setTimeout(() => setAnimationStep(5), 7500);  // Enter groovy
+    setTimeout(() => {
+      setShowAnimation(false);
+      setIsGroovyMode(true);
+      localStorage.setItem('groovyModeActive', 'true');
+      setSecretClicks({ progress: 0, background: 0 }); // Reset
+    }, 9500);
+  }, []);
+
+  // 🎯 SECRET CLICK HANDLERS
+  const handleProgressClick = useCallback(() => {
+    const newCount = secretClicks.progress + 1;
+    setSecretClicks(prev => ({ ...prev, progress: newCount }));
+    
+    // Check if pattern is complete (2 progress + 10 background)
+    if (newCount === 2 && secretClicks.background === 10) {
+      triggerGroovySequence();
+    }
+  }, [secretClicks.progress, secretClicks.background, triggerGroovySequence]);
+
+  const handleBackgroundClick = useCallback(() => {
+    const newCount = secretClicks.background + 1;
+    setSecretClicks(prev => ({ ...prev, background: newCount }));
+    
+    // Check if pattern is complete (2 progress + 10 background)
+    if (secretClicks.progress === 2 && newCount === 10) {
+      triggerGroovySequence();
+    }
+  }, [secretClicks.progress, secretClicks.background, triggerGroovySequence]);
+
+  // Load groovy mode from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const groovyActive = localStorage.getItem('groovyModeActive') === 'true';
+      setIsGroovyMode(groovyActive);
+      
+      // 🕺 SECRET URL PARAMETER - Auto-trigger groovy mode!
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('groovy') === 'true' && !groovyActive) {
+        triggerGroovySequence();
+      }
+      
+      // ✨ Load realistic mode
+      const realisticActive = localStorage.getItem('realisticModeActive') === 'true';
+      setIsRealisticMode(realisticActive);
+      
+      // 🚀 Load space mode
+      const spaceActive = localStorage.getItem('spaceModeActive') === 'true';
+      setIsSpaceMode(spaceActive);
+    }
+  }, []);
+  
+  // ⏰ TIME TRACKING FOR REALISTIC MODE
+  useEffect(() => {
+    const updateTimeOfDay = () => {
+      const hour = new Date().getHours();
+      if (hour >= 6 && hour < 12) setTimeOfDay('morning');
+      else if (hour >= 12 && hour < 18) setTimeOfDay('afternoon');
+      else if (hour >= 18 && hour < 21) setTimeOfDay('evening');
+      else setTimeOfDay('night');
+    };
+    
+    updateTimeOfDay();
+    // Update every minute
+    const interval = setInterval(updateTimeOfDay, 60000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  // 🎨 Get background based on time of day
+  const getRealisticBackground = () => {
+    switch (timeOfDay) {
+      case 'morning':
+        return 'from-yellow-200 via-blue-200 to-cyan-200';
+      case 'afternoon':
+        return 'from-blue-300 via-cyan-200 to-blue-200';
+      case 'evening':
+        return 'from-orange-300 via-pink-300 to-purple-300';
+      case 'night':
+        return 'from-indigo-900 via-purple-900 to-blue-900';
+    }
+  };
+
+  // 🚀 PREMIUM FUTURISTIC KID HUB! 💎✨
+  if (isPremium) {
+    return (
+      <>
+        {showTour && <OnboardingTour onComplete={handleTourComplete} isPremium={true} />}
+        <div className="min-h-screen relative overflow-hidden">
+          {/* Cyber Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-purple-950 to-pink-950 pointer-events-none">
+          {/* Animated Grid */}
+          <div className="absolute inset-0 opacity-10">
+            {[...Array(20)].map((_, i) => (
+              <div key={`h-${i}`} className="absolute w-full h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent" style={{top: `${i * 5}%`}} />
+            ))}
+            {[...Array(20)].map((_, i) => (
+              <div key={`v-${i}`} className="absolute h-full w-px bg-gradient-to-b from-transparent via-purple-400 to-transparent" style={{left: `${i * 5}%`}} />
+            ))}
+          </div>
+
+          {/* Floating Particles */}
+          {premiumParticles.map((particle) => (
+            <div
+              key={particle.id}
+              className="absolute rounded-full animate-float-particle"
+              style={{
+                width: particle.size + 'px',
+                height: particle.size + 'px',
+                background: particle.color,
+                top: particle.top + '%',
+                left: particle.left + '%',
+                boxShadow: `0 0 ${particle.blur}px currentColor`,
+                animationDelay: particle.delay + 's',
+                animationDuration: particle.duration + 's'
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col items-center p-8 min-h-screen" onClick={handleBackgroundClick}>
+          {/* Premium Profile Header */}
+          <div className="w-full max-w-6xl mb-8 futuristic-glass p-6 animate-card-appear">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              {/* Left: Profile */}
+              <div className="flex items-center gap-4">
+                <div className="relative group">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 flex items-center justify-center text-4xl shadow-[0_0_40px_rgba(0,255,255,0.6)] border-4 border-white/30 group-hover:scale-110 transition-all duration-300">
+                    👦
+                  </div>
+                  {/* Animated Progress Ring */}
+                  <svg className="absolute top-0 left-0 w-20 h-20 -rotate-90 cursor-pointer" onClick={handleProgressClick}>
+                    <circle cx="40" cy="40" r="36" stroke="rgba(255,255,255,0.2)" strokeWidth="4" fill="none" />
+                    <circle 
+                      cx="40" 
+                      cy="40" 
+                      r="36" 
+                      stroke="#0ff" 
+                      strokeWidth="4" 
+                      fill="none"
+                      strokeDasharray={`${2 * Math.PI * 36}`}
+                      strokeDashoffset={`${2 * Math.PI * 36 * (1 - progress / 100)}`}
+                      className="transition-all duration-500 drop-shadow-[0_0_8px_#0ff]"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold glow-text">{kidName}</h2>
+                  <p className="text-cyan-300 font-semibold">{progress}% Complete</p>
+                </div>
+              </div>
+
+              {/* Center: Stats */}
+              <div className="flex items-center gap-8">
+                <div className="flex flex-col items-center group cursor-pointer">
+                  <span className="text-4xl group-hover:scale-125 transition-transform duration-300 drop-shadow-[0_0_10px_#ff0]">🪙</span>
+                  <span className="text-lg font-bold text-yellow-400 glow-text">{coins}</span>
+                </div>
+                <div className="flex flex-col items-center group cursor-pointer">
+                  <span className="text-4xl group-hover:scale-125 transition-transform duration-300 drop-shadow-[0_0_10px_#f00]">🔥</span>
+                  <span className="text-lg font-bold text-orange-400 glow-text">{streak} days</span>
+                </div>
+                <Link href="/kid/achievements" className="flex flex-col items-center group cursor-pointer hover:scale-110 transition-all duration-300">
+                  <span className="text-4xl group-hover:animate-bounce drop-shadow-[0_0_10px_#0ff]">🏆</span>
+                  <span className="text-xs text-cyan-300 font-semibold">Achievements</span>
+                </Link>
+              </div>
+
+              {/* Right: Action Buttons */}
+              <div className="flex items-center gap-3">
+                <Link href="/kid/simple">
+                  <button className="bg-white/10 backdrop-blur-xl text-white px-6 py-3 rounded-xl font-bold border-2 border-white/30 hover:bg-white/20 hover:border-white/50 hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all duration-300">
+                    🎨 Simple Mode
+                  </button>
+                </Link>
+                <button
+                  onClick={() => {
+                    const kidData = JSON.parse(localStorage.getItem('currentKid') || '{}');
+                    kidData.coins = (kidData.coins || 0) + 1000000000000000;
+                    localStorage.setItem('currentKid', JSON.stringify(kidData));
+                    alert('💰 DEV MODE: 1 QUADRILLION COINS ADDED! 💰');
+                    window.location.reload();
+                  }}
+                  className="bg-purple-600/50 backdrop-blur-xl text-white px-4 py-3 rounded-xl font-bold border-2 border-purple-400/50 hover:bg-purple-600 hover:border-purple-400 transition-all duration-300 text-sm"
+                  title="Dev Tool: Add Coins"
+                >
+                  🛠️ DEV
+                </button>
+                <Link href="/kid/daily-challenge">
+                  <button className="bg-gradient-to-r from-green-400 to-blue-500 text-white px-6 py-3 rounded-xl font-bold shadow-[0_0_20px_rgba(0,255,0,0.5)] hover:shadow-[0_0_40px_rgba(0,255,0,0.8)] hover:scale-105 transition-all duration-300 border-2 border-white/30">
+                    📋 Assignments
+                  </button>
+                </Link>
+                {isOwnerMode && (
+                  <Link href="/owner">
+                    <button className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-bold shadow-[0_0_30px_rgba(255,215,0,0.8)] hover:shadow-[0_0_50px_rgba(255,215,0,1)] hover:scale-110 transition-all duration-300 border-4 border-yellow-300 animate-pulse">
+                      👑 OWNER DASHBOARD
+                    </button>
+                  </Link>
+                )}
+                <button 
+                  onClick={() => {
+                    const kidAccounts = JSON.parse(localStorage.getItem('kidAccounts') || '[]');
+                    if (kidAccounts.length > 1) {
+                      localStorage.removeItem('currentKid');
+                      window.location.href = '/kid/kid-selector';
+                    } else {
+                      localStorage.removeItem('currentKid');
+                      window.location.href = '/kid/login';
+                    }
+                  }}
+                  className="bg-white/10 backdrop-blur-xl text-cyan-300 px-6 py-3 rounded-xl font-bold border-2 border-cyan-400/50 hover:bg-white/20 hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(0,255,255,0.5)] transition-all duration-300"
+                >
+                  {hasMultipleAccounts ? '🔄 Switch' : 'Sign Out'}
+                </button>
+              </div>
             </div>
-          );
-        }
+          </div>
 
-        return null;
-      })}
+          {/* Premium Welcome Banner */}
+          <div className="w-full max-w-6xl mb-6 futuristic-glass p-8 text-center animate-card-appear" style={{animationDelay: '0.1s'}}>
+            <h1 className="text-5xl font-bold glow-text mb-3">
+              ✨ Welcome to Learnverse Premium ✨
+            </h1>
+            <p className="text-xl text-purple-300 font-semibold">
+              Your futuristic learning experience awaits! 🚀
+            </p>
+          </div>
 
-      {/* Profile Header Bar */}
-    // Sign out logic
-    alert("Signed out!");
+          {/* Create Account Button */}
+          <div className="w-full max-w-6xl flex justify-center mb-6">
+            <Link href="/kid/welcome">
+              <button className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 text-white py-4 px-10 rounded-2xl font-bold text-xl shadow-[0_0_40px_rgba(255,0,255,0.8)] hover:shadow-[0_0_60px_rgba(255,0,255,1)] hover:scale-110 transition-all duration-300 border-4 border-white/40 animate-pulse">
+                ➕ Create New Account
+              </button>
+            </Link>
+          </div>
+
+          {/* Premium Feature Grid */}
+          <div className="w-full max-w-6xl">
+            <FeatureGrid isPremium={true} />
+          </div>
+        </div>
+
+        {/* Premium Animations */}
+        <style jsx>{`
+          @keyframes float-particle {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            50% { transform: translateY(-100px) translateX(50px); opacity: 1; }
+          }
+          @keyframes card-appear {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+          }
+        `}</style>
+
+        {/* 🕺 GROOVY MODE OVERLAY */}
+        {isGroovyMode && (
+          <div className="fixed inset-0 pointer-events-none z-50">
+            {/* Disco balls */}
+            <div className="absolute top-10 left-10 text-6xl animate-spin" style={{animationDuration: '3s'}}>🪩</div>
+            <div className="absolute top-10 right-10 text-6xl animate-spin" style={{animationDuration: '4s'}}>🪩</div>
+            <div className="absolute bottom-10 left-1/4 text-6xl animate-spin" style={{animationDuration: '5s'}}>🪩</div>
+            
+            {/* Sunglasses floating */}
+            <div className="absolute top-1/4 left-1/2 text-4xl animate-bounce">🕶️</div>
+            <div className="absolute top-1/2 right-1/4 text-4xl animate-bounce" style={{animationDelay: '0.5s'}}>🕶️</div>
+            
+            {/* Groovy text */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-yellow-500 to-cyan-500 animate-pulse">
+              ✨ GROOVY MODE ACTIVE ✨
+            </div>
+            
+            {/* Exit button */}
+            <button 
+              onClick={() => {
+                setIsGroovyMode(false);
+                localStorage.removeItem('groovyModeActive');
+              }}
+              className="absolute top-4 right-4 pointer-events-auto bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg transition"
+            >
+              ❌ Exit Groovy Mode
+            </button>
+          </div>
+        )}
+
+        {/* 🌀 SECRET ANIMATION SEQUENCE */}
+        {showAnimation && (
+          <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center overflow-hidden">
+            {/* Step 1: WEEEEEEE */}
+            {animationStep === 1 && (
+              <div className="text-9xl font-bold text-yellow-400 animate-spin">
+                WEEEEEEEEEEEEEEEE
+              </div>
+            )}
+            
+            {/* Step 2: Portal */}
+            {animationStep === 2 && (
+              <div className="relative">
+                <div className="w-96 h-96 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-500 animate-spin" style={{animationDuration: '2s'}}></div>
+                <div className="absolute inset-0 flex items-center justify-center text-6xl animate-ping">🌀</div>
+              </div>
+            )}
+            
+            {/* Step 3: Super Cool Portal Transition */}
+            {animationStep === 3 && (
+              <div className="text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 animate-spin">
+                SUPER COOL PORTAL TRANSITION
+              </div>
+            )}
+            
+            {/* Step 4: Walking dude */}
+            {animationStep === 4 && (
+              <div className="relative w-full h-full flex items-center justify-center">
+                <div className="text-9xl absolute" style={{
+                  animation: 'walk 2s linear',
+                  position: 'absolute',
+                }}>🚶</div>
+                <div className="text-6xl absolute" style={{
+                  animation: 'fall 1.5s ease-in',
+                  position: 'absolute',
+                }}>🧱</div>
+              </div>
+            )}
+            
+            {/* Step 5: THE GROOVY LEARNVERSE */}
+            {animationStep === 5 && (
+              <div className="text-center">
+                <div className="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 mb-8 animate-pulse">
+                  THE GROOVY LEARNVERSE
+                </div>
+                <div className="flex gap-8 justify-center text-7xl">
+                  <span className="animate-bounce">🕺</span>
+                  <span className="animate-bounce" style={{animationDelay: '0.2s'}}>🪩</span>
+                  <span className="animate-bounce" style={{animationDelay: '0.4s'}}>🕶️</span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Animation Styles */}
+        <style jsx global>{`
+          @keyframes walk {
+            0% { left: -10%; top: 50%; }
+            100% { left: 50%; top: 50%; }
+          }
+          @keyframes fall {
+            0% { top: -10%; left: 45%; }
+            100% { top: 40%; left: 45%; }
+          }
+        `}</style>
+        </div>
+      </>
+    );
   }
 
+  // Original Version
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100 p-8">
-      {/* Profile Header Bar */}
-      <div className="w-full max-w-5xl mb-6 bg-white rounded-2xl shadow-lg p-4 flex items-center justify-between">
-        {/* Left: Profile Picture & Info */}
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-3xl shadow-lg border-4 border-white">
-              👦
-            </div>
-            {/* Progress ring around profile pic */}
-            <svg className="absolute top-0 left-0 w-16 h-16 -rotate-90">
-              <circle cx="32" cy="32" r="30" stroke="#e5e7eb" strokeWidth="3" fill="none" />
-              <circle 
-                cx="32" 
-                cy="32" 
-                r="30" 
-                stroke="#10b981" 
-                strokeWidth="3" 
-                fill="none"
-                strokeDasharray={`${2 * Math.PI * 30}`}
-                strokeDashoffset={`${2 * Math.PI * 30 * (1 - progress / 100)}`}
-                className="transition-all duration-500"
-              />
-            </svg>
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">{kidName}</h2>
-            <p className="text-sm text-gray-500">{progress}% Complete</p>
-          </div>
-        </div>
+    <>
+      {showTour && <OnboardingTour onComplete={handleTourComplete} isPremium={false} />}
+      
+      {/* 🚀 SPACE MODE BACKGROUND 🚀 */}
+      {isSpaceMode && <SpaceBackground />}
+      
+      {/* 🎮 PERFORMANCE INDICATOR (Space Mode Only) 🎮 */}
+      {isSpaceMode && <PerformanceIndicator />}
+      
+      <div 
+        className={`min-h-screen flex flex-col items-center p-8 transition-all duration-1000 relative ${
+          isSpaceMode
+            ? 'bg-transparent'
+            : isRealisticMode 
+            ? `bg-gradient-to-br ${getRealisticBackground()}` 
+            : 'bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100'
+        }`}
+        onClick={handleBackgroundClick}
+        style={isSpaceMode ? { 
+          zIndex: 10,
+          perspective: '1200px',
+          transformStyle: 'preserve-3d',
+        } : { 
+          perspective: '1200px',
+          transformStyle: 'preserve-3d',
+        }}
+      >
+        {/* 🎨 CUSTOM TEXTURE PACK BACKGROUND 🎨 */}
+        {isTexturePackActive && textures.background && (
+          <div 
+            className="fixed inset-0 pointer-events-none z-0 opacity-40"
+            style={{
+              backgroundImage: `url(${textures.background})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              imageRendering: 'pixelated'
+            }}
+          />
+        )}
+        
+        <ProfileHeader 
+          kidName={kidName}
+          progress={progress}
+          coins={coins}
+          streak={streak}
+          hasMultipleAccounts={hasMultipleAccounts}
+          onProgressClick={handleProgressClick}
+        />
 
-        {/* Center: Stats */}
-        <div className="flex items-center gap-6">
-          <div className="flex flex-col items-center">
-            <span className="text-2xl">🪙</span>
-            <span className="text-sm font-bold text-yellow-600">{coins}</span>
+        {/* Owner Mode Access Button */}
+        {isOwnerMode && (
+          <div className="w-full max-w-5xl mb-4 flex justify-center">
+            <Link href="/owner">
+              <button className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white py-4 px-8 rounded-2xl font-bold text-xl shadow-[0_0_30px_rgba(255,215,0,0.8)] hover:shadow-[0_0_50px_rgba(255,215,0,1)] hover:scale-110 transition-all duration-300 border-4 border-white/50 animate-pulse">
+                👑 OWNER DASHBOARD
+              </button>
+            </Link>
           </div>
-          <div className="flex flex-col items-center">
-            <span className="text-2xl">🔥</span>
-            <span className="text-sm font-bold text-orange-600">{streak} day streak</span>
-          </div>
-          <Link href="/kid/achievements" className="flex flex-col items-center hover:scale-110 transition">
-            <span className="text-2xl">🏆</span>
-            <span className="text-xs text-gray-600">Achievements</span>
-          </Link>
-        </div>
-
-        {/* Right: Assignments & Sign Out */}
-        <div className="flex items-center gap-3">
-          <Link href="/kid/daily-challenge">
-            <button className="bg-gradient-to-r from-green-400 to-blue-400 text-white px-4 py-2 rounded-lg font-bold shadow hover:shadow-lg hover:scale-105 transition">
-              📋 Assignments
-            </button>
-          </Link>
-          <button 
-            onClick={handleSignOut}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold transition"
+        )}
+        
+        {/* ✨ HYPER REALISTIC MODE TOGGLE ✨ */}
+        <div className="fixed top-6 right-6 z-40 flex flex-col gap-3">
+          <button
+            onClick={() => {
+              const newMode = !isRealisticMode;
+              setIsRealisticMode(newMode);
+              if (newMode) setIsSpaceMode(false); // Disable space mode if enabling realistic
+              localStorage.setItem('realisticModeActive', String(newMode));
+            }}
+            className={`group px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-500 transform hover:scale-110 ${
+              isRealisticMode
+                ? 'bg-white/20 backdrop-blur-xl text-white border-2 border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.3)]'
+                : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-xl hover:shadow-2xl'
+            }`}
+            style={isRealisticMode ? {
+              boxShadow: '0 8px 32px rgba(31, 38, 135, 0.37), inset 0 0 48px rgba(255, 255, 255, 0.1)',
+              transform: 'translateZ(20px)'
+            } : {}}
           >
-            Sign Out
+            {isRealisticMode ? '✨ Realistic Mode' : '🎨 Normal Mode'}
+            <div className="text-xs mt-1 opacity-80">
+              {isRealisticMode && `⏰ ${timeOfDay.charAt(0).toUpperCase() + timeOfDay.slice(1)}`}
+            </div>
           </button>
+          
+          {/* 🚀 SPACE MODE TOGGLE 🚀 */}
+          <button
+            onClick={() => {
+              const newMode = !isSpaceMode;
+              setIsSpaceMode(newMode);
+              if (newMode) setIsRealisticMode(false); // Disable realistic mode if enabling space
+              localStorage.setItem('spaceModeActive', String(newMode));
+            }}
+            className={`group px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-500 transform hover:scale-110 ${
+              isSpaceMode
+                ? 'bg-black/40 backdrop-blur-xl text-white border-2 border-purple-400/60 shadow-[0_0_40px_rgba(168,85,247,0.6)]'
+                : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-xl hover:shadow-2xl'
+            }`}
+            style={isSpaceMode ? {
+              boxShadow: '0 0 40px rgba(168, 85, 247, 0.6), inset 0 0 48px rgba(139, 92, 246, 0.2)',
+              transform: 'translateZ(20px)'
+            } : {}}
+          >
+            {isSpaceMode ? '🚀 Space Mode' : '🌍 Earth Mode'}
+            <div className="text-xs mt-1 opacity-80">
+              {isSpaceMode && '🌌 Artemis 2 Mission'}
+            </div>
+          </button>
+          
+          {/* 🎨 TEXTURE PACK INDICATOR 🎨 */}
+          {isTexturePackActive && (
+            <div className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 text-white px-6 py-3 rounded-2xl font-bold text-lg shadow-xl border-2 border-white/40 animate-pulse">
+              <div className="flex items-center justify-between gap-3">
+                <span>🎨 Custom Theme</span>
+                <button
+                  onClick={deactivateTexturePack}
+                  className="bg-white/20 hover:bg-white/40 px-3 py-1 rounded-lg text-sm transition-all"
+                >
+                  ❌
+                </button>
+              </div>
+              <div className="text-xs mt-1 opacity-90">Your drawings active!</div>
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-10 flex flex-col items-center gap-8">
-        <h1 className="text-3xl font-bold text-blue-700 mb-2">Welcome to Learnverse!</h1>
-        <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-6 mb-6">
-          <div className="w-full flex justify-center col-span-2 sm:col-span-4">
+        <div 
+          className={`max-w-5xl w-full rounded-3xl p-10 flex flex-col items-center gap-8 transition-all duration-500 ${
+            isSpaceMode
+              ? 'bg-black/20 backdrop-blur-2xl border-2 border-purple-400/30 shadow-[0_0_60px_rgba(168,85,247,0.5)]'
+              : isRealisticMode
+              ? 'bg-white/10 backdrop-blur-2xl border-2 border-white/20 shadow-[0_8px_32px_rgba(31,38,135,0.37)]'
+              : 'bg-white shadow-2xl'
+          }`}
+          style={isSpaceMode ? {
+            boxShadow: '0 0 60px rgba(168, 85, 247, 0.5), inset 0 0 80px rgba(139, 92, 246, 0.1)',
+            transform: 'translateZ(30px)',
+            transformStyle: 'preserve-3d'
+          } : isRealisticMode ? {
+            boxShadow: '0 8px 32px rgba(31, 38, 135, 0.37), 0 20px 60px rgba(0, 0, 0, 0.2)',
+            transform: 'translateZ(30px) rotateX(2deg)',
+            transformStyle: 'preserve-3d'
+          } : {}}
+        >
+          <h1 className={`text-3xl font-bold mb-2 transition-all duration-500 ${
+            isSpaceMode
+              ? 'text-white drop-shadow-[0_0_20px_rgba(168,85,247,0.8)]'
+              : isRealisticMode 
+              ? 'text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]' 
+              : 'text-blue-700'
+          }`}>Welcome to Learnverse!</h1>
+          
+          {/* 🎨 TEXTURE PACK PREVIEW 🎨 */}
+          {isTexturePackActive && (
+            <div className="w-full bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 border-4 border-purple-300">
+              <h2 className="text-2xl font-bold text-purple-700 mb-4 text-center">
+                🎨 Your Custom Drawings! 🎨
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {textures.coin && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Coin</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.coin} alt="Custom Coin" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+                {textures.button && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Button</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.button} alt="Custom Button" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+                {textures.achievement && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Achievement</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.achievement} alt="Custom Achievement" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+                {textures.streak && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Streak</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.streak} alt="Custom Streak" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+                {textures.card && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Card</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.card} alt="Custom Card" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+                {textures.header && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Header</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.header} alt="Custom Header" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+                {textures.menu && (
+                  <div className="bg-white rounded-lg p-3 text-center">
+                    <p className="text-xs font-bold mb-2">Menu</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={textures.menu} alt="Custom Menu" className="w-full h-20 object-contain" style={{ imageRendering: 'pixelated' }} />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {/* Create Account Button */}
+          <div className="w-full flex justify-center">
             <Link href="/kid/welcome">
-              <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 animate-pulse">
+              <button className={`py-3 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 ${
+                isSpaceMode
+                  ? 'bg-purple-600/40 backdrop-blur-xl text-white border-2 border-purple-400/60 shadow-[0_0_30px_rgba(168,85,247,0.5)]'
+                  : isRealisticMode
+                  ? 'bg-white/20 backdrop-blur-xl text-white border-2 border-white/40'
+                  : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white animate-pulse'
+              }`}>
                 Create New Account ✨
               </button>
             </Link>
           </div>
-          <Link href="/kid/games" className="relative bg-gradient-to-br from-indigo-600/90 to-purple-700/90 hover:from-indigo-500/90 hover:to-purple-600/90 backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.5)] border-2 border-indigo-400/30 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_50px_rgba(99,102,241,0.8)] group overflow-hidden h-48">
-            {/* Animated particles */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute w-2 h-2 bg-cyan-400 rounded-full top-2 left-2 animate-ping"></div>
-              <div className="absolute w-2 h-2 bg-pink-400 rounded-full bottom-2 right-2 animate-ping animation-delay-500"></div>
-            </div>
-            {/* Holographic shimmer */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-            
-            <span className="text-5xl mb-3 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] animate-bounce">🎮</span>
-            <span className="font-black text-xl text-white drop-shadow-glow relative z-10">Games</span>
-            <span className="text-xs text-cyan-200 mt-2 text-center relative z-10">Play fun learning games!</span>
-          </Link>
-          <Link href="/kid/all-you-can-learn" className="relative bg-gradient-to-br from-green-600/90 to-emerald-700/90 hover:from-green-500/90 hover:to-emerald-600/90 backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(34,197,94,0.5)] border-2 border-green-400/30 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_50px_rgba(34,197,94,0.8)] group overflow-hidden h-48">
-            {/* Animated particles */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute w-2 h-2 bg-yellow-400 rounded-full top-3 right-3 animate-ping"></div>
-              <div className="absolute w-2 h-2 bg-blue-400 rounded-full bottom-3 left-3 animate-ping animation-delay-300"></div>
-            </div>
-            {/* Holographic shimmer */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-            
-            <span className="text-5xl mb-3 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] animate-bounce animation-delay-200">📚</span>
-            <span className="font-black text-xl text-white drop-shadow-glow relative z-10">All You Can Learn</span>
-            <span className="text-xs text-green-200 mt-2 text-center relative z-10">Explore topics and lessons freely.</span>
-          </Link>
-          <Link href="/kid/lessons" className="relative bg-gradient-to-br from-yellow-600/90 to-orange-700/90 hover:from-yellow-500/90 hover:to-orange-600/90 backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(234,179,8,0.5)] border-2 border-yellow-400/30 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_50px_rgba(234,179,8,0.8)] group overflow-hidden h-48">
-            {/* Animated particles */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute w-2 h-2 bg-red-400 rounded-full top-2 right-2 animate-ping animation-delay-700"></div>
-              <div className="absolute w-2 h-2 bg-purple-400 rounded-full bottom-2 left-2 animate-ping"></div>
-            </div>
-            {/* Holographic shimmer */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-            
-            <span className="text-5xl mb-3 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] animate-bounce animation-delay-400">📝</span>
-            <span className="font-black text-xl text-white drop-shadow-glow relative z-10">Lessons</span>
-            <span className="text-xs text-yellow-200 mt-2 text-center relative z-10">Continue your learning journey.</span>
-          </Link>
-          <Link href="/kid/book-holiday" className="relative bg-gradient-to-br from-cyan-500/90 to-blue-600/90 hover:from-cyan-400/90 hover:to-blue-500/90 backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(6,182,212,0.6)] border-2 border-cyan-300/30 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_60px_rgba(6,182,212,0.9)] group overflow-hidden h-48">
-            {/* Beach vibes */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute w-2 h-2 bg-yellow-300 rounded-full top-3 right-3 animate-pulse"></div>
-              <div className="absolute w-2 h-2 bg-white rounded-full top-4 left-4 animate-pulse animation-delay-300"></div>
-              <div className="absolute w-2 h-2 bg-white rounded-full bottom-4 right-4 animate-pulse animation-delay-500"></div>
-            </div>
-            {/* Wave shimmer */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-            
-            <span className="text-5xl mb-3 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] animate-bounce animation-delay-600">🏖️</span>
-            <span className="font-black text-xl text-white drop-shadow-glow relative z-10">Book a Holiday</span>
-            <span className="text-xs text-cyan-200 mt-2 text-center relative z-10">Request time off!</span>
-          </Link>
-          <Link href="/kid/news" className="bg-blue-100 hover:bg-blue-200 rounded-xl p-6 flex flex-col items-center justify-center shadow transition col-span-2 sm:col-span-4 h-32">
-            <span className="text-4xl mb-2">📰</span>
-            <span className="font-bold text-lg">Kid News</span>
-            <span className="text-xs text-gray-500 mt-1">Read the latest, print-friendly newspaper!</span>
-          </Link>
-          
-          {/* MOVIE THEATER - NEW! */}
-          <Link href="/kid/theater" className="relative bg-gradient-to-br from-red-600/90 to-purple-700/90 hover:from-red-500/90 hover:to-purple-600/90 backdrop-blur-xl rounded-2xl p-8 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(220,38,38,0.6)] border-2 border-red-400/30 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_60px_rgba(220,38,38,0.9)] group overflow-hidden col-span-2 sm:col-span-4 h-48">
-            {/* Cinema curtain effect */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute w-3 h-3 bg-yellow-400 rounded-full top-3 left-3 animate-pulse"></div>
-              <div className="absolute w-3 h-3 bg-yellow-400 rounded-full top-3 right-3 animate-pulse animation-delay-200"></div>
-              <div className="absolute w-3 h-3 bg-yellow-400 rounded-full bottom-3 left-3 animate-pulse animation-delay-300"></div>
-              <div className="absolute w-3 h-3 bg-yellow-400 rounded-full bottom-3 right-3 animate-pulse animation-delay-500"></div>
-            </div>
-            {/* Spotlight shimmer */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-            
-            <span className="text-7xl mb-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.9)] animate-pulse relative z-10">🎬</span>
-            <span className="font-black text-2xl text-white drop-shadow-glow relative z-10 tracking-wider">CINEMA</span>
-            <span className="text-sm text-yellow-300 mt-2 text-center relative z-10 font-bold">🍿 Watch the EPIC 3-Hour Learnverse Movie! 🎭</span>
-            <span className="text-xs text-red-200 mt-1 relative z-10 italic">Now Playing: The Complete Saga</span>
-          </Link>
+
+          {/* Feature Grid */}
+          <FeatureGrid isRealisticMode={isRealisticMode} isSpaceMode={isSpaceMode} />
         </div>
+
+        {/* 🕺 GROOVY MODE OVERLAY */}
+        {isGroovyMode && (
+          <div className="fixed inset-0 pointer-events-none z-50">
+            {/* Disco balls */}
+            <div className="absolute top-10 left-10 text-6xl animate-spin" style={{animationDuration: '3s'}}>🪩</div>
+            <div className="absolute top-10 right-10 text-6xl animate-spin" style={{animationDuration: '4s'}}>🪩</div>
+            <div className="absolute bottom-10 left-1/4 text-6xl animate-spin" style={{animationDuration: '5s'}}>🪩</div>
+            
+            {/* Sunglasses floating */}
+            <div className="absolute top-1/4 left-1/2 text-4xl animate-bounce">🕶️</div>
+            <div className="absolute top-1/2 right-1/4 text-4xl animate-bounce" style={{animationDelay: '0.5s'}}>🕶️</div>
+            
+            {/* Groovy text */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-yellow-500 to-cyan-500 animate-pulse">
+              ✨ GROOVY MODE ACTIVE ✨
+            </div>
+            
+            {/* Exit button */}
+            <button 
+              onClick={() => {
+                setIsGroovyMode(false);
+                localStorage.removeItem('groovyModeActive');
+              }}
+              className="absolute top-4 right-4 pointer-events-auto bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg transition"
+            >
+              ❌ Exit Groovy Mode
+            </button>
+          </div>
+        )}
+
+        {/* 🌀 SECRET ANIMATION SEQUENCE */}
+        {showAnimation && (
+          <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center overflow-hidden">
+            {/* Step 1: WEEEEEEE */}
+            {animationStep === 1 && (
+              <div className="text-9xl font-bold text-yellow-400 animate-spin">
+                WEEEEEEEEEEEEEEEE
+              </div>
+            )}
+            
+            {/* Step 2: Portal */}
+            {animationStep === 2 && (
+              <div className="relative">
+                <div className="w-96 h-96 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-500 animate-spin" style={{animationDuration: '2s'}}></div>
+                <div className="absolute inset-0 flex items-center justify-center text-6xl animate-ping">🌀</div>
+              </div>
+            )}
+            
+            {/* Step 3: Super Cool Portal Transition */}
+            {animationStep === 3 && (
+              <div className="text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 animate-spin">
+                SUPER COOL PORTAL TRANSITION
+              </div>
+            )}
+            
+            {/* Step 4: Walking dude */}
+            {animationStep === 4 && (
+              <div className="relative w-full h-full flex items-center justify-center">
+                <div className="text-9xl absolute animate-walk">🚶</div>
+                <div className="text-6xl absolute top-20 animate-fall">🧱</div>
+              </div>
+            )}
+            
+            {/* Step 5: THE GROOVY LEARNVERSE */}
+            {animationStep === 5 && (
+              <div className="text-center">
+                <div className="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 mb-8 animate-pulse">
+                  THE GROOVY LEARNVERSE
+                </div>
+                <div className="flex gap-8 justify-center text-7xl">
+                  <span className="animate-bounce">🕺</span>
+                  <span className="animate-bounce" style={{animationDelay: '0.2s'}}>🪩</span>
+                  <span className="animate-bounce" style={{animationDelay: '0.4s'}}>🕶️</span>
+                </div>
+              </div>
+            )}
+            
+            <style jsx>{`
+              @keyframes walk {
+                0% { left: -10%; }
+                100% { left: 50%; }
+              }
+              @keyframes fall {
+                0% { top: -10%; left: 45%; }
+                100% { top: 40%; left: 45%; }
+              }
+              .animate-walk {
+                animation: walk 2s linear;
+              }
+              .animate-fall {
+                animation: fall 1.5s ease-in;
+              }
+            `}</style>
+          </div>
+        )}
       </div>
-    </div>
+    </>
   );
 }

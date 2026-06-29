@@ -13,13 +13,19 @@ export default function ParentLogin() {
   const [error, setError] = useState("");
   const [isPremium, setIsPremium] = useState(false);
 
-  // Check if Premium version is selected
+  // Check if Premium version is selected and auto-login if already logged in
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const version = localStorage.getItem('learnverseVersion') || 'original';
       setIsPremium(version === 'premium');
+      
+      // Auto-redirect if already logged in
+      const isLoggedIn = localStorage.getItem('parentLoggedIn');
+      if (isLoggedIn === 'true') {
+        router.push('/parent/dashboard');
+      }
     }
-  }, []);
+  }, [router]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();

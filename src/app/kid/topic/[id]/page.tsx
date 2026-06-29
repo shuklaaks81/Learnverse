@@ -46,7 +46,7 @@ const loadLesson = async (id: number): Promise<TopicLesson | null> => {
 export default function TopicPage() {
   const params = useParams();
   const router = useRouter();
-  const topicId = parseInt(params.id as string);
+  const topicId = parseInt((params?.id as string) || '0');
   const soundEffects = useSoundEffects();
 
   const [lesson, setLesson] = useState<TopicLesson | null>(null);

@@ -14,9 +14,9 @@ interface Activity {
 
 function DetailsContent() {
   const searchParams = useSearchParams();
-  const kidName = searchParams.get("name") || "Kid";
-  const kidId = searchParams.get("id") || "";
-  const progress = parseInt(searchParams.get("progress") || "0");
+  const kidName = searchParams?.get("name") || "Kid";
+  const kidId = searchParams?.get("id") || "";
+  const progress = parseInt(searchParams?.get("progress") || "0");
 
   const activities: Activity[] = [
     { id: 1, type: "Lesson", title: "Math: Addition Basics", date: "2 hours ago", score: 95 },

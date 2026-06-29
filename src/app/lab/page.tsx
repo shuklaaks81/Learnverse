@@ -117,6 +117,10 @@ const initialItems = [
   { name: "Weak Explosive", icon: "🧨", effect: "A small pop! The weak explosive made a little noise.", explanation: "Weak explosives release a small amount of energy. Still, always be careful!" },
   { name: "Medium Explosive", icon: "💥", effect: "A big bang! The medium explosive shook the lab.", explanation: "Medium explosives are more powerful and can cause significant damage." },
   { name: "Strong Explosive", icon: "💣🔥", effect: "Massive explosion! The strong explosive changed the landscape.", explanation: "Strong explosives are extremely dangerous and should only be handled by professionals." },
+  { name: "TNT", icon: "🧨💥", effect: "TNT explodes with massive force!", explanation: "TNT (Trinitrotoluene) is a powerful explosive used in demolition. Chain reactions possible!" },
+  { name: "C4", icon: "🧱💣", effect: "C4 plastic explosive detonates!", explanation: "C4 is a military-grade plastic explosive that can be molded into shapes." },
+  { name: "Dynamite", icon: "🧨🔥", effect: "Dynamite stick explodes with a bang!", explanation: "Dynamite was invented by Alfred Nobel and revolutionized mining and construction." },
+  { name: "Nuclear Bomb", icon: "☢️💥", effect: "NUCLEAR EXPLOSION! Everything is GONE!", explanation: "Nuclear weapons use atomic reactions. This is just a simulation - never use in real life!" },
   { name: "Chemical Bottle", icon: "🧪", effect: "A chemical reaction occurs! Bubbles and colors appear.", explanation: "Chemicals can react in surprising ways. Always wear safety gear in real labs!" },
   { name: "Acid", icon: "🧫", effect: "Acid reacts with metals and other chemicals!", explanation: "Acids can dissolve metals and cause strong reactions. Handle with care!" },
   { name: "Base", icon: "🧴", effect: "Base neutralizes acids!", explanation: "Bases can neutralize acids and are slippery to the touch. Always use gloves!" },
@@ -138,7 +142,18 @@ const initialItems = [
   { name: "Book", icon: "📚", effect: "A book opens, revealing new knowledge!", explanation: "Books are a source of endless learning and discovery." },
   { name: "Star", icon: "⭐", effect: "A star twinkles in the lab.", explanation: "Stars are massive balls of burning gas in space." },
   { name: "Crystal", icon: "💎", effect: "A crystal sparkles with light.", explanation: "Crystals form beautiful shapes due to their atomic structure." },
-  { name: "Paint", icon: "🎨", effect: "Paint splashes everywhere, making the lab colorful!", explanation: "Painting is a creative way to express ideas and decorate." }
+  { name: "Paint", icon: "🎨", effect: "Paint splashes everywhere, making the lab colorful!", explanation: "Painting is a creative way to express ideas and decorate." },
+  { name: "Light Bulb", icon: "💡", effect: "The light bulb glows!", explanation: "Light bulbs convert electrical energy into light. Needs power to work!" },
+  { name: "Motor", icon: "⚙️", effect: "The motor starts spinning!", explanation: "Motors convert electrical energy into mechanical motion. Needs power!" },
+  { name: "Generator", icon: "🔌", effect: "The generator produces electricity!", explanation: "Generators convert mechanical energy into electrical energy." },
+  { name: "Computer", icon: "💻", effect: "The computer boots up!", explanation: "Computers process information using binary code. Needs power!" },
+  { name: "Tesla Coil", icon: "⚡", effect: "The Tesla coil shoots lightning bolts!", explanation: "Tesla coils create high-voltage electricity and spectacular electrical discharges!" },
+  { name: "Laser", icon: "🔴", effect: "The laser fires a beam of intense light!", explanation: "Lasers emit concentrated beams of light through stimulated emission. Needs power!" },
+  { name: "Piston", icon: "🔩", effect: "The piston pushes and pulls!", explanation: "Pistons convert pressure into mechanical motion, used in engines." },
+  { name: "Gear", icon: "⚙️", effect: "The gear rotates and transfers motion!", explanation: "Gears are used to transfer rotational force between machine parts." },
+  { name: "Spring", icon: "〰️", effect: "The spring bounces!", explanation: "Springs store mechanical energy and can compress and extend." },
+  { name: "Fan", icon: "🌀", effect: "The fan blows air around!", explanation: "Fans move air by rotating blades. Needs power!" },
+  { name: "Drill", icon: "🔨", effect: "The drill spins and makes holes!", explanation: "Drills are rotating tools that create holes in materials. Needs power!" }
 ];
 
 // Type for all Lab items, including chips
@@ -179,7 +194,20 @@ export default function LabPage() {
     { items: ["Robot", "Chip"], emoji: "🤖💾", text: "Robot Upgraded with Chip!", color: "from-blue-400 via-green-200 to-yellow-200" },
     { items: ["Star", "Rocket"], emoji: "⭐🚀", text: "Rocket Reaches the Stars!", color: "from-yellow-200 via-blue-200 to-purple-300" },
     { items: ["Fire", "Water"], emoji: "🔥💧", text: "Fire is Extinguished by Water!", color: "from-blue-300 via-gray-200 to-fuchsia-200" },
-    { items: ["Crystal", "Light"], emoji: "💎💡", text: "Crystal Sparkles with Light!", color: "from-yellow-100 via-blue-100 to-pink-200" },
+    { items: ["Crystal", "Light Bulb"], emoji: "💎💡", text: "Crystal Sparkles with Light!", color: "from-yellow-100 via-blue-100 to-pink-200" },
+    { items: ["Battery", "Light Bulb"], emoji: "🔋💡", text: "Light Bulb Powers ON!", color: "from-yellow-300 via-orange-200 to-yellow-400" },
+    { items: ["Battery", "Motor"], emoji: "🔋⚙️", text: "Motor Starts Spinning!", color: "from-blue-300 via-gray-300 to-green-300" },
+    { items: ["Battery", "Computer"], emoji: "🔋💻", text: "Computer Boots Up!", color: "from-blue-400 via-purple-300 to-green-400" },
+    { items: ["Battery", "Tesla Coil"], emoji: "🔋⚡", text: "Tesla Coil Shoots Lightning!", color: "from-purple-400 via-blue-300 to-yellow-200" },
+    { items: ["Battery", "Laser"], emoji: "🔋🔴", text: "Laser Beam Activated!", color: "from-red-400 via-pink-300 to-red-500" },
+    { items: ["Battery", "Fan"], emoji: "🔋🌀", text: "Fan Starts Blowing!", color: "from-blue-200 via-white to-blue-300" },
+    { items: ["Battery", "Drill"], emoji: "🔋🔨", text: "Drill Powers Up and Spins!", color: "from-gray-400 via-yellow-300 to-gray-500" },
+    { items: ["Motor", "Gear"], emoji: "⚙️⚙️", text: "Gears Start Turning Together!", color: "from-gray-300 via-blue-200 to-gray-400" },
+    { items: ["Piston", "Motor"], emoji: "🔩⚙️", text: "Piston Engine Created!", color: "from-gray-400 via-red-300 to-gray-500" },
+    { items: ["Generator", "Wire"], emoji: "🔌🪢", text: "Electrical Circuit Complete!", color: "from-yellow-300 via-blue-200 to-green-300" },
+    { items: ["TNT", "Fire"], emoji: "🧨🔥💥", text: "TNT EXPLODES FROM FIRE!", color: "from-red-500 via-orange-400 to-yellow-500" },
+    { items: ["C4", "Fire"], emoji: "🧱💣🔥", text: "C4 DETONATES!", color: "from-red-600 via-orange-500 to-yellow-600" },
+    { items: ["Battery", "Robot"], emoji: "🔋🤖", text: "Robot Powers On and Moves!", color: "from-green-300 via-blue-300 to-purple-300" },
     // Add more combos as you wish!
   ];
 
@@ -200,36 +228,81 @@ export default function LabPage() {
     setLabItems(prevLabItems => {
       const newLabItems = [...prevLabItems, item];
       checkCombos(newLabItems);
-      // Delayed explosion for explosives
-      if (["Explosive", "Weak Explosive", "Medium Explosive", "Strong Explosive"].includes(item.name)) {
+      
+      // Nuclear Bomb - INSTANT DESTRUCTION OF EVERYTHING
+      if (item.name === "Nuclear Bomb") {
         const idx = newLabItems.length - 1;
-        setMessage("The explosive is ticking... 💣");
+        setMessage("⚠️ NUCLEAR BOMB ARMED! ⚠️");
+        setExplanation("In 5 seconds, everything will be destroyed!");
+        setTimeout(() => {
+          setExplodingIdx(idx);
+          setMessage("☢️💥 NUCLEAR EXPLOSION! EVERYTHING IS VAPORIZED! 💥☢️");
+          setExplanation("Nuclear weapons release unimaginable destructive power. This is only a simulation!");
+          playLabSound("Strong Explosive");
+          setTimeout(() => {
+            setLabItems([]);
+            setExplodingIdx(null);
+            setMessage("The lab has been completely destroyed...");
+            setExplanation("Everything was vaporized by the nuclear blast.");
+            setTimeout(() => {
+              setMessage("");
+              setExplanation("");
+            }, 3000);
+          }, 2000);
+        }, 5000);
+        return newLabItems;
+      }
+      
+      // Chain Reaction Explosives - TNT, C4, Dynamite (trigger nearby explosives!)
+      const chainExplosives = ["TNT", "C4", "Dynamite", "Explosive", "Weak Explosive", "Medium Explosive", "Strong Explosive"];
+      if (chainExplosives.includes(item.name)) {
+        const idx = newLabItems.length - 1;
+        setMessage(`${item.name} is ticking... 💣`);
         setExplanation("Explosives will detonate after a short delay. Stay back!");
         // If rocket is present, CRASH the app dramatically
         const rocketIdx = newLabItems.findIndex(i => i.name === "Rocket");
         if (rocketIdx !== -1) {
           setTimeout(() => {
             setCrashed(true);
-            setCrashReason("ERR: Please do NOT explode explosives with rocket! The nuke caused a catastrophic failure. Reload the page to continue.");
+            setCrashReason("ERR: Please do NOT explode explosives with rocket! The explosion caused a catastrophic failure. Reload the page to continue.");
           }, 3500);
         }
+        
         setTimeout(() => {
           setExplodingIdx(idx);
-          setMessage("BOOM! The explosive detonated and blew up everything!");
-          setExplanation("Explosives release energy rapidly, causing destruction. In real life, always be safe!");
+          setMessage(`💥 BOOM! ${item.name} EXPLODED!`);
+          setExplanation("The explosion triggers a chain reaction!");
           playLabSound("Strong Explosive");
+          
+          // Chain reaction - find other explosives and trigger them!
+          const otherExplosives = newLabItems
+            .map((it, i) => ({ item: it, index: i }))
+            .filter(({ item, index }) => index !== idx && chainExplosives.includes(item.name));
+          
+          if (otherExplosives.length > 0) {
+            setMessage(`💥💥 CHAIN REACTION! ${otherExplosives.length} more explosives triggered! 💥💥`);
+            // Trigger chain explosions with delays
+            otherExplosives.forEach(({ index }, i) => {
+              setTimeout(() => {
+                setExplodingIdx(index);
+                playLabSound("Strong Explosive");
+              }, (i + 1) * 500);
+            });
+          }
+          
           setTimeout(() => {
-            setLabItems([newLabItems[idx]]); // Only the explosive remains (to animate fade out)
+            setLabItems([newLabItems[idx]]); // Only one explosive remains (to animate fade out)
             setTimeout(() => {
               setLabItems([]);
               setExplodingIdx(null);
               setMessage("");
               setExplanation("");
-            }, 700);
-          }, 700);
+            }, 1000);
+          }, 1000 + otherExplosives.length * 500);
         }, 5000);
         return newLabItems;
       }
+      
       // Explosion animation for building/explosive combo (instant)
       if (
         (item.name === "Explosive" && prevLabItems.some(i => i.name === "Building")) ||
@@ -453,10 +526,16 @@ export default function LabPage() {
               if (item.name !== "Fire" && fireIndices.has(idx)) {
                 item = { ...item, name: "Fire", icon: "🔥", effect: "Fire burns brightly in the lab.", explanation: "Fire is a chemical reaction that releases heat and light." };
               }
-              // Power logic for chips
+              // Power logic for chips and machines
               const power = getPower(idx);
               const isChip = item.name === "Chip";
               const isPowered = isChip && power >= 30;
+              
+              // Check if machine needs power
+              const powerMachines = ["Light Bulb", "Motor", "Computer", "Tesla Coil", "Laser", "Fan", "Drill"];
+              const isMachine = powerMachines.includes(item.name);
+              const machinePowered = isMachine && power >= 1;
+              
               // Connect/click logic
               const isSelected = connectMode && selectedIdx === idx;
               const baseClass = `text-5xl mx-2 animate-bounce cursor-pointer relative group` + (isSelected ? ' ring-4 ring-blue-400' : '');
@@ -464,9 +543,46 @@ export default function LabPage() {
                 key: idx,
                 id: `lab-item-${idx}`,
                 className: baseClass,
-                title: item.name + (isChip ? ` (Power: ${power})` : ''),
+                title: item.name + (isChip ? ` (Power: ${power})` : isMachine ? ` (Power: ${power})` : ''),
                 onClick: () => handleItemClick(idx)
               };
+              
+              // Powered Machines - Special Effects!
+              if (isMachine) {
+                let machineClass = baseClass;
+                let machineIcon = item.icon;
+                
+                if (machinePowered) {
+                  // Different effects for different machines
+                  if (item.name === "Light Bulb") {
+                    machineClass = `text-5xl mx-2 cursor-pointer relative group animate-pulse ${isSelected ? 'ring-4 ring-blue-400' : ''}`;
+                    machineIcon = "💡";
+                  } else if (item.name === "Tesla Coil") {
+                    machineClass = `text-5xl mx-2 cursor-pointer relative group animate-ping ${isSelected ? 'ring-4 ring-blue-400' : ''}`;
+                    machineIcon = "⚡";
+                  } else if (item.name === "Laser") {
+                    machineClass = `text-5xl mx-2 cursor-pointer relative group animate-pulse ${isSelected ? 'ring-4 ring-blue-400' : ''}`;
+                    machineIcon = "🔴";
+                  } else if (item.name === "Motor" || item.name === "Fan" || item.name === "Drill") {
+                    machineClass = `text-5xl mx-2 cursor-pointer relative group animate-spin ${isSelected ? 'ring-4 ring-blue-400' : ''}`;
+                  } else if (item.name === "Computer") {
+                    machineClass = `text-5xl mx-2 cursor-pointer relative group animate-pulse ${isSelected ? 'ring-4 ring-blue-400' : ''}`;
+                  }
+                }
+                
+                return (
+                  <span {...commonProps} className={machineClass}>
+                    {machineIcon}
+                    <span className={`absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs px-2 py-0.5 rounded-full ${machinePowered ? 'bg-yellow-300 text-yellow-900 animate-pulse' : 'bg-gray-300 text-gray-500'}`}>
+                      {machinePowered ? '⚡ON' : 'OFF'}
+                    </span>
+                    {machinePowered && (item.name === "Tesla Coil" || item.name === "Laser") && (
+                      <span className="absolute top-0 left-0 text-yellow-400 text-2xl animate-ping">✨</span>
+                    )}
+                  </span>
+                );
+              }
+              
               // Chip: double-click to program, show power status
               if (isChip) {
                 return (

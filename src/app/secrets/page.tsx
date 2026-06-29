@@ -26,11 +26,54 @@ export default function SecretsPage() {
             SEE ANYWAY
           </button>
         ) : (
-          <div className="w-full flex flex-col items-center">
+          <div className="w-full flex flex-col items-center space-y-4">
             {corruptedText.map((line, i) => (
               <div key={i} className="text-2xl font-mono mb-2 animate-pulse" style={{letterSpacing: 2}}>{line}</div>
             ))}
             <Image src="/icon-192.png.svg" alt="Secret Icon" className="w-24 h-24 my-6" width={96} height={96} />
+            
+            {/* ACTUAL SECRETS! */}
+            <div className="mt-8 w-full bg-gray-900 rounded-xl p-6 border-2 border-lime-500">
+              <h2 className="text-2xl font-bold text-lime-400 mb-4 text-center">🔓 Secret Shortcuts Unlocked!</h2>
+              <ul className="space-y-3 text-lime-300 text-left">
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">⌨️</span>
+                  <div>
+                    <strong className="text-yellow-400">Press &apos;I&apos;</strong> - Replay the Big Bang intro animation
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">⌨️</span>
+                  <div>
+                    <strong className="text-yellow-400">Press &apos;T&apos;</strong> - Replay the onboarding tour and secrets contract
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">🔮</span>
+                  <div>
+                    <strong className="text-purple-400">Legendary Mode</strong> - Set localStorage &apos;legendaryMode&apos; to &apos;true&apos;
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">👑</span>
+                  <div>
+                    <strong className="text-pink-400">God Mode</strong> - Set localStorage &apos;godMode&apos; to &apos;true&apos;
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">🌐</span>
+                  <div>
+                    <strong className="text-cyan-400">Hidden Pages</strong> - Try /lab, /owner, /secrets, /open, /mini
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-2xl">✨</span>
+                  <div>
+                    <strong className="text-orange-400">Version Selector</strong> - Try Premium, Middle Age, or Original versions!
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
         )}
         <Link href="/" className="mt-6 px-6 py-2 bg-gray-700 text-white rounded-lg font-bold shadow hover:bg-gray-900">Back to Home</Link>

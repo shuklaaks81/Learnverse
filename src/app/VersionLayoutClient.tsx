@@ -2,8 +2,7 @@
 
 "use client";
 import React, { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
-const VersionSelectModal = dynamic(() => import("./VersionSelectModal"), { ssr: false });
+import VersionSelectModal from "./VersionSelectModal";
 
 export default function VersionLayoutClient({ children }: { children: React.ReactNode }) {
   const [version, setVersion] = useState<string | null>(null);
