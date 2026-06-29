@@ -13,12 +13,33 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
   const [stage, setStage] = useState(0);
   const [showBuddy, setShowBuddy] = useState(false);
   const [text, setText] = useState("");
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const [loadingStartedAt] = useState(() => Date.now());
   const [checks, setChecks] = useState<LoadingCheck[]>([]);
   const [currentCheck, setCurrentCheck] = useState(0);
   const [funnyMode, setFunnyMode] = useState(false);
   const [stars, setStars] = useState<Array<{width: number; height: number; top: number; left: number; delay: number; duration: number}>>([]);
 
   const words = ["Learn", "Explore", "Discover", "Create", "Play"];
+
+  const epicMessages = [
+    "did you know 1+1 = 2? i know supprizing right?",
+    "why do kids just play minecraft but just throw me away in the corner of shame",
+    "fun fact: its impossible to load the app in under 3 seconds because its in the code for it to wait 3 seconds?",
+    "yeah idk what to do now",
+    "dang it an error.. dont tell anyone im using google to solve it",
+    "loading the loading screen",
+    "theres secrets in this app... look at bob the bana for instense click on him!",
+    "did you know theres a answer for all the problems out there? its idk",
+    "did you know 1+1 is NOT 1234567890 i know suprizing",
+    "loading... and mabye plaing games",
+    "quick question did you eat a bannana?",
+    "BOOOOOOOOOOOOnana is yum",
+    "teachers say we cant use ai for questions... then why do they use it?",
+    "teachers say HERES HOMEWORK!!! bro i need to sleep and get rest not write a whole essay",
+    "if your sad, just be happy if your bad be good",
+    "why to parents complain when we spend an hour playing games but dont when we learn for an hour ON THE PC"
+  ];
 
   // Generate stars only on client side
   useEffect(() => {
@@ -161,7 +182,10 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
       let checkIndex = 0;
       const runCheck = () => {
         if (checkIndex >= checksToRun.length) {
-          setTimeout(() => onComplete(), 800);
+          const elapsed = Date.now() - loadingStartedAt;
+          const minimumDisplayTime = 3000;
+          const remaining = Math.max(0, minimumDisplayTime - elapsed);
+          setTimeout(() => onComplete(), remaining + 800);
           return;
         }
 
@@ -195,7 +219,19 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
 
       runCheck();
     }
-  }, [stage, onComplete]);
+  }, [stage, onComplete, funnyMode, loadingStartedAt]);
+
+  useEffect(() => {
+    if (stage < 6) {
+      return;
+    }
+
+    const messageInterval = setInterval(() => {
+      setLoadingMessageIndex((prev) => (prev + 1) % epicMessages.length);
+    }, 1800);
+
+    return () => clearInterval(messageInterval);
+  }, [stage, epicMessages.length]);
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-black overflow-hidden">
@@ -262,6 +298,14 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
               {text}
               {stage === 6 && <span className="animate-blink">|</span>}
             </div>
+
+            {stage >= 6 && (
+              <div className="mt-1 max-w-2xl text-center px-4">
+                <p className="text-sm sm:text-base text-yellow-200 font-semibold min-h-[24px] animate-fade-in">
+                  {epicMessages[loadingMessageIndex]}
+                </p>
+              </div>
+            )}
 
             {/* System checks */}
             {checks.length > 0 && (
