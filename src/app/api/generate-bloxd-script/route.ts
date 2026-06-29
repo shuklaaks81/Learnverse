@@ -4,7 +4,7 @@ import path from "path";
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt } = await req.json();
+    const { prompt, mode = "world", conversationHistory = "", previousCode = "" } = await req.json();
 
     if (!prompt) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
@@ -39,10 +39,13 @@ export async function POST(req: NextRequest) {
     // STEP 1: Understanding Phase - Figure out what user wants
     const understandingPrompt = `You are analyzing a Bloxd.io script request. Break down what the user wants into clear requirements.
 
+${conversationHistory ? `Previous Conversation:\n${conversationHistory}\n` : ""}
+${previousCode ? `Previous Code:\n\`\`\`\n${previousCode.slice(0, 500)}...\n\`\`\`\n` : ""}
+
 User Request: "${prompt}"
 
 Respond with:
-1. What they want to create
+1. What they want to create/fix
 2. Key features needed
 3. Which Bloxd.io APIs would be useful
 
@@ -75,7 +78,29 @@ Be concise and technical.`;
     const analysis = understandingData.choices[0]?.message?.content || "";
 
     // STEP 2: Code Generation Phase with API docs
+    const modeInstructions = mode === "codeblock" 
+      ? `
+CODE BLOCK MODE: Generate COMPACT code for use in Bloxd code blocks.
+- Keep it SHORT (under 50 lines)
+- Focus on ONE specific action
+- No complex world setups
+- Use simple effects/sounds
+- Perfect for buttons, triggers, simple actions
+Example: A button that gives items, spawns one entity, plays sound, etc.
+`
+      : `
+WORLD CODE MODE: Generate FULL world scripts with complete setups.
+- Can be ANY length needed
+- Full world initialization
+- Multiple features/systems
+- Complex player interactions
+- Terrain generation, multiple entities, full game mechanics
+Example: Complete minigames, adventure worlds, full survival systems, etc.
+`;
+
     const codeGenPrompt = `You are an expert Bloxd.io script developer. Generate working JavaScript code based on the requirements.
+
+${modeInstructions}
 
 Requirements Analysis:
 ${analysis}

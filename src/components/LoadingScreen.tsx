@@ -299,7 +299,8 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
     }
 
     const messageInterval = setInterval(() => {
-      setLoadingMessageIndex((prev) => (prev + 1) % epicMessages.length);
+      // Pick a random message instead of sequential
+      setLoadingMessageIndex(Math.floor(Math.random() * epicMessages.length));
     }, 1800);
 
     return () => clearInterval(messageInterval);
