@@ -12,16 +12,34 @@ export async function POST(req: NextRequest) {
 
     const issues: Array<{type: "error" | "warning" | "info"; message: string}> = [];
 
-    // Load API docs for validation
+    // Load ALL API docs for validation
     const apiDocsPath = path.join(process.cwd(), "bloxd-api-docs");
-    const apiReference = fs.readFileSync(
-      path.join(apiDocsPath, "API_REFERENCE.md"),
-      "utf-8"
-    );
-    const callbacks = fs.readFileSync(
-      path.join(apiDocsPath, "CALLBACKS.md"),
-      "utf-8"
-    );
+    const apiFiles = [
+      "API_REFERENCE.md",
+      "CALLBACKS.md",
+      "MESH_ENTITY_DOCS.md",
+      "ENTITY_SETTINGS.md",
+      "MOB_SETTINGS.md",
+      "PARTICLES.md",
+      "QTE_DOCS.md",
+      "SOUNDS_AND_MUSIC.md",
+      "SKINS_AND_POSES.md",
+      "BLOCK_NAMES.txt",
+      "ITEM_NAMES.txt"
+    ];
+    
+    let allAPIDocs = "";
+    apiFiles.forEach(file => {
+      try {
+        const content = fs.readFileSync(path.join(apiDocsPath, file), "utf-8");
+        allAPIDocs += content + "\n";
+      } catch (err) {
+        // File doesn't exist, skip it
+      }
+    });
+
+    const apiReference = allAPIDocs;
+    const callbacks = allAPIDocs; // Use same combined docs for both checks
 
     // 1. Check for setTimeout/setInterval
     if (code.includes("setTimeout") || code.includes("setInterval")) {
@@ -103,12 +121,18 @@ export async function POST(req: NextRequest) {
       const funcSet = new Set<string>(functionCalls.map((f: string) => f.replace("(", "")));
       const uniqueCalls = Array.from(funcSet);
       uniqueCalls.forEach((funcName) => {
-        // Skip obvious JS built-ins
-        const builtIns = ["console", "Math", "parseInt", "parseFloat", "String", "Number", "Array", "Object"];
+        // Skip obvious JS built-ins and common keywords
+        const builtIns = [
+          "console", "Math", "parseInt", "parseFloat", "String", "Number", 
+          "Array", "Object", "Date", "JSON", "isNaN", "isFinite",
+          "setTimeout", "setInterval", "clearTimeout", "clearInterval",
+          "log", "error", "warn", "info", "abs", "floor", "ceil", "round",
+          "random", "max", "min", "sqrt", "pow"
+        ];
         if (builtIns.includes(funcName)) return;
 
-        // Check if function exists in API docs
-        if (!apiReference.includes(funcName) && !callbacks.includes(funcName)) {
+        // Check if function exists in ALL API docs
+        if (!apiReference.includes(funcName)) {
           issues.push({
             type: "warning",
             message: `Function "${funcName}()" not found in Bloxd API docs. Double-check spelling or it might not exist!`
