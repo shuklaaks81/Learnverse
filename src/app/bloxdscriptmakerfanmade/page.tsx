@@ -16,6 +16,14 @@ export default function BloxdScriptMaker() {
   const [errorReport, setErrorReport] = useState("");
   const [conversationHistory, setConversationHistory] = useState<string>("");
   const chatEndRef = useRef<HTMLDivElement>(null);
+  
+  // New modes
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<string[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [deepScanResults, setDeepScanResults] = useState<Array<{type: "error" | "warning" | "info"; message: string}>>([]);
+  const [isScanning, setIsScanning] = useState(false);
+  const [activeTab, setActiveTab] = useState<"generate" | "search" | "scan">("generate");
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -143,6 +151,59 @@ export default function BloxdScriptMaker() {
     alert("Code copied! 🍌");
   };
 
+  const searchAPIDocs = async () => {
+    if (!searchQuery.trim()) return;
+    
+    setIsSearching(true);
+    setSearchResults([]);
+    
+    try {
+      const response = await fetch("/api/search-bloxd-docs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: searchQuery }),
+      });
+      
+      const data = await response.json();
+      setSearchResults(data.results || []);
+    } catch (err) {
+      console.error(err);
+      setSearchResults(["Error searching docs. Try again!"]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const deepScanCode = async () => {
+    if (!generatedCode) {
+      setDeepScanResults([{type: "error", message: "No code to scan! Generate a script first."}]);
+      return;
+    }
+    
+    setIsScanning(true);
+    setDeepScanResults([]);
+    
+    try {
+      const response = await fetch("/api/deep-scan-bloxd", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: generatedCode }),
+      });
+      
+      const data = await response.json();
+      setDeepScanResults(data.issues || []);
+      
+      if (data.issues.length === 0) {
+        setDeepScanResults([{type: "info", message: "✅ No issues found! Code looks good!"}]);
+      }
+    } catch (err) {
+      console.error(err);
+      setDeepScanResults([{type: "error", message: "Scan failed. Try again!"}]);
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
@@ -174,10 +235,48 @@ export default function BloxdScriptMaker() {
           <p className="text-gray-400 text-sm">Fan-made tool • Not affiliated with Bloxd.io</p>
         </div>
 
+        {/* Tab Navigation */}
+        <div className="flex justify-center gap-4 mb-6">
+          <button
+            onClick={() => setActiveTab("generate")}
+            className={`px-6 py-3 rounded-xl font-bold transition ${
+              activeTab === "generate"
+                ? "bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg"
+                : "bg-white/10 text-gray-300 hover:bg-white/20"
+            }`}
+          >
+            🚀 Generate
+          </button>
+          <button
+            onClick={() => setActiveTab("search")}
+            className={`px-6 py-3 rounded-xl font-bold transition ${
+              activeTab === "search"
+                ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg"
+                : "bg-white/10 text-gray-300 hover:bg-white/20"
+            }`}
+          >
+            🔍 Search API
+          </button>
+          <button
+            onClick={() => setActiveTab("scan")}
+            className={`px-6 py-3 rounded-xl font-bold transition ${
+              activeTab === "scan"
+                ? "bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg"
+                : "bg-white/10 text-gray-300 hover:bg-white/20"
+            }`}
+          >
+            👀 Deep Scan
+          </button>
+        </div>
+
         {/* 2-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: Main Generator (2 columns) */}
+          {/* Left: Main Content (2 columns) */}
           <div className="lg:col-span-2 space-y-6">
+            
+            {/* GENERATE TAB */}
+            {activeTab === "generate" && (
+              <>
             {/* Mode Toggle */}
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
               <label className="block text-lg font-semibold mb-3 text-center">🎯 Script Mode</label>
@@ -262,6 +361,104 @@ export default function BloxdScriptMaker() {
                         <li key={i}>{warning}</li>
                       ))}
                     </ul>
+                  </div>
+                )}
+              </div>
+            )}
+              </>
+            )}
+            
+            {/* SEARCH TAB */}
+            {activeTab === "search" && (
+              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+                <h2 className="text-2xl font-bold mb-4 text-center">🔍 Search Bloxd API Docs</h2>
+                <p className="text-gray-300 text-sm mb-4 text-center">
+                  Search for functions, blocks, items, callbacks, and more!
+                </p>
+                
+                <div className="flex gap-2 mb-4">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && searchAPIDocs()}
+                    placeholder="Example: setBlock, player, entity, tick..."
+                    className="flex-1 bg-black/30 border border-white/30 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400"
+                  />
+                  <button
+                    onClick={searchAPIDocs}
+                    disabled={isSearching || !searchQuery.trim()}
+                    className="bg-purple-500 hover:bg-purple-600 disabled:bg-gray-600 text-white font-bold px-6 rounded-lg transition"
+                  >
+                    {isSearching ? "🔍..." : "Search"}
+                  </button>
+                </div>
+
+                {searchResults.length > 0 && (
+                  <div className="bg-black/30 rounded-xl p-4 max-h-96 overflow-y-auto">
+                    <h3 className="font-bold mb-3 text-purple-300">Results:</h3>
+                    {searchResults.map((result, i) => (
+                      <div key={i} className="bg-white/5 rounded-lg p-3 mb-2 border border-purple-500/30">
+                        <pre className="text-sm text-gray-300 whitespace-pre-wrap font-mono">{result}</pre>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {!isSearching && searchQuery && searchResults.length === 0 && (
+                  <div className="bg-gray-500/20 border border-gray-400 rounded-lg p-4 text-center text-gray-300">
+                    Type something and hit Search!
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* DEEP SCAN TAB */}
+            {activeTab === "scan" && (
+              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+                <h2 className="text-2xl font-bold mb-4 text-center">👀 Deep Code Scanner</h2>
+                <p className="text-gray-300 text-sm mb-4 text-center">
+                  Scans your generated code for errors, undefined variables, fake APIs, and more!
+                </p>
+
+                <button
+                  onClick={deepScanCode}
+                  disabled={isScanning || !generatedCode}
+                  className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold py-4 px-8 rounded-xl transition mb-4"
+                >
+                  {isScanning ? "🔬 Scanning..." : generatedCode ? "🔍 Scan Generated Code" : "⚠️ Generate Code First"}
+                </button>
+
+                {deepScanResults.length > 0 && (
+                  <div className="bg-black/30 rounded-xl p-4 max-h-96 overflow-y-auto space-y-2">
+                    {deepScanResults.map((issue, i) => (
+                      <div
+                        key={i}
+                        className={`p-3 rounded-lg border ${
+                          issue.type === "error"
+                            ? "bg-red-500/20 border-red-500"
+                            : issue.type === "warning"
+                            ? "bg-yellow-500/20 border-yellow-500"
+                            : "bg-green-500/20 border-green-500"
+                        }`}
+                      >
+                        <p className={`text-sm ${
+                          issue.type === "error"
+                            ? "text-red-200"
+                            : issue.type === "warning"
+                            ? "text-yellow-200"
+                            : "text-green-200"
+                        }`}>
+                          {issue.type === "error" ? "❌" : issue.type === "warning" ? "⚠️" : "✅"} {issue.message}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {!isScanning && !generatedCode && (
+                  <div className="bg-gray-500/20 border border-gray-400 rounded-lg p-4 text-center text-gray-300">
+                    Go to Generate tab and create a script first!
                   </div>
                 )}
               </div>
