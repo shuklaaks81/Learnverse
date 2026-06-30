@@ -187,7 +187,7 @@ export default function BloxdScriptMaker() {
       const response = await fetch("/api/deep-scan-bloxd", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: generatedCode }),
+        body: JSON.stringify({ code: generatedCode, mode: scriptMode }),
       });
       
       const data = await response.json();

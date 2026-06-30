@@ -83,14 +83,18 @@ Be concise and technical.`;
 CODE BLOCK MODE: Generate COMPACT code for use in Bloxd code blocks.
 - Keep it SHORT (under 50 lines)
 - Focus on ONE specific action
+- NO CALLBACKS! Code blocks can't use tick(), onPlayerJoin, etc.
+- Code runs ONCE when triggered (button press, player touch, etc.)
 - No complex world setups
 - Use simple effects/sounds
 - Perfect for buttons, triggers, simple actions
-Example: A button that gives items, spawns one entity, plays sound, etc.
+Example: A button that gives items, spawns one entity, plays sound, teleports player.
+CRITICAL: DO NOT include tick, onPlayerJoin, onPlayerChat, or any callbacks!
 `
       : `
 WORLD CODE MODE: Generate FULL world scripts with complete setups.
 - Can be ANY length needed
+- CAN use callbacks: tick, onPlayerJoin, onPlayerChat, etc.
 - Full world initialization
 - Multiple features/systems
 - Complex player interactions

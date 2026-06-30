@@ -4,7 +4,7 @@ import path from "path";
 
 export async function POST(req: NextRequest) {
   try {
-    const { code } = await req.json();
+    const { code, mode = "world" } = await req.json();
 
     if (!code) {
       return NextResponse.json({ error: "Code is required" }, { status: 400 });
@@ -27,11 +27,24 @@ export async function POST(req: NextRequest) {
     if (code.includes("setTimeout") || code.includes("setInterval")) {
       issues.push({
         type: "error",
-        message: "setTimeout/setInterval are NOT allowed in Bloxd! Use tick() callback for timing."
+        message: "setTimeout/setInterval are NOT allowed in Bloxd! Use tick() callback for timing (in World Code mode only)."
       });
     }
 
-    // 2. Check for common callback mistakes
+    // 2. Check for callbacks in Code Block mode
+    if (mode === "codeblock") {
+      const callbacks = ["tick", "onPlayerJoin", "onPlayerChat", "onPlayerAttack", "onPlayerChangeBlock"];
+      callbacks.forEach(cb => {
+        if (code.includes(cb)) {
+          issues.push({
+            type: "error",
+            message: `"${cb}" callback can't be used in CODE BLOCK MODE! Code blocks run once when triggered, no callbacks allowed. Switch to World Code mode for callbacks.`
+          });
+        }
+      });
+    }
+
+    // 3. Check for common callback mistakes (World Code mode)
     const wrongCallbacks = ["world.tick", "world.onPlayerJoin", "world.onPlayerChat", "world.onPlayerAttack"];
     wrongCallbacks.forEach(wrong => {
       if (code.includes(wrong)) {
@@ -43,7 +56,7 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // 3. Check for undefined variables
+    // 4. Check for undefined variables
     const lines = code.split("\n");
     const definedVars = new Set<string>();
     const usedVars = new Set<string>();
