@@ -5,6 +5,7 @@ import Link from "next/link";
 
 export default function BloxdScriptMaker() {
   const [prompt, setPrompt] = useState("");
+  const [lastPrompt, setLastPrompt] = useState(""); // Save original prompt for auto-fix
   const [generatedCode, setGeneratedCode] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
@@ -23,7 +24,7 @@ export default function BloxdScriptMaker() {
   const [isSearching, setIsSearching] = useState(false);
   const [deepScanResults, setDeepScanResults] = useState<Array<{type: "error" | "warning" | "info"; message: string}>>([]);
   const [isScanning, setIsScanning] = useState(false);
-  const [activeTab, setActiveTab] = useState<"generate" | "search" | "scan">("generate");
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1); // Step-based flow
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -88,7 +89,13 @@ export default function BloxdScriptMaker() {
       
       setChatMessages(prev => [...prev, { role: "system", message: "✅ Script generated successfully!" }]);
       setConversationHistory(prev => prev + `\nUser: ${prompt}\nGenerated: Success\n`);
+      setLastPrompt(prompt); // Save for auto-fix
       setPrompt("");
+      
+      // Auto-advance to Step 2: Deep Scan & Auto-Fix Loop
+      setCurrentStep(2);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await autoDeepScan(data.code);
     } catch (err) {
       setError("Oops! Something went wrong. Try again!");
       console.error(err);
@@ -196,12 +203,107 @@ export default function BloxdScriptMaker() {
       if (data.issues.length === 0) {
         setDeepScanResults([{type: "info", message: "✅ No issues found! Code looks good!"}]);
       }
+      
+      // Move to Step 3 after scan
+      setCurrentStep(3);
     } catch (err) {
       console.error(err);
       setDeepScanResults([{type: "error", message: "Scan failed. Try again!"}]);
     } finally {
       setIsScanning(false);
     }
+  };
+
+  const autoDeepScan = async (code: string) => {
+    const MAX_ITERATIONS = 3;
+    let currentCode = code;
+    let iteration = 0;
+    
+    while (iteration < MAX_ITERATIONS) {
+      iteration++;
+      setDeepScanResults([]);
+      setIsScanning(true);
+      
+      setChatMessages(prev => [...prev, { 
+        role: "system", 
+        message: `🔬 Deep Scan + Simulation (Attempt ${iteration}/${MAX_ITERATIONS})...` 
+      }]);
+      
+      try {
+        const response = await fetch("/api/deep-scan-bloxd", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: currentCode, mode: scriptMode })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) throw new Error(data.error || "Scan failed");
+        
+        setDeepScanResults(data.issues || []);
+        
+        const errors = data.issues?.filter((i: any) => i.type === "error") || [];
+        const warnings = data.issues?.filter((i: any) => i.type === "warning") || [];
+        
+        if (errors.length === 0) {
+          // SUCCESS! No errors found
+          setChatMessages(prev => [...prev, { 
+            role: "system", 
+            message: `✅ Code is clean! (${warnings.length} warnings, ${iteration} ${iteration === 1 ? 'scan' : 'scans'})` 
+          }]);
+          setGeneratedCode(currentCode);
+          setIsScanning(false);
+          setCurrentStep(3);
+          return;
+        }
+        
+        // AUTO-FIX: Send errors back to AI
+        setChatMessages(prev => [...prev, { 
+          role: "system", 
+          message: `🔧 Found ${errors.length} errors. Auto-fixing...` 
+        }]);
+        
+        const errorPrompt = `FIX THESE ERRORS:\n${errors.map((e: any) => `- ${e.message}`).join('\n')}\n\nOriginal request: ${lastPrompt || 'Fix the code'}`;
+        
+        const fixResponse = await fetch("/api/generate-bloxd-script", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: errorPrompt,
+            mode: scriptMode,
+            conversationHistory: conversationHistory + `\nFix iteration ${iteration}\n`,
+            previousCode: currentCode
+          })
+        });
+        
+        const fixData = await fixResponse.json();
+        
+        if (!fixResponse.ok) throw new Error(fixData.error || "Fix generation failed");
+        
+        currentCode = fixData.code;
+        setGeneratedCode(currentCode);
+        
+        // Continue loop for next scan iteration
+        
+      } catch (error) {
+        console.error("Auto-fix error:", error);
+        setChatMessages(prev => [...prev, { 
+          role: "system", 
+          message: `❌ Auto-fix failed: ${error instanceof Error ? error.message : String(error)}` 
+        }]);
+        setIsScanning(false);
+        setCurrentStep(3);
+        return;
+      }
+    }
+    
+    // Max iterations reached
+    setChatMessages(prev => [...prev, { 
+      role: "system", 
+      message: `⚠️ Reached max iterations (${MAX_ITERATIONS}). Some errors may remain.` 
+    }]);
+    setIsScanning(false);
+    setCurrentStep(3);
   };
 
   return (
@@ -235,47 +337,51 @@ export default function BloxdScriptMaker() {
           <p className="text-gray-400 text-sm">Fan-made tool • Not affiliated with Bloxd.io</p>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex justify-center gap-4 mb-6">
-          <button
-            onClick={() => setActiveTab("generate")}
-            className={`px-6 py-3 rounded-xl font-bold transition ${
-              activeTab === "generate"
-                ? "bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg"
-                : "bg-white/10 text-gray-300 hover:bg-white/20"
-            }`}
-          >
-            🚀 Generate
-          </button>
-          <button
-            onClick={() => setActiveTab("search")}
-            className={`px-6 py-3 rounded-xl font-bold transition ${
-              activeTab === "search"
-                ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg"
-                : "bg-white/10 text-gray-300 hover:bg-white/20"
-            }`}
-          >
-            🔍 Search API
-          </button>
-          <button
-            onClick={() => setActiveTab("scan")}
-            className={`px-6 py-3 rounded-xl font-bold transition ${
-              activeTab === "scan"
-                ? "bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg"
-                : "bg-white/10 text-gray-300 hover:bg-white/20"
-            }`}
-          >
-            👀 Deep Scan
-          </button>
+        {/* Step Progress Bar */}
+        <div className="mb-8 bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+          <div className="flex items-center justify-between max-w-4xl mx-auto">
+            {[
+              { num: 1, label: "Generate", icon: "🚀" },
+              { num: 2, label: "Scanning", icon: "🔬" },
+              { num: 3, label: "Review", icon: "👀" },
+              { num: 4, label: "Done", icon: "✅" }
+            ].map((step, i) => (
+              <div key={step.num} className="flex items-center flex-1">
+                <div className="flex flex-col items-center flex-1">
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold transition-all ${
+                      currentStep >= step.num
+                        ? "bg-gradient-to-r from-green-500 to-blue-500 scale-110 shadow-lg"
+                        : "bg-gray-600"
+                    }`}
+                  >
+                    {step.icon}
+                  </div>
+                  <p className={`text-sm mt-2 font-bold ${currentStep >= step.num ? "text-white" : "text-gray-400"}`}>
+                    {step.label}
+                  </p>
+                </div>
+                {i < 3 && (
+                  <div
+                    className={`h-1 flex-1 mx-2 transition-all ${
+                      currentStep > step.num ? "bg-gradient-to-r from-green-500 to-blue-500" : "bg-gray-600"
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* Tab Navigation - REMOVED */}
 
         {/* 2-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: Main Content (2 columns) */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* GENERATE TAB */}
-            {activeTab === "generate" && (
+            {/* STEP 1: GENERATE */}
+            {currentStep >= 1 && (
               <>
             {/* Mode Toggle */}
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
@@ -368,73 +474,26 @@ export default function BloxdScriptMaker() {
               </>
             )}
             
-            {/* SEARCH TAB */}
-            {activeTab === "search" && (
+            {/* STEP 2 & 3: AUTO SCAN + REVIEW RESULTS */}
+            {currentStep >= 2 && (
               <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                <h2 className="text-2xl font-bold mb-4 text-center">🔍 Search Bloxd API Docs</h2>
-                <p className="text-gray-300 text-sm mb-4 text-center">
-                  Search for functions, blocks, items, callbacks, and more!
-                </p>
-                
-                <div className="flex gap-2 mb-4">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && searchAPIDocs()}
-                    placeholder="Example: setBlock, player, entity, tick..."
-                    className="flex-1 bg-black/30 border border-white/30 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400"
-                  />
-                  <button
-                    onClick={searchAPIDocs}
-                    disabled={isSearching || !searchQuery.trim()}
-                    className="bg-purple-500 hover:bg-purple-600 disabled:bg-gray-600 text-white font-bold px-6 rounded-lg transition"
-                  >
-                    {isSearching ? "🔍..." : "Search"}
-                  </button>
-                </div>
+                <h2 className="text-2xl font-bold mb-4 text-center">
+                  {isScanning ? "🔬 Scanning Code..." : "👀 Scan Results"}
+                </h2>
 
-                {searchResults.length > 0 && (
-                  <div className="bg-black/30 rounded-xl p-4 max-h-96 overflow-y-auto">
-                    <h3 className="font-bold mb-3 text-purple-300">Results:</h3>
-                    {searchResults.map((result, i) => (
-                      <div key={i} className="bg-white/5 rounded-lg p-3 mb-2 border border-purple-500/30">
-                        <pre className="text-sm text-gray-300 whitespace-pre-wrap font-mono">{result}</pre>
-                      </div>
-                    ))}
+                {isScanning && (
+                  <div className="text-center py-8">
+                    <div className="animate-spin text-6xl mb-4">🔬</div>
+                    <p className="text-gray-300">Checking for errors, undefined variables, fake APIs...</p>
                   </div>
                 )}
 
-                {!isSearching && searchQuery && searchResults.length === 0 && (
-                  <div className="bg-gray-500/20 border border-gray-400 rounded-lg p-4 text-center text-gray-300">
-                    Type something and hit Search!
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* DEEP SCAN TAB */}
-            {activeTab === "scan" && (
-              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                <h2 className="text-2xl font-bold mb-4 text-center">👀 Deep Code Scanner</h2>
-                <p className="text-gray-300 text-sm mb-4 text-center">
-                  Scans your generated code for errors, undefined variables, fake APIs, and more!
-                </p>
-
-                <button
-                  onClick={deepScanCode}
-                  disabled={isScanning || !generatedCode}
-                  className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold py-4 px-8 rounded-xl transition mb-4"
-                >
-                  {isScanning ? "🔬 Scanning..." : generatedCode ? "🔍 Scan Generated Code" : "⚠️ Generate Code First"}
-                </button>
-
-                {deepScanResults.length > 0 && (
-                  <div className="bg-black/30 rounded-xl p-4 max-h-96 overflow-y-auto space-y-2">
+                {!isScanning && deepScanResults.length > 0 && (
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
                     {deepScanResults.map((issue, i) => (
                       <div
                         key={i}
-                        className={`p-3 rounded-lg border ${
+                        className={`p-4 rounded-lg border ${
                           issue.type === "error"
                             ? "bg-red-500/20 border-red-500"
                             : issue.type === "warning"
@@ -456,14 +515,94 @@ export default function BloxdScriptMaker() {
                   </div>
                 )}
 
-                {!isScanning && !generatedCode && (
-                  <div className="bg-gray-500/20 border border-gray-400 rounded-lg p-4 text-center text-gray-300">
-                    Go to Generate tab and create a script first!
+                {!isScanning && currentStep === 3 && (
+                  <div className="mt-6 flex gap-4 justify-center">
+                    <button
+                      onClick={() => setCurrentStep(4)}
+                      className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-3 rounded-xl font-bold hover:scale-105 transition"
+                    >
+                      ✅ Looks Good! Finish
+                    </button>
+                    <button
+                      onClick={() => {
+                        setCurrentStep(1);
+                        setGeneratedCode("");
+                        setDeepScanResults([]);
+                      }}
+                      className="bg-orange-500 text-white px-8 py-3 rounded-xl font-bold hover:scale-105 transition"
+                    >
+                      🔄 Regenerate Script
+                    </button>
                   </div>
                 )}
               </div>
             )}
+
+            {/* STEP 4: DONE + SEARCH HELPER */}
+            {currentStep === 4 && (
+              <>
+                <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-8 border-4 border-white/50 text-center">
+                  <div className="text-6xl mb-4">🎉</div>
+                  <h2 className="text-3xl font-bold mb-2">Script Ready!</h2>
+                  <p className="text-lg mb-6">Your code is validated and ready to use in Bloxd!</p>
+                  <div className="flex gap-4 justify-center">
+                    <button
+                      onClick={copyCode}
+                      className="bg-white text-green-600 px-8 py-3 rounded-xl font-bold hover:scale-105 transition"
+                    >
+                      📋 Copy Code
+                    </button>
+                    <button
+                      onClick={() => {
+                        setCurrentStep(1);
+                        setGeneratedCode("");
+                        setDeepScanResults([]);
+                      }}
+                      className="bg-yellow-400 text-black px-8 py-3 rounded-xl font-bold hover:scale-105 transition"
+                    >
+                      🚀 Create Another
+                    </button>
+                  </div>
+                </div>
+
+                {/* Search Helper */}
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+                  <h3 className="text-xl font-bold mb-4 text-center">🔍 Need Help? Search API Docs</h3>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyPress={(e) => e.key === "Enter" && searchAPIDocs()}
+                      placeholder="Search: setBlock, player, entity, tick..."
+                      className="flex-1 bg-black/30 border border-white/30 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400"
+                    />
+                    <button
+                      onClick={searchAPIDocs}
+                      disabled={isSearching || !searchQuery.trim()}
+                      className="bg-purple-500 hover:bg-purple-600 disabled:bg-gray-600 text-white font-bold px-6 rounded-lg transition"
+                    >
+                      {isSearching ? "..." : "Search"}
+                    </button>
+                  </div>
+
+                  {searchResults.length > 0 && (
+                    <div className="mt-4 bg-black/30 rounded-xl p-4 max-h-64 overflow-y-auto">
+                      {searchResults.map((result, i) => (
+                        <div key={i} className="bg-white/5 rounded-lg p-3 mb-2 border border-purple-500/30">
+                          <pre className="text-xs text-gray-300 whitespace-pre-wrap font-mono">{result}</pre>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
           </div>
+
+          {/* SEARCH TAB - REMOVED, now in Step 4 */}
+            
+          {/* DEEP SCAN TAB - REMOVED, now automatic in Step 2/3 */}
 
           {/* Right: Chat Sidebar */}
           <div className="lg:col-span-1">
