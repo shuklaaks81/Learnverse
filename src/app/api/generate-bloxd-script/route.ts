@@ -305,8 +305,10 @@ ${apiReference.slice(0, 8000)}`;
     });
   } catch (error) {
     console.error("Error generating script:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Full error details:", errorMessage);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: `Generation failed: ${errorMessage}` },
       { status: 500 }
     );
   }
