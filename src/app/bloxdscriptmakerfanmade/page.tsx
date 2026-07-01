@@ -245,11 +245,11 @@ export default function BloxdScriptMaker() {
         const errors = data.issues?.filter((i: any) => i.type === "error") || [];
         const warnings = data.issues?.filter((i: any) => i.type === "warning") || [];
         
-        if (errors.length === 0) {
-          // SUCCESS! No errors found
+        if (errors.length === 0 && warnings.length === 0) {
+          // PERFECT! No errors or warnings
           setChatMessages(prev => [...prev, { 
             role: "system", 
-            message: `✅ Code is clean! (${warnings.length} warnings, ${iteration} ${iteration === 1 ? 'scan' : 'scans'})` 
+            message: `✅ Code is perfect! No errors or warnings! (${iteration} ${iteration === 1 ? 'scan' : 'scans'})` 
           }]);
           setGeneratedCode(currentCode);
           setIsScanning(false);
@@ -257,13 +257,18 @@ export default function BloxdScriptMaker() {
           return;
         }
         
-        // AUTO-FIX: Send errors back to AI
+        // AUTO-FIX: Send all issues (errors + warnings) back to AI
+        const allIssues = [...errors, ...warnings];
+        const issueTypes = errors.length > 0 
+          ? `${errors.length} error${errors.length > 1 ? 's' : ''} + ${warnings.length} warning${warnings.length > 1 ? 's' : ''}`
+          : `${warnings.length} warning${warnings.length > 1 ? 's' : ''}`;
+          
         setChatMessages(prev => [...prev, { 
           role: "system", 
-          message: `🔧 Found ${errors.length} errors. Auto-fixing...` 
+          message: `🔧 Found ${issueTypes}. Auto-fixing...` 
         }]);
         
-        const errorPrompt = `FIX THESE ERRORS:\n${errors.map((e: any) => `- ${e.message}`).join('\n')}\n\nOriginal request: ${lastPrompt || 'Fix the code'}`;
+        const errorPrompt = `FIX THESE ISSUES:\n${allIssues.map((e: any) => `- ${e.message}`).join('\n')}\n\nOriginal request: ${lastPrompt || 'Fix the code'}`;
         
         const fixResponse = await fetch("/api/generate-bloxd-script", {
           method: "POST",
